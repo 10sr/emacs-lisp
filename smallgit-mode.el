@@ -25,11 +25,14 @@
 ;;   ""
 ;;   (start-process "git" nil nil nil "update-index" "-add" file))
 
-(defun smallgit-commit-all ()
-  ""
-  (interactive)
-  (smallgit-add-all)
-  (log-edit ((call-process "git" nil nil nil "commit"))
+;; (defun smallgit-commit-all ()
+;;   ""
+;;   (interactive)
+;;   (smallgit-add-all)
+;;   (log-edit (lambda ()
+;;               (call-process "git" nil nil nil "commit" "-m" comment))
+
+
 
 
 
