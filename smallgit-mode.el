@@ -1,7 +1,4 @@
-;; (defun smallgit-mode ()
-;;   ""
-;;   (interactive)
-;;   (use-local-map smallgit-mode-map))
+(setq vc-handled-backends (delq 'Git vc-handled-backends))
 
 (require 'easy-mmode)
 
@@ -15,9 +12,9 @@
  "small minor mode to handle git"
  nil
  " SGit"
- '(("\C-xvv" . smallgit-commit-all)
-   ("\C-xvi" . smallgit-add)))
-
+ '(("\C-xvv" . smallgit-add-current-file)
+   ("\C-xvi" . smallgit-init)
+   ("\C-xvu" . smallgit-commit-update)))
 
 (defvar smallgit-mode-hook nil)
 
@@ -26,11 +23,10 @@
 ;;     (define-key map (kbd "C-x v v") 'smallgit-add)
 ;;     (define-key map (kbd "C-x v i") 'smallgit-add)))
 
-
 (defun load-smallgit-mode ()
   ""
   (interactive)
-  (when (file-directory-p "./.git")
+  (when (smallgit-repo-p)
     (smallgit-mode 1)))
 
 (defvar smallgit-log-buffer "*smallgit-log*")
@@ -41,35 +37,59 @@
 ;;                          (apply 'concat ARGS))
 ;;                  smallgit-log-buffer))
 
+(defun smallgit-repo-p ()
+  ""
+  (file-directory-p (concat default-directory ".git")))
+
 (defun smallgit-init ()
   ""
   (interactive)
-  (shell-command "git init" smallgit-log-buffer)
-  (load-smallgit-mode))
+  (unless (smallgit-repo-p)
+    (shell-command "git init" smallgit-log-buffer)
+    (load-smallgit-mode)))
 
-(defun smallgit-add (&optional file)
+(defun smallgit-add (&optional file switches)
   ""
   (interactive)
+  (smallgit-init)
   (shell-command (concat "git add "
+                         (or switches "")
+                         " "
                          (or file
-                             (buffer-file-name)))
+                             "")))
                  smallgit-log-buffer)
   (message "smallgit: added"))
+
+(defun smallgit-add-current-file ()
+  (interactive)
+  (smallgit-add buffer-file-name nil))
 
 (defun smallgit-add-all ()
   ""
   (interactive)
-  (shell-command "git add -A" smallgit-log-buffer)
-  (message "smallgit: added all"))
+  (smallgit-init)
+  (smallgit-add nil "-A")
+  ;; (shell-command "git add -A" smallgit-log-buffer)
+  (message "smallgit: added all in dir"))
+
+(defun smallgit-add-update ()
+  ""
+  (interactive)
+  (smallgit-init)
+  (smallgit-add nil "-u")
+  ;; (shell-command "git add -u" smallgit-log-buffer)
+  (message "smallgit: added all updated files"))
 
 (require 'log-edit)
 
 (defvar smallgit--wc nil)
 
-(defun smallgit-commit-all ()
+(defun smallgit-commit (&optional all-update-p)
   ""
   (interactive)
-  (smallgit-add-all)
+  (if (eq 'u all-update-p)
+      (smallgit-add-update)
+    (if all-update-p (smallgit-add-all)))
   (setq smallgit--wc (current-window-configuration))
   (log-edit (lambda ()
               (interactive)
@@ -82,10 +102,47 @@
             nil
             (get-buffer-create "*smallgit commit*")))
 
+(defun smallgit-commit-all ()
+  ""
+  (interactive)
+  (smallgit-commit t))
+
+(defun smallgit-commit-update ()
+  ""
+  (interactive)
+  (smallgit-commit 'u))
+
+
+(defvar smallgit--last-commit-massage nil)
+(defvar smallgit--commit-amend nil)
+
+(defun smallgit-commit-amend ()
+  ""
+  (interactive)
+  (setq smallgit--commit-amend t)
+  (smallgit-commit))
+
+(add-hook 'log-edit-hook
+          (lambda ()
+            (when smallgit--commit-amend
+              (insert smallgit--last-commit-massage))))
 
 (defun smallgit--commit (message)
-  "call from `smallgit-commit-all'"
-  (shell-command (concat "git commit -m \"" message "\"")) smallgit-log-buffer)
+  "call from `smallgit-commit'"
+  (shell-command (concat
+                  "git commit "
+                  (if smallgit--commit-amend "--amend " "")
+                  "-m \""
+                  message
+                  "\"")
+                 smallgit-log-buffer)
+  (setq smallgit--last-commit-massage message)
+  (setq smallgit--commit-amend nil))
+
+(defun smallgit-log ()
+  ""
+  (interactive)
+  (shell-command "git log" smallgit-log-buffer))
 
 (defun smallgit-status ()
   ""
@@ -95,7 +152,47 @@
 (defun smallgit-push ()
   ""
   (interactive)
-  (shell-command "git push"))
+  (shell-command "git push" smallgit-log-buffer))
+
+(defun smallgit-remote-add (url name)
+  ""
+  (interactive "sUrl to add: \nShortname: ")
+  (shell-command (concat "git remote add " name " " url) smallgit-log-buffer))
+
+(defun smallgit-tag (name comment)
+  ""
+  (interactive "sTag name: \nsComment for tag: ")
+  (shell-command (concat "git tag -a " name " -m \"" comment "\""))
+
+(defun smallgit-clone (url)
+  ""
+  (interactive "sUrl to clone: ")
+  (shell-command (concat "git clone " url)))
+
+(defun smallgit-checkout-new-branch (name)
+  ""
+  (interactive "sNew branch name: ")
+  (smallgit-checkout name "-b"))
+
+(defun smallgit-checkout (name &optional switches)
+  ""
+  (interactive "sBranch name:")
+  (shell-command (concat "git checkout " (or switches "") " " name)))
+
+(defun smallgit-merge (name)
+  ""
+  (interactive"sBranch name to merge: ")
+  (shell-command (concat "git merge " name)))
+
+(defun smallgit-branch (name &optional switches)
+  ""
+  (interactive "sBranch name: ")
+  (shell-command (concat "git branch " (or switches "") " " name)))
+
+(defun smallgit-delete-branch (name)
+  ""
+  (interactive "sBranch name to delete: ")
+  (smallgit-branch name "-d"))
 
 (provide 'smallgit-mode)
 
