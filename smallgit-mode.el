@@ -15,7 +15,7 @@
  "small minor mode to handle git"
  nil
  " SGit"
- '(("\C-xvv" . smallgit-add)
+ '(("\C-xvv" . smallgit-commit-all)
    ("\C-xvi" . smallgit-add)))
 
 
@@ -82,11 +82,12 @@
   "call from `smallgit-commit-all'"
   (shell-command (concat "git commit -m \"" message "\"")))
 
-(provide 'smallgit-mode)
+(defun smallgit-push ()
+  ""
+  (interactive)
+  (shell-command "git push"))
 
-;; for test
-(add-hook 'find-file-hook
-          'load-smallgit-mode)
+(provide 'smallgit-mode)
 
 ;; (defun smallgit-update-index-add (&optional file)
 ;;   ""
