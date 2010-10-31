@@ -77,6 +77,7 @@
             nil
             (get-buffer-create "*smallgit commit*")))
 
+
 (defun smallgit--commit (message)
   "call from `smallgit-commit-all'"
   (shell-command (concat "git commit -m \"" message "\"")))
