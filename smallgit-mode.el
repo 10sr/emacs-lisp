@@ -97,10 +97,12 @@
                                   (set-buffer "*smallgit commit*")
                                   (buffer-substring-no-properties (point-max)
                                                                   (point-min))))
-              (set-window-configuration smallgit--wc))
+              (set-window-configuration smallgit--wc)
+              (kill-buffer "*smallgit commit*"))
             t
             nil
             (get-buffer-create "*smallgit commit*")))
+
 
 (defun smallgit-commit-all ()
   ""
