@@ -39,7 +39,7 @@
 
 (defun smallgit-repo-p ()
   ""
-  (file-directory-p (concat default-directory ".git")))
+  (eq 0 (call-process "git" nil nil nil "status")))
 
 (defun smallgit-init ()
   ""
@@ -85,7 +85,7 @@
 
 (defvar smallgit--wc nil)
 
-(defun smallgit-commit (&optional message)
+(defun smallgit-commit ()
   ""
   ;; (interactive "sCommit massage: ")
   ;; (smallgit--commit message))
@@ -142,7 +142,7 @@
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
 
-(defun smallgit-log ()
+(defun smallgit-log (&optional switches)
   ""
   (interactive)
   (shell-command "git log" smallgit-log-buffer))
@@ -151,6 +151,11 @@
   ""
   (interactive)
   (shell-command "git status" smallgit-log-buffer))
+
+(defun smallgit-diff ()
+  ""
+  (interactive)
+  (shell-command "git diff" smallgit-log-buffer))
 
 (defun smallgit-push ()
   ""
