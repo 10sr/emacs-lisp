@@ -113,7 +113,7 @@
   ""
   (interactive)
   (smallgit-add-update)
-  (smallgit-commit nil))
+  (call-interactively 'smallgit-commit))
 
 
 (defvar smallgit--last-commit-massage nil)
