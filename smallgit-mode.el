@@ -19,7 +19,7 @@
 (defun smallgit-add-all ()
   ""
   (interactive)
-  (call-process "git" nil nil nil "add" "-a"))
+  (call-process "git" nil nil nil "add" "-A"))
 
 ;; (defun smallgit-update-index-add (&optional file)
 ;;   ""
