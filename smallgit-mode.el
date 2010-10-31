@@ -44,7 +44,8 @@
 (defun smallgit-init ()
   ""
   (interactive)
-  (shell-command "git init" smallgit-log-buffer))
+  (shell-command "git init" smallgit-log-buffer)
+  (load-smallgit-mode))
 
 (defun smallgit-add (&optional file)
   ""
@@ -80,7 +81,12 @@
 
 (defun smallgit--commit (message)
   "call from `smallgit-commit-all'"
-  (shell-command (concat "git commit -m \"" message "\"")))
+  (shell-command (concat "git commit -m \"" message "\"")) smallgit-log-buffer)
+
+(defun smallgit-status ()
+  ""
+  (interactive)
+  (shell-command "git status" smallgit-log-buffer))
 
 (defun smallgit-push ()
   ""
