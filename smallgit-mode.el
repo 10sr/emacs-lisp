@@ -87,21 +87,20 @@
 
 (defun smallgit-commit (&optional message)
   ""
-  (interactive "sCommit massage: ")
-  (smallgit--commit message))
-  ;; (interactive)
-  ;; (setq smallgit--wc (current-window-configuration))
-  ;; (log-edit (lambda ()
-  ;;             (interactive)
-  ;;             (smallgit--commit (save-excursion
-  ;;                                 (set-buffer "*smallgit commit*")
-  ;;                                 (buffer-substring-no-properties (point-max)
-  ;;                                                                 (point-min))))
-  ;;             (set-window-configuration smallgit--wc))
-  ;;           t
-  ;;           nil
-  ;;           (get-buffer-create "*smallgit commit*")))
-
+  ;; (interactive "sCommit massage: ")
+  ;; (smallgit--commit message))
+  (interactive)
+  (setq smallgit--wc (current-window-configuration))
+  (log-edit (lambda ()
+              (interactive)
+              (smallgit--commit (save-excursion
+                                  (set-buffer "*smallgit commit*")
+                                  (buffer-substring-no-properties (point-max)
+                                                                  (point-min))))
+              (set-window-configuration smallgit--wc))
+            t
+            nil
+            (get-buffer-create "*smallgit commit*")))
 
 (defun smallgit-commit-all ()
   ""
@@ -132,12 +131,11 @@
 
 (defun smallgit--commit (message)
   "call from `smallgit-commit'"
-  (shell-command (concat
-                  "git commit "
-                  (if smallgit--commit-amend "--amend " "")
-                  "-m \""
-                  message
-                  "\"")
+  (shell-command (concat "git commit "
+                         (if smallgit--commit-amend "--amend " "")
+                         "-m \""
+                         message
+                         "\"")
                  smallgit-log-buffer)
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
