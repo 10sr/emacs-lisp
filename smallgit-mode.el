@@ -56,9 +56,10 @@
                          (or switches "")
                          " "
                          (or file
-                             "")))
+                             ""))
                  smallgit-log-buffer)
   (message "smallgit: added"))
+
 
 (defun smallgit-add-current-file ()
   (interactive)
@@ -84,13 +85,11 @@
 
 (defvar smallgit--wc nil)
 
-(defun smallgit-commit (&optional message all-update-p)
+(defun smallgit-commit (&optional message)
   ""
   (interactive "sCommit massage: ")
-  (if (eq 'u all-update-p)
-      (smallgit-add-update)
-    (if all-update-p (smallgit-add-all)))
   (smallgit--commit message))
+  ;; (interactive)
   ;; (setq smallgit--wc (current-window-configuration))
   ;; (log-edit (lambda ()
   ;;             (interactive)
@@ -103,15 +102,18 @@
   ;;           nil
   ;;           (get-buffer-create "*smallgit commit*")))
 
+
 (defun smallgit-commit-all ()
   ""
   (interactive)
-  (smallgit-commit t))
+  (smallgit-add-all)
+  (smallgit-commit nil))
 
 (defun smallgit-commit-update ()
   ""
   (interactive)
-  (smallgit-commit 'u))
+  (smallgit-add-update)
+  (smallgit-commit nil))
 
 
 (defvar smallgit--last-commit-massage nil)
@@ -163,7 +165,7 @@
 (defun smallgit-tag (name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (shell-command (concat "git tag -a " name " -m \"" comment "\""))
+  (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
 
 (defun smallgit-clone (url)
   ""
