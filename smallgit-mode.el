@@ -64,16 +64,20 @@
 
 (require 'log-edit)
 
+(defvar smallgit--wc nil)
+
 (defun smallgit-commit-all ()
   ""
   (interactive)
   (smallgit-add-all)
+  (setq smallgit--wc (current-window-configuration))
   (log-edit (lambda ()
               (interactive)
               (smallgit--commit (save-excursion
                                   (set-buffer "*smallgit commit*")
                                   (buffer-substring-no-properties (point-max)
-                                                                  (point-min)))))
+                                                                  (point-min))))
+              (set-window-configuration smallgit--wc))
             t
             nil
             (get-buffer-create "*smallgit commit*")))
