@@ -84,23 +84,24 @@
 
 (defvar smallgit--wc nil)
 
-(defun smallgit-commit (&optional all-update-p)
+(defun smallgit-commit (&optional message all-update-p)
   ""
-  (interactive)
+  (interactive "sCommit massage: ")
   (if (eq 'u all-update-p)
       (smallgit-add-update)
     (if all-update-p (smallgit-add-all)))
-  (setq smallgit--wc (current-window-configuration))
-  (log-edit (lambda ()
-              (interactive)
-              (smallgit--commit (save-excursion
-                                  (set-buffer "*smallgit commit*")
-                                  (buffer-substring-no-properties (point-max)
-                                                                  (point-min))))
-              (set-window-configuration smallgit--wc))
-            t
-            nil
-            (get-buffer-create "*smallgit commit*")))
+  (smallgit--commit message))
+  ;; (setq smallgit--wc (current-window-configuration))
+  ;; (log-edit (lambda ()
+  ;;             (interactive)
+  ;;             (smallgit--commit (save-excursion
+  ;;                                 (set-buffer "*smallgit commit*")
+  ;;                                 (buffer-substring-no-properties (point-max)
+  ;;                                                                 (point-min))))
+  ;;             (set-window-configuration smallgit--wc))
+  ;;           t
+  ;;           nil
+  ;;           (get-buffer-create "*smallgit commit*")))
 
 (defun smallgit-commit-all ()
   ""
