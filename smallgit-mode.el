@@ -11,10 +11,12 @@
  smallgit-mode
  "small minor mode to handle git"
  nil
- " SGit"
+ nil ;; " SGit"
  '(("\C-xvv" . smallgit-add-current-file)
    ("\C-xvi" . smallgit-init)
-   ("\C-xvu" . smallgit-commit-update)))
+   ("\C-xvu" . smallgit-commit-update))
+ (smallgit--replace-mode-line-vc-mode)
+ (smallgit--get-branch-name))
 
 (defvar smallgit-mode-hook nil)
 
@@ -29,13 +31,37 @@
   (when (smallgit-repo-p)
     (smallgit-mode 1)))
 
+(defun smallgit--replace-mode-line-vc-mode ()
+  ""
+  
+  (let ((ls (member '(vc-mode vc-mode)
+                    mode-line-format)))
+    (and ls (setcar ls 'smallgit-mode-line))))
+
+(defvar smallgit-branch-name nil)
+(make-variable-buffer-local 'smallgit-branch-name)
+
+(defun smallgit--get-current-branch ()
+  ""
+  (interactive)
+  (setq smallgit-branch-name (with-temp-buffer
+                               (shell-command "git branch" t)
+                               (goto-char (point-min))
+                               (search-forward "*")
+                               (forward-char 1)
+                               (buffer-substring-no-properties (point)
+                                                               (point-at-eol)))))
+
+(defvar smallgit-mode-line (list "SGit:" 'smallgit-branch-name))
+
 (defvar smallgit-log-buffer "*smallgit-log*")
 
-;; (defun smallgit--call-git (&rest ARGS)
-;;   "not needed?"
-;;   (shell-command (concat "git"
-;;                          (apply 'concat ARGS))
-;;                  smallgit-log-buffer))
+(defun smallgit-git (&rest ARGS)
+  "not needed?"
+  (interactive "sgit command options: ")
+  (shell-command (concat "git "
+                         (mapconcat 'identity (delq nil ARGS) " "))
+                 smallgit-log-buffer))
 
 (defun smallgit-repo-p ()
   ""
@@ -45,7 +71,7 @@
   ""
   (interactive)
   (unless (smallgit-repo-p)
-    (shell-command "git init" smallgit-log-buffer)
+    (smallgit-git "init") ;; (shell-command "git init" smallgit-log-buffer)
     (load-smallgit-mode)))
 
 (defun smallgit-add (&optional file switches)
@@ -145,22 +171,23 @@
 (defun smallgit-log (&optional switches)
   ""
   (interactive)
-  (shell-command "git log" smallgit-log-buffer))
+  (smallgit-git "log")) ;; (shell-command "git log" smallgit-log-buffer))
+
 
 (defun smallgit-status ()
   ""
   (interactive)
-  (shell-command "git status" smallgit-log-buffer))
+  (smallgit-git "status")) ;; (shell-command "git status" smallgit-log-buffer))
 
 (defun smallgit-diff ()
   ""
   (interactive)
-  (shell-command "git diff" smallgit-log-buffer))
+  (smallgit-git "diff")) ;; (shell-command "git diff" smallgit-log-buffer))
 
 (defun smallgit-push ()
   ""
   (interactive)
-  (shell-command "git push" smallgit-log-buffer))
+  (smallgit-git "push")) ;; (shell-command "git push" smallgit-log-buffer))
 
 (defun smallgit-remote-add (url name)
   ""
@@ -203,19 +230,5 @@
   (smallgit-branch name "-d"))
 
 (provide 'smallgit-mode)
-
-;; (defun smallgit-update-index-add (&optional file)
-;;   ""
-;;   (start-process "git" nil nil nil "update-index" "-add" file))
-
-;; (defun smallgit-commit-all ()
-;;   ""
-;;   (interactive)
-;;   (smallgit-add-all)
-;;   (log-edit (lambda ()
-;;               (call-process "git" nil nil nil "commit" "-m" comment))
-
-
-
 
 
