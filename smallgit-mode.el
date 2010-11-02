@@ -20,10 +20,11 @@
  "small minor mode to handle git"
  nil
  nil ;; " SGit"
- '(("\C-xvv" . smallgit-add-current-file)
-   ("\C-xvi" . smallgit-init)
+ '(("\C-xvv" . smallgit-commit)
+   ("\C-xvi" . smallgit-add-current-file)
    ("\C-xvu" . smallgit-commit-update)
-   ("\C-xvg" . smallgit-git))
+   ("\C-xvg" . smallgit-git)
+   ("\C-xvb" . smallgit-checkout))
  (smallgit--display-mode-line)
  (smallgit--get-branch-name)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
@@ -45,10 +46,10 @@
     (setq smallgit-branch-name (with-temp-buffer
                                  (shell-command "git branch" t)
                                  (goto-char (point-min))
-                                 (search-forward "*")
-                                 (forward-char 1)
-                                 (buffer-substring-no-properties (point)
-                                                                 (point-at-eol))))))
+                                 (when (search-forward "*" nil t)
+                                   (forward-char 1)
+                                   (buffer-substring-no-properties (point)
+                                                                   (point-at-eol)))))))
 
 (add-hook 'window-configuration-change-hook
           'smallgit--get-branch-name)
