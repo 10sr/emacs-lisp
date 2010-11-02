@@ -40,7 +40,6 @@
 
 (defun smallgit--get-branch-name ()
   "git current branch name and set to `smallgit-branch-name'"
-  (interactive)
   (when (smallgit-repo-p)
     (setq smallgit-branch-name (with-temp-buffer
                                  (shell-command "git branch" t)
