@@ -24,7 +24,8 @@
    ("\C-xvi" . smallgit-add-current-file)
    ("\C-xvu" . smallgit-commit-update)
    ("\C-xvg" . smallgit-git)
-   ("\C-xvb" . smallgit-checkout))
+   ("\C-xvb" . smallgit-checkout)
+   ("\C-xv=" . smallgit-diff))
  (smallgit--display-mode-line)
  (smallgit--get-branch-name)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
@@ -51,6 +52,11 @@
                                    (buffer-substring-no-properties (point)
                                                                    (point-at-eol)))))))
 
+(defun smallgit-when-switch-branch ()
+  (smallgit--get-branch-name)
+  (revert-buffer)
+  (run-hook 'smallgit-switch-branch-hook))
+
 (add-hook 'window-configuration-change-hook
           'smallgit--get-branch-name)
 
@@ -72,7 +78,7 @@
   ;;                        message
   ;;                        "\"")
   ;;                smallgit-log-buffer)
-  (smallgit-git "commit -m" (concat "\"" (shell-quote-argument message) "\""))
+  (smallgit-git "commit -m" (shell-quote-argument message))
   (smallgit--get-branch-name)
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
@@ -209,7 +215,7 @@
 (defun smallgit-tag (name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (smallgit-git "tag" "-a" name "-m" comment)) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
+  (smallgit-git "tag" "-a" name "-m" (shell-quote-argument comment))) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
 
 (defun smallgit-clone (url)
   ""
