@@ -248,7 +248,7 @@
 
 (defun smallgit-checkout (name &optional switches)
   ""
-  (interactive "sBranch name:")
+  (interactive "sBranch name to checkout:")
   (smallgit-git "checkout" switches name) ;; (shell-command (concat "git checkout " (or switches "") " " name))
   (smallgit--get-branch-name))
 
@@ -258,8 +258,6 @@ that is, first checkout the branch to leave, then merge."
   (interactive"sBranch name to merge: ")
   (smallgit-git "merge" switches name) ;; (shell-command (concat "git merge " name))
   (smallgit--get-branch-name))
-
-
 
 (defun smallgit-branch (name &optional switches)
   "create new branch or do another command with switches"
