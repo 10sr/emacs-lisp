@@ -25,7 +25,8 @@
    ("\C-xvu" . smallgit-commit-update)
    ("\C-xvg" . smallgit-git)
    ("\C-xvb" . smallgit-checkout)
-   ("\C-xv=" . smallgit-diff))
+   ("\C-xv=" . smallgit-diff)
+   ("\C-xvu" . smallgit-reset-hard))
  (smallgit--display-mode-line)
  (smallgit--get-branch-name)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
@@ -96,12 +97,12 @@
     (smallgit-mode 1)
     (smallgit--get-branch-name)))
 
-(defun smallgit-git (&rest ARGS)
+(defun smallgit-git (&rest args)
   "execute git with ARGS. ignore `nil' arg."
   (interactive "sgit command options: ")
   (shell-command (concat "git "
-                         (mapconcat 'identity (delq nil ARGS) " "))
-                 smallgit-log-buffer))
+                         (mapconcat 'identity (delq nil args) " "))
+                 (get-buffer-create smallgit-log-buffer)))
 
 (defun smallgit-init ()
   ""
@@ -207,6 +208,10 @@
   (interactive)
   (smallgit-git "push")) ;; (shell-command "git push" smallgit-log-buffer))
 
+(defun smallgit-pull ()
+  ""
+  (smallgit-git "pull"))
+
 (defun smallgit-remote-add (url name)
   ""
   (interactive "sUrl to add: \nShortname: ")
@@ -220,8 +225,7 @@
 (defun smallgit-clone (url)
   ""
   (interactive "sUrl to clone: ")
-  (smallgit-git "clone" url) ;; (shell-command (concat "git clone " url)))
-  (smallgit-load))
+  (smallgit-git "clone" url)) ;; (shell-command (concat "git clone " url)))
 
 (defun smallgit-checkout-new-branch (name)
   ""
@@ -241,6 +245,8 @@ that is, first checkout the branch to leave, then merge."
   (smallgit-git "merge" switches name) ;; (shell-command (concat "git merge " name))
   (smallgit--get-branch-name))
 
+
+
 (defun smallgit-branch (name &optional switches)
   "create new branch or do another command with switches"
   (interactive "sBranch name: ")
@@ -252,6 +258,11 @@ that is, first checkout the branch to leave, then merge."
   (interactive "sBranch name to delete: ")
   (smallgit-branch name "-d")
   (smallgit--get-branch-name))
+
+(defun smallgit-reset-hard ()
+  "resert all tracked files to last commit state."
+  (interactive)
+  (smallgit-git "reset" "--hard" "HEAD"))
 
 (provide 'smallgit-mode)
 
