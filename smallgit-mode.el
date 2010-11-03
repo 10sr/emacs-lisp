@@ -28,7 +28,8 @@
    ("\C-xvg" . smallgit-git)
    ("\C-xvb" . smallgit-checkout)
    ("\C-xv=" . smallgit-diff)
-   ("\C-xvu" . smallgit-reset-hard))
+   ("\C-xvu" . smallgit-reset-hard)
+   ("\C-xvn" . smallgit-checkout-new-branch))
  (smallgit--display-mode-line)
  (smallgit--get-branch-name)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
@@ -52,19 +53,21 @@
       (with-temp-buffer
         (shell-command "git branch" t)
         (goto-char (point-min))
-        (when (search-forward "^*" nil t)
+        (when (search-forward "*" nil t)
           (forward-char 1)
           (setq a (buffer-substring-no-properties (point)
                                                   (point-at-eol)))
           (goto-char (point-min))
-          (while (re-search-forward "^.." nil t)
-            (replace-match "")
-            (setq b (split-string (buffer-substring-no-properties (point-min)
-                                                                  (point-max))
-                                  "\n")))
-          )
+          (while (re-search-forward "^. " nil t)
+            (replace-match ""))
+          (setq b (delete ""
+                          (split-string (buffer-substring-no-properties (point-min)
+                                                                        (point-max))
+                                        "\n")))))
       (setq smallgit-branch-name a)
-      (setq smallgit-branch-list b)))))
+      (setq smallgit-branch-list b))))
+
+(split-string "aeaaebebebedeevfde" "e")
 
 (defun smallgit-when-switch-branch ()
   (smallgit--get-branch-name)
@@ -100,6 +103,11 @@
 (defun smallgit-repo-p ()
   "t if current dir is git repository, otherwise nil."
   (eq 0 (call-process "git" nil nil nil "status")))
+
+(defun smallgit-complete-branch-name (prompt)
+  ""
+  (completing-read prompt
+                   smallgit-branch-list))
 
 ;; 外部用
 
@@ -261,7 +269,7 @@
 
 (defun smallgit-checkout (name &optional switches)
   ""
-  (interactive "sBranch name to checkout:")
+  (interactive (list (smallgit-complete-branch-name "sBranch name to checkout: ")))
   (smallgit-git "checkout" switches name) ;; (shell-command (concat "git checkout " (or switches "") " " name))
   (smallgit--get-branch-name))
 
