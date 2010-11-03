@@ -22,22 +22,26 @@
  "small minor mode to handle git"
  nil
  nil ;; " SGit"
- '(("\C-xvv" . smallgit-commit)
-   ("\C-xvi" . smallgit-add-current-file)
-   ("\C-xvu" . smallgit-commit-update)
-   ("\C-xvg" . smallgit-git)
-   ("\C-xvb" . smallgit-checkout)
-   ("\C-xv=" . smallgit-diff)
-   ("\C-xvu" . smallgit-reset-hard)
-   ("\C-xvn" . smallgit-checkout-new-branch))
+ ;; '(("\C-xvv" . smallgit-commit)
+ ;;   ("\C-xvi" . smallgit-add-current-file)
+ ;;   ("\C-xvu" . smallgit-commit-update)
+ ;;   ("\C-xvg" . smallgit-git)
+ ;;   ("\C-xvb" . smallgit-checkout)
+ ;;   ("\C-xv=" . smallgit-diff)
+ ;;   ("\C-xvu" . smallgit-reset-hard)
+ ;;   ("\C-xvn" . smallgit-checkout-new-branch))
+ nil
+ (use-local-keymap smallgit-mode-map)
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
 
-;; (defvar smallgit-mode-map
-;;   (let ((map (make-keymap)))
-;;     (define-key map (kbd "C-x v v") 'smallgit-add)
-;;     (define-key map (kbd "C-x v i") 'smallgit-add)))
+(defvar smallgit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-x v v") 'smallgit-add)
+    (define-key map (kbd "C-x v i") 'smallgit-add)
+    
+    map))
 
 ;; non-interactive functions
 
@@ -308,7 +312,8 @@ that is, first checkout the branch to leave, then merge."
     (let ((b smallgit-branch-name))
       (smallgit-checkout "master")
       (smallgit-merge b)
-      (smallgit-checkout b))))
+      (smallgit-checkout b)))
+  (message "merge to master branch"))
 
 (provide 'smallgit-mode)
 
