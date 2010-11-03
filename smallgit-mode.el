@@ -28,19 +28,24 @@
  ;;   ("\C-xvg" . smallgit-git)
  ;;   ("\C-xvb" . smallgit-checkout)
  ;;   ("\C-xv=" . smallgit-diff)
- ;;   ("\C-xvu" . smallgit-reset-hard)
+ ;;   ("\C-xvr" . smallgit-reset-hard)
  ;;   ("\C-xvn" . smallgit-checkout-new-branch))
  nil
- (use-local-keymap smallgit-mode-map)
+ (use-local-map smallgit-mode-map)
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
 
 (defvar smallgit-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x v v") 'smallgit-add)
-    (define-key map (kbd "C-x v i") 'smallgit-add)
-    
+    (define-key map (kbd "C-x v u") 'smallgit-commit-update)
+    (define-key map (kbd "C-x v i") 'smallgit-add-current-file)
+    (define-key map (kbd "C-x v v") 'smallgit-commit)
+    (define-key map (kbd "C-x v g") 'smallgit-git)
+    (define-key map (kbd "C-x v b") 'smallgit-checkout)
+    (define-key map (kbd "C-x v =") 'smallgit-diff)
+    (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
+    (define-key map (kbd "C-x v n") 'smallgit-checkout-new-branch)
     map))
 
 ;; non-interactive functions
