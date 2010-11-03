@@ -101,14 +101,22 @@
   "execute git with ARGS. ignore `nil' arg."
   (interactive "sgit command options: ")
   ;; (shell-command (concat "git "
-  ;;                        (mapconcat 'shell-quote-argument (delq nil args) " "))
+  ;;                        (mapconcat 'identity (delq nil args) " "))
   ;;                (get-buffer-create smallgit-log-buffer)))
-  (apply 'call-process
-         "git"
-         nil
-         (get-buffer-create smallgit-log-buffer)
-         t
-         (delq nil args)))
+  (let ((op (with-temp-buffer
+              (apply 'call-process
+                     "git"
+                     nil
+                     t
+                     t
+                     (delq nil args))
+              (buffer-substring-no-properties (point-min)
+                                              (point-max)))))
+    (save-excursion
+      (set-buffer (get-buffer-create smallgit-log-buffer))
+      (goto-char (point-max))
+      (insert op))
+    (message op)))
 
 (defun smallgit-init ()
   ""
