@@ -301,13 +301,14 @@ that is, first checkout the branch to leave, then merge."
   (smallgit-git "rebase" name)
   (smallgit-when-change-branch))
 
-(defun smallgit-merge-current-branch-to-master ()
+(defun smallgit-merge-to-master ()
   "checkout master, merge previous branch, and then checkout previous branch."
   (interactive)
-  (let ((b smallgit-branch-name))
-    (smallgit-checkout "master")
-    (smallgit-merge b)
-    (smallgit-checkout b)))
+  (unless (equal smallgit-branch-name "master")
+    (let ((b smallgit-branch-name))
+      (smallgit-checkout "master")
+      (smallgit-merge b)
+      (smallgit-checkout b))))
 
 (provide 'smallgit-mode)
 
