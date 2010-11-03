@@ -116,7 +116,8 @@
       (set-buffer (get-buffer-create smallgit-log-buffer))
       (goto-char (point-max))
       (insert op))
-    (message op)))
+    (message op))
+  (revert-buffer nil t))
 
 (defun smallgit-init ()
   ""
