@@ -1,10 +1,12 @@
 
 (defvar smallgit-mode-hook nil "hook run with smallgit-mode.")
 (defvar smallgit-branch-name nil "current branch name")
+(defvar smallgit-branch-list nil "branch list")
 (make-variable-buffer-local 'smallgit-branch-name)
 (defvar smallgit-mode-line-format nil)
 (make-variable-buffer-local 'smallgit-mode-line-format)
 (defvar smallgit-log-buffer "*smallgit-log*")
+
 
 (require 'log-edit)
 (require 'easy-mmode)
@@ -45,13 +47,24 @@
 (defun smallgit--get-branch-name ()
   "git current branch name and set to `smallgit-branch-name'"
   (when (smallgit-repo-p)
-    (setq smallgit-branch-name (with-temp-buffer
-                                 (shell-command "git branch" t)
-                                 (goto-char (point-min))
-                                 (when (search-forward "*" nil t)
-                                   (forward-char 1)
-                                   (buffer-substring-no-properties (point)
-                                                                   (point-at-eol)))))))
+    (let (a
+          b)
+      (with-temp-buffer
+        (shell-command "git branch" t)
+        (goto-char (point-min))
+        (when (search-forward "^*" nil t)
+          (forward-char 1)
+          (setq a (buffer-substring-no-properties (point)
+                                                  (point-at-eol)))
+          (goto-char (point-min))
+          (while (re-search-forward "^.." nil t)
+            (replace-match "")
+            (setq b (split-string (buffer-substring-no-properties (point-min)
+                                                                  (point-max))
+                                  "\n")))
+          )
+      (setq smallgit-branch-name a)
+      (setq smallgit-branch-list b)))))
 
 (defun smallgit-when-switch-branch ()
   (smallgit--get-branch-name)
@@ -79,7 +92,7 @@
   ;;                        message
   ;;                        "\"")
   ;;                smallgit-log-buffer)
-  (smallgit-git "commit" "-m" message)
+  (smallgit-git "commit" "-m" (shell-quote-argument message))
   (smallgit--get-branch-name)
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
@@ -104,20 +117,19 @@
   ;;                        (mapconcat 'identity (delq nil args) " "))
   ;;                (get-buffer-create smallgit-log-buffer)))
   (let ((op (with-temp-buffer
-              (apply 'call-process
-                     "git"
-                     nil
-                     t
-                     t
-                     (delq nil args))
+              (shell-command (concat "git "
+                                     (mapconcat 'identity
+                                                (delq nil args)
+                                                " "))
+                             t)
               (buffer-substring-no-properties (point-min)
                                               (point-max)))))
     (save-excursion
       (set-buffer (get-buffer-create smallgit-log-buffer))
       (goto-char (point-max))
       (insert op))
-    (message op))
-  (revert-buffer nil t))
+    (message op)))
+  ;; (revert-buffer nil t))
 
 (defun smallgit-init ()
   ""
@@ -235,7 +247,7 @@
 (defun smallgit-tag (name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (smallgit-git "tag" "-a" name "-m" comment)) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
+  (smallgit-git "tag" "-a" name "-m" (shell-quote-argument comment))) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
 
 (defun smallgit-clone (url)
   ""
