@@ -36,7 +36,7 @@
 ;;     (define-key map (kbd "C-x v v") 'smallgit-add)
 ;;     (define-key map (kbd "C-x v i") 'smallgit-add)))
 
-;; 内部用
+;; non-interactive
 
 (defvar smallgit--wc nil "for `smallgit-commit', store window configuration")
 (defvar smallgit--last-commit-massage nil "save last commit message. used in `smallgit-commit-amend'")
@@ -79,7 +79,7 @@
   ;;                        message
   ;;                        "\"")
   ;;                smallgit-log-buffer)
-  (smallgit-git "commit -m" (shell-quote-argument message))
+  (smallgit-git "commit" "-m" message)
   (smallgit--get-branch-name)
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
@@ -100,9 +100,15 @@
 (defun smallgit-git (&rest args)
   "execute git with ARGS. ignore `nil' arg."
   (interactive "sgit command options: ")
-  (shell-command (concat "git "
-                         (mapconcat 'identity (delq nil args) " "))
-                 (get-buffer-create smallgit-log-buffer)))
+  ;; (shell-command (concat "git "
+  ;;                        (mapconcat 'shell-quote-argument (delq nil args) " "))
+  ;;                (get-buffer-create smallgit-log-buffer)))
+  (apply 'call-process
+         "git"
+         nil
+         (get-buffer-create smallgit-log-buffer)
+         t
+         (delq nil args)))
 
 (defun smallgit-init ()
   ""
@@ -220,7 +226,7 @@
 (defun smallgit-tag (name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (smallgit-git "tag" "-a" name "-m" (shell-quote-argument comment))) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
+  (smallgit-git "tag" "-a" name "-m" comment)) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
 
 (defun smallgit-clone (url)
   ""
