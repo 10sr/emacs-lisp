@@ -46,6 +46,7 @@
     (define-key map (kbd "C-x v =") 'smallgit-diff)
     (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
     (define-key map (kbd "C-x v n") 'smallgit-checkout-new-branch)
+    (define-key map (kbd "C-x v m") 'smallgit-merge)
     map))
 
 ;; non-interactive functions
@@ -310,15 +311,16 @@ that is, first checkout the branch to leave, then merge."
   (smallgit-git "rebase" name)
   (smallgit-when-change-branch))
 
-(defun smallgit-merge-to-master ()
-  "checkout master, merge previous branch, and then checkout previous branch."
-  (interactive)
-  (unless (equal smallgit-branch-name "master")
-    (let ((b smallgit-branch-name))
-      (smallgit-checkout "master")
-      (smallgit-merge b)
-      (smallgit-checkout b)))
-  (message "merge to master branch"))
+;; this function is VERY harmful!
+;; (defun smallgit-merge-to-master ()
+;;   "checkout master, merge previous branch, and then checkout previous branch."
+;;   (interactive)
+;;   (unless (equal smallgit-branch-name "master")
+;;     (let ((b smallgit-branch-name))
+;;       (smallgit-checkout "master")
+;;       (smallgit-merge b)
+;;       (smallgit-checkout b)))
+;;   (message "merge to master branch"))
 
 (provide 'smallgit-mode)
 
