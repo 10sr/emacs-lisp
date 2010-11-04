@@ -44,7 +44,7 @@
     (define-key map (kbd "C-x v g") 'smallgit-git)
     (define-key map (kbd "C-x v b") 'smallgit-checkout)
     (define-key map (kbd "C-x v =") 'smallgit-diff)
-    (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
+    ;; (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
     (define-key map (kbd "C-x v n") 'smallgit-checkout-new-branch)
     (define-key map (kbd "C-x v m") 'smallgit-merge)
     map))
@@ -79,12 +79,12 @@
 
 (defun smallgit-when-change-branch ()
   "called when create, checkout, or delete branch"
-  (smallgit--get-branch-name)
+  (smallgit--get-branch-name))
   ;;(when buffer-file-name (revert-buffer nil t)) ;;これつけると無限ループ
-  (run-hooks 'smallgit-chenge-branch-hook))
+  ;; (run-hooks 'smallgit-chenge-branch-hook))
 
-(add-hook 'window-configuration-change-hook
-          'smallgit-when-change-branch)
+;; (add-hook 'window-configuration-change-hook
+;;           'smallgit-when-change-branch)
 
 (defun smallgit--display-mode-line ()
   ""
@@ -111,7 +111,7 @@
 
 (defun smallgit-repo-p ()
   "t if current dir is git repository, otherwise nil."
-  (eq 0 (call-process "git" nil nil nil "status")))
+  (eq 0 (shell-command "git status")))
 
 (defun smallgit-complete-branch-name (prompt &optional require-match)
   "about arg REQUIRE-MATCH refer to `completing-read'"
@@ -135,7 +135,7 @@
   ;; (shell-command (concat "git "
   ;;                        (mapconcat 'identity (delq nil args) " "))
   ;;                (get-buffer-create smallgit-log-buffer)))
-  ;; (when buffer-file-name (save-buffer))
+  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
   (let ((op (with-temp-buffer
               (shell-command (concat "git "
                                      (mapconcat 'identity
@@ -148,8 +148,8 @@
       (set-buffer (get-buffer-create smallgit-log-buffer))
       (goto-char (point-max))
       (insert op))
-    (message op)))
-  ;; (when buffer-file-name (revert-buffer nil t)))
+    (message op)
+    (when buffer-file-name (revert-buffer nil t))))
 
 (defun smallgit-init ()
   ""
@@ -298,7 +298,7 @@ that is, first checkout the branch to leave, then merge."
 (defun smallgit-delete-branch (name)
   ""
   (interactive (list (smallgit-complete-branch-name "Branch name to delete: " t)))
-  (smallgit-branch name "-d"))
+  (smallgit-branch name "-D"))
 
 (defun smallgit-reset-hard ()
   "resert all tracked files to last commit state."
@@ -310,17 +310,6 @@ that is, first checkout the branch to leave, then merge."
   (interactive (list (smallgit-complete-branch-name "Branch name to rebase: " t)))
   (smallgit-git "rebase" name)
   (smallgit-when-change-branch))
-
-;; this function is VERY harmful!
-;; (defun smallgit-merge-to-master ()
-;;   "checkout master, merge previous branch, and then checkout previous branch."
-;;   (interactive)
-;;   (unless (equal smallgit-branch-name "master")
-;;     (let ((b smallgit-branch-name))
-;;       (smallgit-checkout "master")
-;;       (smallgit-merge b)
-;;       (smallgit-checkout b)))
-;;   (message "merge to master branch"))
 
 (provide 'smallgit-mode)
 
