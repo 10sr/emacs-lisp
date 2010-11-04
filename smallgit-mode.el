@@ -22,14 +22,6 @@
  "small minor mode to handle git"
  nil
  nil ;; " SGit"
- ;; '(("\C-xvv" . smallgit-commit)
- ;;   ("\C-xvi" . smallgit-add-current-file)
- ;;   ("\C-xvu" . smallgit-commit-update)
- ;;   ("\C-xvg" . smallgit-git)
- ;;   ("\C-xvb" . smallgit-checkout)
- ;;   ("\C-xv=" . smallgit-diff)
- ;;   ("\C-xvr" . smallgit-reset-hard)
- ;;   ("\C-xvn" . smallgit-checkout-new-branch))
  nil
  (use-local-map smallgit-mode-map)
  (smallgit--display-mode-line)
@@ -47,6 +39,7 @@
     ;; (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
     (define-key map (kbd "C-x v n") 'smallgit-checkout-new-branch)
     (define-key map (kbd "C-x v m") 'smallgit-merge)
+    (define-key map (kbd "C-x v l") 'smallgit-short-log)
     map))
 
 ;; non-interactive functions
@@ -111,7 +104,9 @@
 
 (defun smallgit-repo-p ()
   "t if current dir is git repository, otherwise nil."
-  (eq 0 (shell-command "git status")))
+  (condition-case nil
+      (eq 0 (call-process "git" nil nil nil "status"))
+    (error nil))) 
 
 (defun smallgit-complete-branch-name (prompt &optional require-match)
   "about arg REQUIRE-MATCH refer to `completing-read'"
@@ -241,6 +236,23 @@
   ""
   (interactive)
   (smallgit-git "status")) ;; (shell-command "git status" smallgit-log-buffer))
+
+(defun smallgit-log (&optional number &rest args)
+  ""
+  (interactive)
+  (apply 'smallgit-git
+         "log"
+         (if number (format "-%d" number)
+           "-5")
+         args))
+
+(defun smallgit-short-log (&optional number format)
+  ""
+  (interactive)
+  (smallgit-log number
+                (shell-quote-argument (concat "--pretty=format:"
+                                                         (or format
+                                                             "%h - %an, %ad : %s")))))
 
 (defun smallgit-diff ()
   ""
