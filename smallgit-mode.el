@@ -131,20 +131,24 @@
   ;;                        (mapconcat 'identity (delq nil args) " "))
   ;;                (get-buffer-create smallgit-log-buffer)))
   (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
-  (let ((op (with-temp-buffer
-              (shell-command (concat "git "
-                                     (mapconcat 'identity
-                                                (delq nil args)
-                                                " "))
-                             t)
-              (buffer-substring-no-properties (point-min)
-                                              (point-max)))))
+  (interactive-p)
+  (let (op
+        p)
+    (setq op (with-temp-buffer
+               (setq p (shell-command (concat "git "
+                                              (mapconcat 'identity
+                                                         (delq nil args)
+                                                         " "))
+                                      t))
+               (buffer-substring-no-properties (point-min)
+                                               (point-max))))
     (save-excursion
       (set-buffer (get-buffer-create smallgit-log-buffer))
       (goto-char (point-max))
       (insert op))
     (message op)
-    (when buffer-file-name (revert-buffer nil t))))
+    (when buffer-file-name (revert-buffer nil t)) ;もしかしてこれあんまよくない？
+    p))
 
 (defun smallgit-init ()
   ""
