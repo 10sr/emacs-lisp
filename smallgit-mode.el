@@ -148,7 +148,7 @@
       (insert op))
     (message op)
     (when buffer-file-name (revert-buffer nil t)) ;もしかしてこれあんまよくない？
-    p))
+    (eq 0 p)))
 
 (defun smallgit-init ()
   ""
@@ -241,22 +241,23 @@
   (interactive)
   (smallgit-git "status")) ;; (shell-command "git status" smallgit-log-buffer))
 
-(defun smallgit-log (&optional number &rest args)
+(defun smallgit-log (&optional num &rest args)
   ""
   (interactive)
   (apply 'smallgit-git
          "log"
-         (if number (format "-%d" number)
-           "-5")
+         (and num (format "-%d" num))
          args))
 
-(defun smallgit-short-log (&optional number format)
+(defun smallgit-short-log (&optional num format)
   ""
-  (interactive)
-  (smallgit-log number
+  (interactive "p")
+  (smallgit-log (or num
+                    5)
                 (shell-quote-argument (concat "--pretty=format:"
                                                          (or format
-                                                             "%h - %an, %ad : %s")))))
+                                                             "%h - %an, %ad : %s")))
+                "--graph"))
 
 (defun smallgit-diff ()
   ""
