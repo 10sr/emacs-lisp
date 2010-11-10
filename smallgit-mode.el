@@ -27,6 +27,9 @@
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
+ ;; (make-local-hook 'after-revert-hook)
+ ;; (add-hook 'after-revert-hook
+ ;;           'smallgit-when-change-branch))
 
 (defvar smallgit-mode-map
   (let ((map (make-sparse-keymap)))
@@ -49,7 +52,8 @@
 (defvar smallgit--commit-amend nil "t when current commit is amend")
 
 (defun smallgit--get-branch-name ()
-  "get current branches and set to `smallgit-branch-name' and `smallgit-branch-list'"
+  "get current branches and set to `smallgit-branch-name' and `smallgit-branch-list'.
+do nothing if current buffer in not under git repository."
   (when (smallgit-repo-p)
     (let (a
           b)
@@ -70,14 +74,24 @@
       (setq smallgit-branch-name a)
       (setq smallgit-branch-list b))))
 
+(defun smallgit-revert-changed-buffer ()
+  ""
+  (interactive)
+  (mapcar (lambda (bf)
+            (save-excursion
+              (set-buffer bf)
+              (when (and smallgit-mode (verify-visited-file-modtime bf))
+                (revert-buffer t t)
+                (smallgit-when-change-branch))))
+          (buffer-list)))
+
 (defun smallgit-when-change-branch ()
   "called when create, checkout, or delete branch"
   (smallgit--get-branch-name))
+;  (smallgit-revert-changed-buffer))
   ;;(when buffer-file-name (revert-buffer nil t)) ;;これつけると無限ループ
   ;; (run-hooks 'smallgit-chenge-branch-hook))
 
-;; (add-hook 'window-configuration-change-hook
-;;           'smallgit-when-change-branch)
 
 (defun smallgit--display-mode-line ()
   ""
@@ -98,18 +112,18 @@
   ;;                        "\"")
   ;;                smallgit-log-buffer)
   (smallgit-git "commit" "-m" (shell-quote-argument message))
-  (smallgit--get-branch-name)
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
 
 (defun smallgit-repo-p ()
-  "t if current dir is git repository, otherwise nil."
+  "t if git installed and current dir is git repository, otherwise nil."
   (condition-case nil
       (eq 0 (call-process "git" nil nil nil "status"))
     (error nil))) 
 
 (defun smallgit-complete-branch-name (prompt &optional require-match)
-  "about arg REQUIRE-MATCH refer to `completing-read'"
+  "read from minibuffer name of branch and return as string.
+about arg REQUIRE-MATCH refer to `completing-read'"
   (completing-read prompt
                    smallgit-branch-list
                    nil
@@ -147,7 +161,7 @@
       (goto-char (point-max))
       (insert op))
     (message op)
-    (when buffer-file-name (revert-buffer nil t)) ;もしかしてこれあんまよくない？
+    ;; (when buffer-file-name (revert-buffer nil t)) ;もしかしてこれあんまよくない？
     (eq 0 p)))
 
 (defun smallgit-init ()
@@ -259,10 +273,10 @@
                                                              "%h - %an, %ad : %s")))
                 "--graph"))
 
-(defun smallgit-diff ()
+(defun smallgit-diff (&optional switches)
   ""
   (interactive)
-  (smallgit-git "diff")) ;; (shell-command "git diff" smallgit-log-buffer))
+  (smallgit-git "diff" switches)) ;; (shell-command "git diff" smallgit-log-buffer))
 
 (defun smallgit-push ()
   ""
@@ -275,8 +289,13 @@
 
 (defun smallgit-remote-add (url name)
   ""
-  (interactive "sUrl to add: \nShortname: ")
-  (smallgit-git "remote" "add" name url));; (shell-command (concat "git remote add " name " " url) smallgit-log-buffer))
+  (interactive "sUrl to add: \nsShortname: ")
+  (smallgit-git (shell-quote-argument "remote") "add" name url));; (shell-command (concat "git remote add " name " " url) smallgit-log-buffer))
+
+(defun smallgit-remote-add-as-origin (url)
+  ""
+  (interactive "sUrl to add: ")
+  (smallgit-remote-add url "origin"))
 
 (defun smallgit-tag (&optional name comment)
   ""
@@ -294,10 +313,10 @@
   (smallgit-checkout name "-b"))
 
 (defun smallgit-checkout (name &optional switches)
-  ""
+  "checkout branch"
   (interactive (list (smallgit-complete-branch-name "Branch name to checkout: " t)))
   (smallgit-git "checkout" switches name) ;; (shell-command (concat "git checkout " (or switches "") " " name))
-  (smallgit-when-change-branch))
+  (smallgit-revert-changed-buffer))
 
 (defun smallgit-merge (name &optional switches)
   "merge branch NAME to CURRENT branch.
@@ -320,13 +339,22 @@ that is, first checkout the branch to leave, then merge."
 (defun smallgit-reset-hard ()
   "resert all tracked files to last commit state."
   (interactive)
-  (smallgit-git "reset" "--hard" "HEAD"))
+  (smallgit-git "reset" "--hard" "HEAD")
+  (smallgit-revert-changed-buffer))
 
 (defun smallgit-rebase (name)
   ""
   (interactive (list (smallgit-complete-branch-name "Branch name to rebase: " t)))
   (smallgit-git "rebase" name)
-  (smallgit-when-change-branch))
+  (smallgit-revert-changed-buffer))
+
+(defun smallgit-merge-current-branch-to-master ()
+  ""
+  (interactive)
+  (let ((bch smallgit-branch-name))
+    (and (smallgit-checkout "master")
+         (smallgit-merge bch)
+         (smallgit-checkout bch))))
 
 (provide 'smallgit-mode)
 
