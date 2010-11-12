@@ -74,9 +74,9 @@ do nothing if current buffer in not under git repository."
        (set-buffer bf)
        (when (and smallgit-mode
                   (not (verify-visited-file-modtime bf)))
-         (revert-buffer t t)
-         (smallgit-when-change-branch))))
-   (buffer-list)))
+         (revert-buffer t t))))
+   (buffer-list))
+  (smallgit-when-change-branch))
 
 (defun smallgit-when-change-branch ()
   "called when create, checkout, or delete branch"
