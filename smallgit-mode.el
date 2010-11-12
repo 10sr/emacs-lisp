@@ -68,13 +68,15 @@ do nothing if current buffer in not under git repository."
 (defun smallgit-revert-changed-buffer ()
   ""
   (interactive)
-  (mapcar (lambda (bf)
-            (save-excursion
-              (set-buffer bf)
-              (when (and smallgit-mode (verify-visited-file-modtime bf))
-                (revert-buffer t t)
-                (smallgit-when-change-branch))))
-          (buffer-list)))
+  (mapcar
+   (lambda (bf)
+     (save-excursion
+       (set-buffer bf)
+       (when (and smallgit-mode
+                  (not (verify-visited-file-modtime bf)))
+         (revert-buffer t t)
+         (smallgit-when-change-branch))))
+   (buffer-list)))
 
 (defun smallgit-when-change-branch ()
   "called when create, checkout, or delete branch"
@@ -114,8 +116,7 @@ about arg REQUIRE-MATCH refer to `completing-read'"
   ""
   (interactive)
   (when (and buffer-file-name (smallgit-repo-p))
-    (smallgit-mode 1)
-    (smallgit-when-change-branch)))
+    (smallgit-mode 1)))
 
 (defun smallgit-git (&rest args)
   "execute git with ARGS. ignore `nil' arg."
@@ -291,7 +292,7 @@ that is, first checkout the branch to leave, then merge."
   "create new branch or do another command with switches"
   (interactive (list (smallgit-complete-branch-name "Branch name to create: ")))
   (smallgit-git "branch" switches name)
-  (smallgit-when-change-branch))
+  (smallgit-revert-changed-buffer))
 
 (defun smallgit-delete-branch (name)
   ""
