@@ -12,11 +12,6 @@
 (require 'easy-mmode)
 (setq vc-handled-backends (delq 'Git vc-handled-backends))
 
-;; (easy-mmode-define-keymap
-;;  (list ((kbd "C-x v v") . 'smallgit-add)
-;;        ((kbd "C-x v i") . 'smallgit-add))
-;;  'smallgit-mode-map)
-
 (easy-mmode-define-minor-mode
  smallgit-mode
  "small minor mode to handle git"
@@ -27,10 +22,6 @@
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
- ;; (make-local-hook 'after-revert-hook)
- ;; (add-hook 'after-revert-hook
- ;;           'smallgit-when-change-branch))
-
 (defvar smallgit-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x v u") 'smallgit-commit-update)
@@ -88,16 +79,9 @@ do nothing if current buffer in not under git repository."
 (defun smallgit-when-change-branch ()
   "called when create, checkout, or delete branch"
   (smallgit--get-branch-name))
-;  (smallgit-revert-changed-buffer))
-  ;;(when buffer-file-name (revert-buffer nil t)) ;;これつけると無限ループ
-  ;; (run-hooks 'smallgit-chenge-branch-hook))
-
 
 (defun smallgit--display-mode-line ()
   ""
-  ;; (let ((ls (member '(vc-mode vc-mode)
-  ;;                   mode-line-format)))
-  ;;   (and ls (setcar ls 'smallgit-mode-line))))
   (if (and smallgit-mode (not (member 'smallgit-mode-line-format mode-line-format)))
       (let ((ls (member 'mode-line-position
                         mode-line-format)))
@@ -105,12 +89,7 @@ do nothing if current buffer in not under git repository."
 
 (defun smallgit--commit (message)
   "call from `smallgit-commit', etc."
-  ;; (shell-command (concat "git commit "
-  ;;                        (if smallgit--commit-amend "--amend " "")
-  ;;                        "-m \""
-  ;;                        message
-  ;;                        "\"")
-  ;;                smallgit-log-buffer)
+  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))  
   (smallgit-git "commit" "-m" (shell-quote-argument message))
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
@@ -141,10 +120,6 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-git (&rest args)
   "execute git with ARGS. ignore `nil' arg."
   (interactive "sgit command options: ")
-  ;; (shell-command (concat "git "
-  ;;                        (mapconcat 'identity (delq nil args) " "))
-  ;;                (get-buffer-create smallgit-log-buffer)))
-  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
   (interactive-p)
   (let (op
         p)
@@ -161,26 +136,19 @@ about arg REQUIRE-MATCH refer to `completing-read'"
       (goto-char (point-max))
       (insert op))
     (message op)
-    ;; (when buffer-file-name (revert-buffer nil t)) ;もしかしてこれあんまよくない？
     (eq 0 p)))
 
 (defun smallgit-init ()
   ""
   (interactive)
   (unless (smallgit-repo-p)
-    (smallgit-git "init") ;; (shell-command "git init" smallgit-log-buffer)
+    (smallgit-git "init")
     (smallgit-load)))
 
 (defun smallgit-add (&optional file switches)
   ""
   (interactive)
   (smallgit-init)
-  ;; (shell-command (concat "git add "
-  ;;                        (or switches "")
-  ;;                        " "
-  ;;                        (or file
-  ;;                            ""))
-  ;;                smallgit-log-buffer)
   (when buffer-file-name (save-buffer))
   (smallgit-git "add" switches file))
 
@@ -191,23 +159,17 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-add-all ()
   ""
   (interactive)
-  ;; (smallgit-init)
   (smallgit-add nil "-A")
-  ;; (shell-command "git add -A" smallgit-log-buffer)
   (message "smallgit: added all in dir"))
 
 (defun smallgit-add-update ()
   ""
   (interactive)
-  ;; (smallgit-init)
   (smallgit-add nil "-u")
-  ;; (shell-command "git add -u" smallgit-log-buffer)
   (message "smallgit: added all updated files"))
 
 (defun smallgit-commit ()
   ""
-  ;; (interactive "sCommit massage: ")
-  ;; (smallgit--commit message))
   (interactive)
   (setq smallgit--wc (current-window-configuration))
   (log-edit (lambda ()
@@ -248,12 +210,12 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-log (&optional switches)
   ""
   (interactive)
-  (smallgit-git "log")) ;; (shell-command "git log" smallgit-log-buffer))
+  (smallgit-git "log"))
 
 (defun smallgit-status ()
   ""
   (interactive)
-  (smallgit-git "status")) ;; (shell-command "git status" smallgit-log-buffer))
+  (smallgit-git "status"))
 
 (defun smallgit-log (&optional num &rest args)
   ""
@@ -276,12 +238,12 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-diff (&optional switches)
   ""
   (interactive)
-  (smallgit-git "diff" switches)) ;; (shell-command "git diff" smallgit-log-buffer))
+  (smallgit-git "diff" switches))
 
 (defun smallgit-push ()
   ""
   (interactive)
-  (smallgit-git "push")) ;; (shell-command "git push" smallgit-log-buffer))
+  (smallgit-git "push"))
 
 (defun smallgit-pull ()
   ""
@@ -290,7 +252,7 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-remote-add (url name)
   ""
   (interactive "sUrl to add: \nsShortname: ")
-  (smallgit-git (shell-quote-argument "remote") "add" name url));; (shell-command (concat "git remote add " name " " url) smallgit-log-buffer))
+  (smallgit-git (shell-quote-argument "remote") "add" name url))
 
 (defun smallgit-remote-add-as-origin (url)
   ""
@@ -300,12 +262,12 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-tag (&optional name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (smallgit-git "tag" "-a" name "-m" (shell-quote-argument comment))) ;; (shell-command (concat "git tag -a " name " -m \"" comment "\"")))
+  (smallgit-git "tag" "-a" name "-m" (shell-quote-argument comment)))
 
 (defun smallgit-clone (url)
   ""
   (interactive "sUrl to clone: ")
-  (smallgit-git "clone" url)) ;; (shell-command (concat "git clone " url)))
+  (smallgit-git "clone" url))
 
 (defun smallgit-checkout-new-branch (name)
   ""
@@ -315,20 +277,20 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 (defun smallgit-checkout (name &optional switches)
   "checkout branch"
   (interactive (list (smallgit-complete-branch-name "Branch name to checkout: " t)))
-  (smallgit-git "checkout" switches name) ;; (shell-command (concat "git checkout " (or switches "") " " name))
+  (smallgit-git "checkout" switches name)
   (smallgit-revert-changed-buffer))
 
 (defun smallgit-merge (name &optional switches)
   "merge branch NAME to CURRENT branch.
 that is, first checkout the branch to leave, then merge."
   (interactive (list (smallgit-complete-branch-name "Branch name to merge: " t)))
-  (smallgit-git "merge" switches name) ;; (shell-command (concat "git merge " name))
-  (smallgit-when-change-branch))
+  (smallgit-git "merge" switches name)
+  (smallgit-revert-changed-buffer))
 
 (defun smallgit-branch (name &optional switches)
   "create new branch or do another command with switches"
   (interactive (list (smallgit-complete-branch-name "Branch name to create: ")))
-  (smallgit-git "branch" switches name) ;; (shell-command (concat "git branch " (or switches "") " " name))
+  (smallgit-git "branch" switches name)
   (smallgit-when-change-branch))
 
 (defun smallgit-delete-branch (name)
@@ -349,7 +311,7 @@ that is, first checkout the branch to leave, then merge."
   (smallgit-revert-changed-buffer))
 
 (defun smallgit-merge-current-branch-to-master ()
-  ""
+  "commit needed before merge."
   (interactive)
   (let ((bch smallgit-branch-name))
     (and (smallgit-checkout "master")
