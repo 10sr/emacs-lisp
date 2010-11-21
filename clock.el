@@ -1,4 +1,4 @@
-;; todo: 書く関数と制御を分ける つまり抽象化
+;; todo: 書く関数と制御を分ける
 
 (defun clock ()
   "make clock buffer and view clock"
