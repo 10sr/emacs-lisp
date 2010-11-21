@@ -22,21 +22,22 @@
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
+
 (defvar smallgit-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x v u") 'smallgit-commit-update)
+    ;; (define-key map (kbd "C-x v u") 'smallgit-commit-update)
     (define-key map (kbd "C-x v i") 'smallgit-add-current-file)
-    (define-key map (kbd "C-x v v") 'smallgit-commit)
+    (define-key map (kbd "C-x v v") 'smallgit-commit-update)
     (define-key map (kbd "C-x v g") 'smallgit-git)
     (define-key map (kbd "C-x v b") 'smallgit-checkout)
     (define-key map (kbd "C-x v =") 'smallgit-diff)
-    ;; (define-key map (kbd "C-x v r") 'smallgit-reset-hard)
+    (define-key map (kbd "C-x v u") 'smallgit-reset-hard)
     (define-key map (kbd "C-x v n") 'smallgit-checkout-new-branch)
     (define-key map (kbd "C-x v m") 'smallgit-merge)
     (define-key map (kbd "C-x v l") 'smallgit-short-log)
     map))
 
-;; non-interactive functions
+;; non-interactive functions?
 
 (defvar smallgit--wc nil "for `smallgit-commit', store window configuration")
 (defvar smallgit--last-commit-massage nil "save last commit message. used in `smallgit-commit-amend'")
@@ -65,6 +66,11 @@ do nothing if current buffer in not under git repository."
       (setq smallgit-branch-name a)
       (setq smallgit-branch-list b))))
 
+(defun smallgit-when-change-branch ()
+  "called when create, checkout, or delete branch.
+it may be called even if branch does not changed."
+  (smallgit--get-branch-name))
+
 (defun smallgit-revert-changed-buffer ()
   ""
   (interactive)
@@ -72,15 +78,11 @@ do nothing if current buffer in not under git repository."
    (lambda (bf)
      (save-excursion
        (set-buffer bf)
-       (when (and smallgit-mode
-                  (not (verify-visited-file-modtime bf)))
-         (revert-buffer t t))))
-   (buffer-list))
-  (smallgit-when-change-branch))
-
-(defun smallgit-when-change-branch ()
-  "called when create, checkout, or delete branch"
-  (smallgit--get-branch-name))
+       (when smallgit-mode
+         (revert-buffer t t))
+       (when smallgit-mode
+         (smallgit-when-change-branch))))
+   (buffer-list)))
 
 (defun smallgit--display-mode-line ()
   ""
@@ -90,8 +92,8 @@ do nothing if current buffer in not under git repository."
         (setcdr ls (cons 'smallgit-mode-line-format (cdr ls))))))
 
 (defun smallgit--commit (message)
-  "call from `smallgit-commit', etc."
-  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))  
+  "call from `smallgit-commit', etc.
+save buffer before commit."
   (smallgit-git "commit" "-m" (shell-quote-argument message))
   (setq smallgit--last-commit-massage message)
   (setq smallgit--commit-amend nil))
@@ -110,6 +112,7 @@ about arg REQUIRE-MATCH refer to `completing-read'"
                    nil
                    require-match))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; interactive
 
 (defun smallgit-load ()
@@ -119,11 +122,12 @@ about arg REQUIRE-MATCH refer to `completing-read'"
     (smallgit-mode 1)))
 
 (defun smallgit-git (&rest args)
-  "execute git with ARGS. ignore `nil' arg."
+  "execute git with ARGS. ignore `nil' args.
+it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
   (interactive "sgit command options: ")
-  (interactive-p)
-  (let (op
-        p)
+  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
+  (let (op                              ;gitの出力
+        p)                              ;gitの終了ステータス
     (setq op (with-temp-buffer
                (setq p (shell-command (concat "git "
                                               (mapconcat 'identity
@@ -311,11 +315,11 @@ that is, first checkout the branch to leave, then merge."
   (smallgit-git "rebase" name)
   (smallgit-revert-changed-buffer))
 
-(defun smallgit-merge-current-branch-to-master ()
+(defun smallgit-merge-current-branch-to-master () ;cannot revert when returned to bch 時間が速すぎてrevertできないんだよね
   "commit needed before merge."
   (interactive)
   (let ((bch smallgit-branch-name))
-    (and (smallgit-checkout "master")
+    (and (smallgit-checkout "master") ;これだと終了判定できない
          (smallgit-merge bch)
          (smallgit-checkout bch))))
 
