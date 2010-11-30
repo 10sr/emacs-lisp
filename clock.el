@@ -52,20 +52,25 @@ called by `clock--format-minute' and `clock--count-sec'"
         (h (nth 2 (decode-time time)))
         (m (nth 1 (decode-time time))))
     (goto-line (+ h 3))
-    (goto-char (point-at-bol))
-    (forward-char 4)
-    (delete-region (point) (point-at-eol))
     (clock--fill-minute m)
-    (insert " " (clock--get-time time))))
+    (clock--append-time time)))
 
 (defun clock--get-time (&optional time)
   ""
   (format-time-string "%H:%M" (or time (current-time))))
 
+(defun clock--append-time (time)
+  ""
+  (let ((buffer-read-only nil))
+    (insert " " (clock--get-time time))))
+
 (defun clock--fill-minute (m)
-  "fill current line by m with `clock-count-string'"
-  (let ((i 0))
-    (goto-char (point-at-eol))
+  "fill current line by M with `clock-count-string'"
+  (let ((i 0)
+        (buffer-read-only nil))
+    (goto-char (point-at-bol))
+    (forward-char 4)
+    (delete-region (point) (point-at-eol))
     (while (not (eq i m))
       (insert " " clock-count-string)
       (setq i (1+ i)))))
@@ -93,7 +98,8 @@ stop timer if clock buffer is not active."
     (if (not (eq (current-buffer) (get-buffer "*clock*")))
         (progn (cancel-timer clock--timer))
       (if (not (eq clock--sec 60))
-          (clock--count-sec-insert)
+          (progn (clock--count-sec-insert)
+                 (message "tick tack tick tack..."))
         (let* ((time (current-time))
                (h (nth 2 (decode-time time)))
                (m (nth 1 (decode-time time)))) 
@@ -102,27 +108,17 @@ stop timer if clock buffer is not active."
             (clock--fill-minute-append-time time))
           (clock--initialize-sec-timer))))))
 
-(defun clock--count-sec-insert (&optional INITIALIZE LINE)
+(defun clock--count-sec-insert (&optional initialize line)
   ""
   (let ((buffer-read-only nil))
-    (goto-line (or LINE 28))
+    (goto-line (or line 28))
     (cond
-     (INITIALIZE (delete-region (point-at-bol) (point-at-eol))
+     (initialize (delete-region (point-at-bol) (point-at-eol))
                  (insert "sec:")) 
      (t (goto-char (point-at-eol))
         (setq clock--sec (1+ clock--sec))
         (insert " " clock-count-string)))))
 
 (defvar clock-count-string "@" "string to count minute and second.")
-
-
-;; 勉強中
-;; でもこれにモードいらないよね
-(defun clock-mode ()
-  ""
-  (setq major-mode 'clock-mode)
-  (setq clock-mode-map (make-keymap))
-  (run-mode-hooks 'clock-mode-hook))
-(defvar clock-mode-hook nil)
 
 (provide 'clock)

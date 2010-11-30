@@ -71,8 +71,8 @@ do nothing if current buffer in not under git repository."
 it may be called even if branch does not changed."
   (smallgit--get-branch-name))
 
-(defun smallgit-revert-changed-buffer ()
-  ""
+(defun smallgit-revert-smallgit-buffer ()
+  "revert all buffer where smallgit-mode is enabled."
   (interactive)
   (mapcar
    (lambda (bf)
@@ -123,7 +123,8 @@ about arg REQUIRE-MATCH refer to `completing-read'"
 
 (defun smallgit-git (&rest args)
   "execute git with ARGS. ignore `nil' args.
-it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
+it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed.
+it saves buffer automatically before run git."
   (interactive "sgit command options: ")
   (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
   (let (op                              ;gitの出力
@@ -139,7 +140,7 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
     (save-excursion
       (set-buffer (get-buffer-create smallgit-log-buffer))
       (goto-char (point-max))
-      (insert op))
+      (insert op "\n"))
     (message op)
     (eq 0 p)))
 
@@ -283,20 +284,20 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
   "checkout branch"
   (interactive (list (smallgit-complete-branch-name "Branch name to checkout: " t)))
   (smallgit-git "checkout" switches name)
-  (smallgit-revert-changed-buffer))
+  (smallgit-revert-smallgit-buffer))
 
 (defun smallgit-merge (name &optional switches)
   "merge branch NAME to CURRENT branch.
 that is, first checkout the branch to leave, then merge."
   (interactive (list (smallgit-complete-branch-name "Branch name to merge: " t)))
   (smallgit-git "merge" switches name)
-  (smallgit-revert-changed-buffer))
+  (smallgit-revert-smallgit-buffer))
 
 (defun smallgit-branch (name &optional switches)
   "create new branch or do another command with switches"
   (interactive (list (smallgit-complete-branch-name "Branch name to create: ")))
   (smallgit-git "branch" switches name)
-  (smallgit-revert-changed-buffer))
+  (smallgit-revert-smallgit-buffer))
 
 (defun smallgit-delete-branch (name)
   ""
@@ -307,19 +308,19 @@ that is, first checkout the branch to leave, then merge."
   "resert all tracked files to last commit state."
   (interactive)
   (smallgit-git "reset" "--hard" "HEAD")
-  (smallgit-revert-changed-buffer))
+  (smallgit-revert-smallgit-buffer))
 
 (defun smallgit-rebase (name)
   ""
   (interactive (list (smallgit-complete-branch-name "Branch name to rebase: " t)))
   (smallgit-git "rebase" name)
-  (smallgit-revert-changed-buffer))
+  (smallgit-revert-smallgit-buffer))
 
 (defun smallgit-merge-current-branch-to-master () ;cannot revert when returned to bch 時間が速すぎてrevertできないんだよね
   "commit needed before merge."
   (interactive)
   (let ((bch smallgit-branch-name))
-    (and (smallgit-checkout "master") ;これだと終了判定できない
+    (and (smallgit-checkout "master")
          (smallgit-merge bch)
          (smallgit-checkout bch))))
 
