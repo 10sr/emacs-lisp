@@ -2,8 +2,10 @@
 (defvar smallgit-mode-hook nil "hook run with smallgit-mode.")
 (defvar smallgit-branch-name nil "current branch name")
 (defvar smallgit-branch-list nil "branch list")
+(defvar smallgit-repository-path nil "dir path")
 (make-variable-buffer-local 'smallgit-branch-name)
 (make-variable-buffer-local 'smallgit-branch-list)
+(make-variable-buffer-local 'smallgit-repository-path)
 (defvar smallgit-mode-line-format nil)
 (make-variable-buffer-local 'smallgit-mode-line-format)
 (defvar smallgit-log-buffer "*smallgit-log*")
@@ -21,6 +23,7 @@
  (use-local-map smallgit-mode-map)
  (smallgit--display-mode-line)
  (smallgit-when-change-branch)
+ (setq smallgit-repository-path (smallgit--find-repository-path))
  (setq smallgit-mode-line-format (list "SGit:" 'smallgit-branch-name)))
 
 (defvar smallgit-mode-map
@@ -70,6 +73,17 @@ do nothing if current buffer in not under git repository."
   "called when create, checkout, or delete branch.
 it may be called even if branch does not changed."
   (smallgit--get-branch-name))
+
+(defun smallgit--find-repository-path (&optional dir)
+  ""
+  (let ((path (file-name-as-directory (or dir
+                                          "."))))
+    (if (file-directory-p (concat path
+                                  ".git"))
+        (expand-file-name (concat path
+                                  ".git"))
+    (smallgit--find-repository-path (concat path
+                                           "..")))))
 
 (defun smallgit-revert-changed-buffer ()
   ""
