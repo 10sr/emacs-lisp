@@ -18,7 +18,7 @@
  smallgit-mode
  "small minor mode to handle git"
  nil
- nil ;; " SGit"
+ nil
  nil
  (use-local-map smallgit-mode-map)
  (smallgit--display-mode-line)
@@ -28,7 +28,7 @@
 
 (defvar smallgit-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; (define-key map (kbd "C-x v u") 'smallgit-commit-update)
+    (define-key map (kbd "C-x v") (make-sparse-keymap))
     (define-key map (kbd "C-x v i") 'smallgit-add-current-file)
     (define-key map (kbd "C-x v v") 'smallgit-commit-update)
     (define-key map (kbd "C-x v g") 'smallgit-git)
@@ -40,7 +40,7 @@
     (define-key map (kbd "C-x v l") 'smallgit-short-log)
     map))
 
-;; non-interactive functions?
+;; internal functions?
 
 (defvar smallgit--wc nil "for `smallgit-commit', store window configuration")
 (defvar smallgit--last-commit-massage nil "save last commit message. used in `smallgit-commit-amend'")
@@ -88,15 +88,23 @@ it may be called even if branch does not changed."
 (defun smallgit-revert-changed-buffer ()
   ""
   (interactive)
-  (mapcar
-   (lambda (bf)
-     (save-excursion
-       (set-buffer bf)
-       (when smallgit-mode
-         (revert-buffer t t))
-       (when smallgit-mode
-         (smallgit-when-change-branch))))
-   (buffer-list)))
+  (let ((rpath smallgit-repository-path)
+        (bl (buffer-list)))
+    (while bl
+      (with-current-buffer (pop bl)
+        (when (and smallgit-mode
+                   (equal rpath smallgit-repository-path))
+          (revert-buffer t t)
+          (smallgit-when-change-branch))))))
+  ;; (mapcar
+  ;;  (lambda (bf)
+  ;;    (save-excursion
+  ;;      (set-buffer bf)
+  ;;      (when smallgit-mode
+  ;;        (revert-buffer t t))
+  ;;      (when smallgit-mode
+  ;;        (smallgit-when-change-branch))))
+  ;;  (buffer-list)))
 
 (defun smallgit--display-mode-line ()
   ""
@@ -127,7 +135,7 @@ about arg REQUIRE-MATCH refer to `completing-read'"
                    require-match))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; interactive
+;; functions for interactive use
 
 (defun smallgit-load ()
   ""
