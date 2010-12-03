@@ -1,7 +1,6 @@
 # emacs lisp
 * elisp i wrote.
-* currently these files does not follow conventions.
-* these are public domain.
+* currently these files do not follow conventions.
 
 ## smallgit-mode.el
 
