@@ -46,33 +46,57 @@
 (defvar sgit--last-commit-massage nil "save last commit message. used in `sgit-commit-amend'")
 (defvar sgit--commit-amend nil "t when current commit is amend")
 
-(defun sgit--get-branch-name ()
+(defun sgit--set-branch-name ()
   "get current branches and set to `sgit-branch-name' and `sgit-branch-list'.
 do nothing if current buffer in not under git repository."
   (when (sgit-repo-p)
-    (let (a
-          b)
-      (with-temp-buffer
-        (shell-command "git branch" t)
-        (goto-char (point-min))
-        (when (search-forward "*" nil t)
-          (forward-char 1)
-          (setq a (buffer-substring-no-properties (point)
-                                                  (point-at-eol)))
-          (goto-char (point-min))
-          (while (re-search-forward "^. " nil t)
-            (replace-match ""))
-          (setq b (delete ""
-                          (split-string (buffer-substring-no-properties (point-min)
-                                                                        (point-max))
-                                        "\n")))))
-      (setq sgit-branch-name a)
-      (setq sgit-branch-list b))))
+    (let ((l (sgit--get-branch-name)))
+      (setq sgit-branch-name (car l))
+      (setq sgit-branch-list l))))
+  ;; (when (sgit-repo-p)
+  ;;   (let (a
+  ;;         b)
+  ;;     (with-temp-buffer
+  ;;       (shell-command "git branch" t)
+  ;;       (goto-char (point-min))
+  ;;       (when (search-forward "*" nil t)
+  ;;         (forward-char 1)
+  ;;         (setq a (buffer-substring-no-properties (point)
+  ;;                                                 (point-at-eol)))
+  ;;         (goto-char (point-min))
+  ;;         (while (re-search-forward "^. " nil t)
+  ;;           (replace-match ""))
+  ;;         (setq b (delete ""
+  ;;                         (split-string (buffer-substring-no-properties (point-min)
+  ;;                                                                       (point-max))
+  ;;                                       "\n")))))
+  ;;     (setq sgit-branch-name a)
+  ;;     (setq sgit-branch-list b))))
+
+(defun sgit--get-branch-name ()             ;not used now
+  "return list of branch names, with current branch in the car."
+  (when (sgit-repo-p)
+    (with-temp-buffer
+      (shell-command "git branch" t)
+      (goto-char (point-min))
+      (when (search-forward "*" nil t)
+        (forward-char 1)
+        (cons (buffer-substring-no-properties (point)
+                                              (point-at-eol))
+              (progn (kill-whole-line)
+                     (goto-char (point-min))
+                     (while (re-search-forward "^  " nil t)
+                       (replace-match ""))
+                     (delete ""
+                             (split-string (buffer-substring-no-properties (point-min)
+                                                                           (point-max))
+                                           "\n"))))))))
+;(sgit--get-branch-name)
 
 (defun sgit-when-change-branch ()
   "called when create, checkout, or delete branch.
 it may be called even if branch does not changed."
-  (sgit--get-branch-name))
+  (sgit--set-branch-name))
 
 (defun sgit--find-repository-path (&optional dir)
   ""
