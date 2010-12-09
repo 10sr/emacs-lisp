@@ -14,17 +14,16 @@
 (require 'easy-mmode)
 (setq vc-handled-backends (delq 'Git vc-handled-backends))
 
-(easy-mmode-define-minor-mode
- sgit-mode
- "small minor mode to handle git"
- nil
- nil
- nil
- (use-local-map sgit-mode-map)
- (sgit--display-mode-line)
- (sgit-when-change-branch)
- (setq sgit-repository-path (sgit--find-repository-path))
- (setq sgit-mode-line-format (list "SGit:" 'sgit-branch-name)))
+(easy-mmode-define-minor-mode sgit-mode
+                              "small minor mode to handle git"
+                              nil
+                              nil
+                              nil
+                              (use-local-map sgit-mode-map)
+                              (sgit--display-mode-line)
+                              (sgit-when-change-branch)
+                              (setq sgit-repository-path (sgit--find-repository-path))
+                              (setq sgit-mode-line-format (list "SGit:" 'sgit-branch-name)))
 
 (defvar sgit-prefix-map
   (let ((map (make-sparse-keymap)))
