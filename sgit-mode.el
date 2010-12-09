@@ -14,31 +14,45 @@
 (require 'easy-mmode)
 (setq vc-handled-backends (delq 'Git vc-handled-backends))
 
-(easy-mmode-define-minor-mode
- sgit-mode
- "small minor mode to handle git"
- nil
- nil
- nil
- (use-local-map sgit-mode-map)
- (sgit--display-mode-line)
- (sgit-when-change-branch)
- (setq sgit-repository-path (sgit--find-repository-path))
- (setq sgit-mode-line-format (list "SGit:" 'sgit-branch-name)))
+(easy-mmode-define-minor-mode sgit-mode
+                              "small minor mode to handle git"
+                              nil
+                              nil
+                              nil
+                              (use-local-map sgit-mode-map)
+                              (sgit--display-mode-line)
+                              (sgit-when-change-branch)
+                              (setq sgit-repository-path (sgit--find-repository-path))
+                              (setq sgit-mode-line-format (list "SGit:" 'sgit-branch-name)))
+
+(defvar sgit-prefix-map
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map (kbd "i") 'sgit-add-current-file)
+    (define-key map (kbd "v") 'sgit-commit-update)
+    (define-key map (kbd "g") 'sgit-git)
+    (define-key map (kbd "b") 'sgit-checkout)
+    (define-key map (kbd "=") 'sgit-diff)
+    (define-key map (kbd "u") 'sgit-reset-hard)
+    (define-key map (kbd "n") 'sgit-checkout-new-branch)
+    (define-key map (kbd "m") 'sgit-merge)
+    (define-key map (kbd "l") 'sgit-short-log)
+    map))
 
 (defvar sgit-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x v") (make-sparse-keymap))
-    (define-key map (kbd "C-x v i") 'sgit-add-current-file)
-    (define-key map (kbd "C-x v v") 'sgit-commit-update)
-    (define-key map (kbd "C-x v g") 'sgit-git)
-    (define-key map (kbd "C-x v b") 'sgit-checkout)
-    (define-key map (kbd "C-x v =") 'sgit-diff)
-    (define-key map (kbd "C-x v u") 'sgit-reset-hard)
-    (define-key map (kbd "C-x v n") 'sgit-checkout-new-branch)
-    (define-key map (kbd "C-x v m") 'sgit-merge)
-    (define-key map (kbd "C-x v l") 'sgit-short-log)
+    (define-key map (kbd "C-x v") sgit-prefix-map)
+    ;; (define-key map (kbd "C-x v i") 'sgit-add-current-file)
+    ;; (define-key map (kbd "C-x v v") 'sgit-commit-update)
+    ;; (define-key map (kbd "C-x v g") 'sgit-git)
+    ;; (define-key map (kbd "C-x v b") 'sgit-checkout)
+    ;; (define-key map (kbd "C-x v =") 'sgit-diff)
+    ;; (define-key map (kbd "C-x v u") 'sgit-reset-hard)
+    ;; (define-key map (kbd "C-x v n") 'sgit-checkout-new-branch)
+    ;; (define-key map (kbd "C-x v m") 'sgit-merge)
+    ;; (define-key map (kbd "C-x v l") 'sgit-short-log)
     map))
+
 
 ;; internal functions?
 
@@ -46,33 +60,56 @@
 (defvar sgit--last-commit-massage nil "save last commit message. used in `sgit-commit-amend'")
 (defvar sgit--commit-amend nil "t when current commit is amend")
 
-(defun sgit--get-branch-name ()
+(defun sgit--set-branch-name ()
   "get current branches and set to `sgit-branch-name' and `sgit-branch-list'.
 do nothing if current buffer in not under git repository."
   (when (sgit-repo-p)
-    (let (a
-          b)
-      (with-temp-buffer
-        (shell-command "git branch" t)
-        (goto-char (point-min))
-        (when (search-forward "*" nil t)
-          (forward-char 1)
-          (setq a (buffer-substring-no-properties (point)
-                                                  (point-at-eol)))
-          (goto-char (point-min))
-          (while (re-search-forward "^. " nil t)
-            (replace-match ""))
-          (setq b (delete ""
-                          (split-string (buffer-substring-no-properties (point-min)
-                                                                        (point-max))
-                                        "\n")))))
-      (setq sgit-branch-name a)
-      (setq sgit-branch-list b))))
+    (let ((l (sgit--get-branch-name)))
+      (setq sgit-branch-name (car l))
+      (setq sgit-branch-list l))))
+  ;; (when (sgit-repo-p)
+  ;;   (let (a
+  ;;         b)
+  ;;     (with-temp-buffer
+  ;;       (shell-command "git branch" t)
+  ;;       (goto-char (point-min))
+  ;;       (when (search-forward "*" nil t)
+  ;;         (forward-char 1)
+  ;;         (setq a (buffer-substring-no-properties (point)
+  ;;                                                 (point-at-eol)))
+  ;;         (goto-char (point-min))
+  ;;         (while (re-search-forward "^. " nil t)
+  ;;           (replace-match ""))
+  ;;         (setq b (delete ""
+  ;;                         (split-string (buffer-substring-no-properties (point-min)
+  ;;                                                                       (point-max))
+  ;;                                       "\n")))))
+  ;;     (setq sgit-branch-name a)
+  ;;     (setq sgit-branch-list b))))
+
+(defun sgit--get-branch-name ()             ;not used now
+  "return list of branch names, with current branch in the car."
+  (with-temp-buffer
+    (shell-command "git branch" t)
+    (goto-char (point-min))
+    (when (search-forward "*" nil t)
+      (forward-char 1)
+      (cons (buffer-substring-no-properties (point)
+                                            (point-at-eol))
+            (progn (kill-whole-line)
+                   (goto-char (point-min))
+                   (while (re-search-forward "^  " nil t)
+                     (replace-match ""))
+                   (delete ""
+                           (split-string (buffer-substring-no-properties (point-min)
+                                                                         (point-max))
+                                         "\n")))))))
+;(sgit--get-branch-name)
 
 (defun sgit-when-change-branch ()
   "called when create, checkout, or delete branch.
 it may be called even if branch does not changed."
-  (sgit--get-branch-name))
+  (sgit--set-branch-name))
 
 (defun sgit--find-repository-path (&optional dir)
   ""
@@ -122,9 +159,11 @@ save buffer before commit."
 
 (defun sgit-repo-p ()
   "t if git installed and current dir is git repository, otherwise nil."
-  (condition-case nil
-      (eq 0 (call-process "git" nil nil nil "status"))
-    (error nil))) 
+  (and (executable-find "git")
+       (eq 0 (call-process "git" nil nil nil "status"))))
+  ;; (condition-case nil
+  ;;     (eq 0 (call-process "git" nil nil nil "status"))
+  ;;   (error nil))) 
 
 (defun sgit-complete-branch-name (prompt &optional require-match)
   "read from minibuffer name of branch and return as string.
