@@ -133,7 +133,8 @@ it may be called even if branch does not changed."
         (when (and sgit-mode
                    (equal rpath sgit-repository-path))
           (revert-buffer t t)
-          (sgit-when-change-branch))))))
+          (sgit-when-change-branch))))
+    t))
   ;; (mapcar
   ;;  (lambda (bf)
   ;;    (save-excursion
@@ -344,21 +345,21 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
 (defun sgit-checkout (name &optional switches)
   "checkout branch"
   (interactive (list (sgit-complete-branch-name "Branch name to checkout: " t)))
-  (sgit-git "checkout" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "checkout" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-merge (name &optional switches)
   "merge branch NAME to CURRENT branch.
 that is, first checkout the branch to leave, then merge."
   (interactive (list (sgit-complete-branch-name "Branch name to merge: " t)))
-  (sgit-git "merge" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "merge" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-branch (name &optional switches)
   "create new branch or do another command with switches"
   (interactive (list (sgit-complete-branch-name "Branch name to create: ")))
-  (sgit-git "branch" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "branch" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-delete-branch (name)
   ""
@@ -368,14 +369,14 @@ that is, first checkout the branch to leave, then merge."
 (defun sgit-reset-hard ()
   "resert all tracked files to last commit state."
   (interactive)
-  (sgit-git "reset" "--hard" "HEAD")
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "reset" "--hard" "HEAD")
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-rebase (name)
   ""
   (interactive (list (sgit-complete-branch-name "Branch name to rebase: " t)))
-  (sgit-git "rebase" name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "rebase" name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-merge-current-branch-to-master ()
   "commit needed before merge."
