@@ -63,6 +63,7 @@
 (defun sgit--set-branch-name ()
   "get current branches and set to `sgit-branch-name' and `sgit-branch-list'.
 do nothing if current buffer in not under git repository."
+  (interactive)
   (when (sgit-repo-p)
     (let ((l (sgit--get-branch-name)))
       (setq sgit-branch-name (car l))
@@ -376,11 +377,11 @@ that is, first checkout the branch to leave, then merge."
   (sgit-git "rebase" name)
   (sgit-revert-changed-buffer))
 
-(defun sgit-merge-current-branch-to-master () ;cannot revert when returned to bch 時間が速すぎてrevertできないんだよね
+(defun sgit-merge-current-branch-to-master ()
   "commit needed before merge."
   (interactive)
   (let ((bch sgit-branch-name))
-    (and (sgit-checkout "master") ;これだと終了判定できない
+    (and (sgit-checkout "master")
          (sgit-merge bch)
          (sgit-checkout bch))))
 
