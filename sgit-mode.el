@@ -54,11 +54,12 @@
     map))
 
 
-;; internal functions?
+;; internal variables and functions?
 
 (defvar sgit--wc nil "for `sgit-commit', store window configuration")
-(defvar sgit--last-commit-massage nil "save last commit message. used in `sgit-commit-amend'")
+(defvar sgit--last-commit-message "" "save last commit message. used in `sgit-commit-amend'")
 (defvar sgit--commit-amend nil "t when current commit is amend")
+(defvar sgit--commit-initial-message "" "")
 
 (defun sgit--set-branch-name ()
   "get current branches and set to `sgit-branch-name' and `sgit-branch-list'.
@@ -68,27 +69,8 @@ do nothing if current buffer in not under git repository."
     (let ((l (sgit--get-branch-name)))
       (setq sgit-branch-name (car l))
       (setq sgit-branch-list l))))
-  ;; (when (sgit-repo-p)
-  ;;   (let (a
-  ;;         b)
-  ;;     (with-temp-buffer
-  ;;       (shell-command "git branch" t)
-  ;;       (goto-char (point-min))
-  ;;       (when (search-forward "*" nil t)
-  ;;         (forward-char 1)
-  ;;         (setq a (buffer-substring-no-properties (point)
-  ;;                                                 (point-at-eol)))
-  ;;         (goto-char (point-min))
-  ;;         (while (re-search-forward "^. " nil t)
-  ;;           (replace-match ""))
-  ;;         (setq b (delete ""
-  ;;                         (split-string (buffer-substring-no-properties (point-min)
-  ;;                                                                       (point-max))
-  ;;                                       "\n")))))
-  ;;     (setq sgit-branch-name a)
-  ;;     (setq sgit-branch-list b))))
 
-(defun sgit--get-branch-name ()             ;not used now
+(defun sgit--get-branch-name ()
   "return list of branch names, with current branch in the car."
   (with-temp-buffer
     (shell-command "git branch" t)
@@ -105,7 +87,6 @@ do nothing if current buffer in not under git repository."
                            (split-string (buffer-substring-no-properties (point-min)
                                                                          (point-max))
                                          "\n")))))))
-;(sgit--get-branch-name)
 
 (defun sgit-when-change-branch ()
   "called when create, checkout, or delete branch.
@@ -133,16 +114,8 @@ it may be called even if branch does not changed."
         (when (and sgit-mode
                    (equal rpath sgit-repository-path))
           (revert-buffer t t)
-          (sgit-when-change-branch))))))
-  ;; (mapcar
-  ;;  (lambda (bf)
-  ;;    (save-excursion
-  ;;      (set-buffer bf)
-  ;;      (when sgit-mode
-  ;;        (revert-buffer t t))
-  ;;      (when sgit-mode
-  ;;        (sgit-when-change-branch))))
-  ;;  (buffer-list)))
+          (sgit-when-change-branch))))
+    t))
 
 (defun sgit--display-mode-line ()
   ""
@@ -152,10 +125,9 @@ it may be called even if branch does not changed."
         (setcdr ls (cons 'sgit-mode-line-format (cdr ls))))))
 
 (defun sgit--commit (message)
-  "call from `sgit-commit', etc.
-save buffer before commit."
-  (sgit-git "commit" "-m" (shell-quote-argument message))
-  (setq sgit--last-commit-massage message)
+  "call from `sgit-commit', etc."
+  (sgit-git "commit" "-m" (shell-quote-argument message)) ; amendに関する引数が抜けてる。でも正直いらない
+  (setq sgit--last-commit-message message)
   (setq sgit--commit-amend nil))
 
 (defun sgit-repo-p ()
@@ -187,23 +159,26 @@ about arg REQUIRE-MATCH refer to `completing-read'"
   "execute git with ARGS. ignore `nil' args.
 it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
   (interactive "sgit command options: ")
-  (when (and buffer-file-name (buffer-modified-p)) (save-buffer))
-  (let (op                              ;gitの出力
-        p)                              ;gitの終了ステータス
-    (setq op (with-temp-buffer
-               (setq p (shell-command (concat "git "
-                                              (mapconcat 'identity
-                                                         (delq nil args)
-                                                         " "))
-                                      t))
-               (buffer-substring-no-properties (point-min)
-                                               (point-max))))
-    (save-excursion
-      (set-buffer (get-buffer-create sgit-log-buffer))
+  (when (and sgit-mode buffer-file-name (buffer-modified-p)) (save-buffer))
+  (let ((ls nil)
+        (op nil)
+        (p nil))
+    (setq ls (with-temp-buffer
+               (cons (shell-command (concat "git "
+                                            (mapconcat 'identity
+                                                        (delq nil args)
+                                                        " "))
+                                    t)
+                     (buffer-substring-no-properties (point-min)
+                                                     (point-max)))))
+    (setq p (car ls))
+    (setq op (cdr ls))
+    (with-current-buffer (get-buffer-create sgit-log-buffer)
       (goto-char (point-max))
       (insert op))
     (message op)
-    (eq 0 p)))
+    (and (eq 0 p)
+         op)))
 
 (defun sgit-init ()
   ""
@@ -246,32 +221,37 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
                                   (buffer-substring-no-properties (point-max)
                                                                   (point-min))))
               (set-window-configuration sgit--wc)
-              (kill-buffer "*sgit commit*"))
+              (kill-buffer "*sgit commit*")
+              (setq sgit--commit-initial-message ""))
             t
             nil
-            (get-buffer-create "*sgit commit*")))
+            (get-buffer-create "*sgit commit*"))
+  (insert sgit--commit-initial-message))
 
-(add-hook 'log-edit-hook
-          (lambda ()
-            (when sgit--commit-amend
-              (insert sgit--last-commit-massage))))
+;; (add-hook 'log-edit-hook
+;;           (lambda ()
+;;             (when sgit--commit-amend
+;;               (insert sgit--last-commit-message))))
 
 (defun sgit-commit-all ()
   ""
   (interactive)
   (sgit-add-all)
+  (setq sgit--commit-initial-message (sgit-status))
   (sgit-commit))
 
 (defun sgit-commit-update ()
   ""
-  (interactive)
+  (interactive) 
   (sgit-add-update)
+  (setq sgit--commit-initial-message (sgit-status))
   (sgit-commit))
 
 (defun sgit-commit-amend ()
   ""
   (interactive)
   (setq sgit--commit-amend t)
+  (setq sgit--commit-initla-message sgit--last-commit-message)
   (sgit-commit))
 
 (defun sgit-log (&optional switches)
@@ -344,21 +324,21 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
 (defun sgit-checkout (name &optional switches)
   "checkout branch"
   (interactive (list (sgit-complete-branch-name "Branch name to checkout: " t)))
-  (sgit-git "checkout" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "checkout" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-merge (name &optional switches)
   "merge branch NAME to CURRENT branch.
 that is, first checkout the branch to leave, then merge."
   (interactive (list (sgit-complete-branch-name "Branch name to merge: " t)))
-  (sgit-git "merge" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "merge" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-branch (name &optional switches)
   "create new branch or do another command with switches"
   (interactive (list (sgit-complete-branch-name "Branch name to create: ")))
-  (sgit-git "branch" switches name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "branch" switches name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-delete-branch (name)
   ""
@@ -368,14 +348,14 @@ that is, first checkout the branch to leave, then merge."
 (defun sgit-reset-hard ()
   "resert all tracked files to last commit state."
   (interactive)
-  (sgit-git "reset" "--hard" "HEAD")
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "reset" "--hard" "HEAD")
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-rebase (name)
   ""
   (interactive (list (sgit-complete-branch-name "Branch name to rebase: " t)))
-  (sgit-git "rebase" name)
-  (sgit-revert-changed-buffer))
+  (and (sgit-git "rebase" name)
+       (sgit-revert-changed-buffer)))
 
 (defun sgit-merge-current-branch-to-master ()
   "commit needed before merge."
