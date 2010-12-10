@@ -2,9 +2,11 @@
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (define-key map (kbd "j") 'next-line)
-    (define-key map (kbd "k") 'previous-line)
+    (define-key map (kbd "k") 'previous-line) 
     (define-key map (kbd "o") 'gtkbm-open)
     (define-key map (kbd "d") 'kill-whole-line)
+    (define-key map "p" 'gtkbm-move-upward)
+    (define-key map "n" 'gtkbm-move-downward)
     (define-key map (kbd "q") 'gtkbm-close)
     (define-key map (kbd "<return>") 'gtkbm-open)
     (define-key map (kbd "C-g") 'gtkbm-close)
@@ -64,7 +66,7 @@
       (goto-char (point-max))
       (unless (eq (point) (point-at-bol))
         (newline))
-     (insert "file://"
+      (insert "file://"
               dir)
       (save-buffer))
     (kill-buffer bf)
@@ -73,11 +75,24 @@
 (defun gtkbm-move-upward ()
   ""
   (interactive)
-  ())
+  (let ((st (buffer-substring-no-properties (point-at-bol)
+                                            (point-at-eol))))
+    (kill-whole-line)
+    (forward-line -1)
+    (insert st
+            "\n")
+    (forward-line -1)))
 
 (defun gtkbm-move-downward ()
   ""
   (interactive)
-  ())
+  (let ((st (buffer-substring-no-properties (point-at-bol)
+                                            (point-at-eol))))
+    (kill-whole-line)
+    (forward-line 1)
+    (insert st
+            "\n")
+    (forward-line -1)))
 
 (provide 'gtkbm)
+
