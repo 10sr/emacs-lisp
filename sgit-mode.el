@@ -101,8 +101,8 @@ it may be called even if branch does not changed."
                                   ".git"))
         (expand-file-name (concat path
                                   ".git"))
-    (sgit--find-repository-path (concat path
-                                           "..")))))
+      (sgit--find-repository-path (concat path
+                                          "..")))))
 
 (defun sgit-revert-changed-buffer ()
   ""
@@ -134,9 +134,9 @@ it may be called even if branch does not changed."
   "t if git installed and current dir is git repository, otherwise nil."
   (and (executable-find "git")
        (eq 0 (call-process "git" nil nil nil "status"))))
-  ;; (condition-case nil
-  ;;     (eq 0 (call-process "git" nil nil nil "status"))
-  ;;   (error nil))) 
+;; (condition-case nil
+;;     (eq 0 (call-process "git" nil nil nil "status"))
+;;   (error nil))) 
 
 (defun sgit-complete-branch-name (prompt &optional require-match)
   "read from minibuffer name of branch and return as string.
@@ -166,8 +166,8 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
     (setq ls (with-temp-buffer
                (cons (shell-command (concat "git "
                                             (mapconcat 'identity
-                                                        (delq nil args)
-                                                        " "))
+                                                       (delq nil args)
+                                                       " "))
                                     t)
                      (buffer-substring-no-properties (point-min)
                                                      (point-max)))))
@@ -178,7 +178,8 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
       (insert op))
     (message op)
     (and (eq 0 p)
-         op)))
+         op))
+  t)
 
 (defun sgit-init ()
   ""
@@ -217,9 +218,9 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
   (log-edit (lambda ()
               (interactive)
               (sgit--commit (save-excursion
-                                  (set-buffer "*sgit commit*")
-                                  (buffer-substring-no-properties (point-max)
-                                                                  (point-min))))
+                              (set-buffer "*sgit commit*")
+                              (buffer-substring-no-properties (point-max)
+                                                              (point-min))))
               (set-window-configuration sgit--wc)
               (kill-buffer "*sgit commit*")
               (setq sgit--commit-initial-message ""))
@@ -276,11 +277,11 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
   ""
   (interactive "p")
   (sgit-log (or num
-                    5)
-                (shell-quote-argument (concat "--pretty=format:"
-                                                         (or format
-                                                             "%h - %an, %ad : %s")))
-                "--graph"))
+                5)
+            (shell-quote-argument (concat "--pretty=format:"
+                                          (or format
+                                              "%h - %an, %ad : %s")))
+            "--graph"))
 
 (defun sgit-diff (&optional switches)
   ""
@@ -356,14 +357,6 @@ that is, first checkout the branch to leave, then merge."
   (interactive (list (sgit-complete-branch-name "Branch name to rebase: " t)))
   (and (sgit-git "rebase" name)
        (sgit-revert-changed-buffer)))
-
-(defun sgit-merge-current-branch-to-master ()
-  "commit needed before merge."
-  (interactive)
-  (let ((bch sgit-branch-name))
-    (and (sgit-checkout "master")
-         (sgit-merge bch)
-         (sgit-checkout bch))))
 
 (provide 'sgit-mode)
 

@@ -1,13 +1,16 @@
 (defvar gtkbm-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
-    (define-key map (kbd "j") 'next-line)
-    (define-key map (kbd "k") 'previous-line) 
-    (define-key map (kbd "o") 'gtkbm-open)
-    (define-key map (kbd "d") 'kill-whole-line)
+    (define-key map "j" 'next-line)
+    (define-key map "k" 'previous-line)
+    (define-key map (kbd "<up>") 'previous-line)
+    (define-key map (kbd "<down>") 'next-line)
+    (define-key map "o" 'gtkbm-open)
+    (define-key map "d" 'kill-whole-line)
+    (define-key map "u" 'undo)
     (define-key map "p" 'gtkbm-move-upward)
     (define-key map "n" 'gtkbm-move-downward)
-    (define-key map (kbd "q") 'gtkbm-close)
+    (define-key map "q" 'gtkbm-close)
     (define-key map (kbd "<return>") 'gtkbm-open)
     (define-key map (kbd "C-g") 'gtkbm-close)
     map))
@@ -35,8 +38,6 @@
     (shrink-window-if-larger-than-buffer (get-buffer-window (pop-to-buffer bf t t)))))
 
 (defvar gtkbm--window-configuration nil "")
-
-(defvar gtkbm--last-window nil "not needed?")
 
 (defun gtkbm-open ()
   ""
