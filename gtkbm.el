@@ -23,7 +23,7 @@
   ""
   (interactive)
   (save-buffer)
-  (kill-buffer)
+  (kill-buffer (current-buffer))
   (set-window-configuration gtkbm--window-configuration))
 
 (defun gtkbm ()

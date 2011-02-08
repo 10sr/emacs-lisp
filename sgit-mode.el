@@ -1,3 +1,5 @@
+;; todo: delete functions around branch
+;; remove branch name from mode-line?
 
 (defvar sgit-mode-hook nil "hook run with sgit-mode.")
 (defvar sgit-branch-name nil "current branch name")
@@ -159,10 +161,13 @@ about arg REQUIRE-MATCH refer to `completing-read'"
   "execute git with ARGS. ignore `nil' args.
 it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
   (interactive "sgit command options: ")
-  (when (and sgit-mode buffer-file-name (buffer-modified-p)) (save-buffer))
+  (when (and sgit-mode buffer-file-name (buffer-modified-p))
+    (save-buffer))
   (let ((ls nil)
         (op nil)
-        (p nil))
+        (p nil)
+        (processs-environment (cons "GIT_PAGER="
+                                    process-environment)))
     (setq ls (with-temp-buffer
                (cons (shell-command (concat "git "
                                             (mapconcat 'identity
