@@ -66,7 +66,7 @@
 (defun sgit--set-branch-name ()
   "get current branches and set to `sgit-branch-name' and `sgit-branch-list'.
 do nothing if current buffer in not under git repository."
-  (interactive)
+  ;; (interactive)
   (when (sgit-repo-p)
     (let ((l (sgit--get-branch-name)))
       (setq sgit-branch-name (car l))
@@ -243,6 +243,9 @@ about arg REQUIRE-MATCH refer to `completing-read'"
               (interactive)
               (sgit--commit (save-excursion
                               (set-buffer "*sgit commit*")
+                              (goto-char (point-min))
+                              (while (re-search-forward "^#" nil t)
+                                (kill-whole-line))
                               (buffer-substring-no-properties (point-max)
                                                               (point-min))))
               (set-window-configuration sgit--wc)
