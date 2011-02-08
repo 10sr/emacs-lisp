@@ -33,11 +33,11 @@
     (define-key map (kbd "i") 'sgit-add-current-file)
     (define-key map (kbd "v") 'sgit-commit-update)
     (define-key map (kbd "g") 'sgit-git)
-    (define-key map (kbd "b") 'sgit-checkout)
+    ;; (define-key map (kbd "b") 'sgit-checkout)
     (define-key map (kbd "=") 'sgit-diff)
     (define-key map (kbd "u") 'sgit-reset-hard)
-    (define-key map (kbd "n") 'sgit-checkout-new-branch)
-    (define-key map (kbd "m") 'sgit-merge)
+    ;; (define-key map (kbd "n") 'sgit-checkout-new-branch)
+    ;; (define-key map (kbd "m") 'sgit-merge)
     (define-key map (kbd "l") 'sgit-short-log)
     map))
 
@@ -183,8 +183,7 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
       (insert op))
     (message op)
     (and (eq 0 p)
-         op))
-  t)
+         op)))
 
 (defun sgit-init ()
   ""
@@ -253,12 +252,12 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
   (setq sgit--commit-initial-message (sgit-status))
   (sgit-commit))
 
-(defun sgit-commit-amend ()
-  ""
-  (interactive)
-  (setq sgit--commit-amend t)
-  (setq sgit--commit-initla-message sgit--last-commit-message)
-  (sgit-commit))
+;; (defun sgit-commit-amend ()
+;;   ""
+;;   (interactive)
+;;   (setq sgit--commit-amend t)
+;;   (setq sgit--commit-initla-message sgit--last-commit-message)
+;;   (sgit-commit))
 
 (defun sgit-log (&optional switches)
   ""
@@ -305,7 +304,7 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
 (defun sgit-remote-add (url name)
   ""
   (interactive "sUrl to add: \nsShortname: ")
-  (sgit-git (shell-quote-argument "remote") "add" name url))
+  (sgit-git "remote" "add" name url))
 
 (defun sgit-remote-add-as-origin (url)
   ""
@@ -322,34 +321,34 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
   (interactive "sUrl to clone: ")
   (sgit-git "clone" url))
 
-(defun sgit-checkout-new-branch (name)
-  ""
-  (interactive "sNew branch name: ")
-  (sgit-checkout name "-b"))
+;; (defun sgit-checkout-new-branch (name)
+;;   ""
+;;   (interactive "sNew branch name: ")
+;;   (sgit-checkout name "-b"))
 
-(defun sgit-checkout (name &optional switches)
-  "checkout branch"
-  (interactive (list (sgit-complete-branch-name "Branch name to checkout: " t)))
-  (and (sgit-git "checkout" switches name)
-       (sgit-revert-changed-buffer)))
+;; (defun sgit-checkout (name &optional switches)
+;;   "checkout branch"
+;;   (interactive (list (sgit-complete-branch-name "Branch name to checkout: " t)))
+;;   (and (sgit-git "checkout" switches name)
+;;        (sgit-revert-changed-buffer)))
 
-(defun sgit-merge (name &optional switches)
-  "merge branch NAME to CURRENT branch.
-that is, first checkout the branch to leave, then merge."
-  (interactive (list (sgit-complete-branch-name "Branch name to merge: " t)))
-  (and (sgit-git "merge" switches name)
-       (sgit-revert-changed-buffer)))
+;; (defun sgit-merge (name &optional switches)
+;;   "merge branch NAME to CURRENT branch.
+;; that is, first checkout the branch to leave, then merge."
+;;   (interactive (list (sgit-complete-branch-name "Branch name to merge: " t)))
+;;   (and (sgit-git "merge" switches name)
+;;        (sgit-revert-changed-buffer)))
 
-(defun sgit-branch (name &optional switches)
-  "create new branch or do another command with switches"
-  (interactive (list (sgit-complete-branch-name "Branch name to create: ")))
-  (and (sgit-git "branch" switches name)
-       (sgit-revert-changed-buffer)))
+;; (defun sgit-branch (name &optional switches)
+;;   "create new branch or do another command with switches"
+;;   (interactive (list (sgit-complete-branch-name "Branch name to create: ")))
+;;   (and (sgit-git "branch" switches name)
+;;        (sgit-revert-changed-buffer)))
 
-(defun sgit-delete-branch (name)
-  ""
-  (interactive (list (sgit-complete-branch-name "Branch name to delete: " t)))
-  (sgit-branch name "-D"))
+;; (defun sgit-delete-branch (name)
+;;   ""
+;;   (interactive (list (sgit-complete-branch-name "Branch name to delete: " t)))
+;;   (sgit-branch name "-D"))
 
 (defun sgit-reset-hard ()
   "resert all tracked files to last commit state."
@@ -357,11 +356,11 @@ that is, first checkout the branch to leave, then merge."
   (and (sgit-git "reset" "--hard" "HEAD")
        (sgit-revert-changed-buffer)))
 
-(defun sgit-rebase (name)
-  ""
-  (interactive (list (sgit-complete-branch-name "Branch name to rebase: " t)))
-  (and (sgit-git "rebase" name)
-       (sgit-revert-changed-buffer)))
+;; (defun sgit-rebase (name)
+;;   ""
+;;   (interactive (list (sgit-complete-branch-name "Branch name to rebase: " t)))
+;;   (and (sgit-git "rebase" name)
+;;        (sgit-revert-changed-buffer)))
 
 (provide 'sgit-mode)
 
