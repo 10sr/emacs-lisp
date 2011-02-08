@@ -128,7 +128,7 @@ it may be called even if branch does not changed."
 
 (defun sgit--commit (message)
   "call from `sgit-commit', etc."
-  (sgit-git "commit" "-m" (shell-quote-argument message)) ; amendに関する引数が抜けてる。でも正直いらない
+  (sgit-git "commit" "-m" message)
   (setq sgit--last-commit-message message)
   (setq sgit--commit-amend nil))
 
@@ -157,33 +157,53 @@ about arg REQUIRE-MATCH refer to `completing-read'"
   (when (and buffer-file-name (sgit-repo-p))
     (sgit-mode 1)))
 
+;; (defun sgit-git (&rest args)
+;;   "execute git with ARGS. ignore `nil' args.
+;; it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
+;;   (interactive "sgit command options: ")
+;;   (when (and sgit-mode buffer-file-name (buffer-modified-p))
+;;     (save-buffer))
+;;   (let ((ls nil)
+;;         (op nil)
+;;         (p nil)
+;;         (processs-environment (cons "GIT_PAGER="
+;;                                     process-environment)))
+;;     (setq ls (with-temp-buffer
+;;                (cons (shell-command (concat "git "
+;;                                             (mapconcat 'identity
+;;                                                        (delq nil args)
+;;                                                        " "))
+;;                                     t)
+;;                      (buffer-substring-no-properties (point-min)
+;;                                                      (point-max)))))
+;;     (setq p (car ls))
+;;     (setq op (cdr ls))
+;;     (with-current-buffer (get-buffer-create sgit-log-buffer)
+;;       (goto-char (point-max))
+;;       (insert op))
+;;     (message op)
+;;     (and (eq 0 p)
+;;          op)))
+
 (defun sgit-git (&rest args)
-  "execute git with ARGS. ignore `nil' args.
-it uses `shell-command', so args including whitespace must be `shell-quote-argument'ed."
-  (interactive "sgit command options: ")
+  (sgit-command (mapconcat 'shell-quote-argument
+                           (delq nil args)
+                           " ")))
+
+(defun sgit-command (option)
+  (interactive "sgit: ")
   (when (and sgit-mode buffer-file-name (buffer-modified-p))
     (save-buffer))
-  (let ((ls nil)
-        (op nil)
-        (p nil)
-        (processs-environment (cons "GIT_PAGER="
-                                    process-environment)))
-    (setq ls (with-temp-buffer
-               (cons (shell-command (concat "git "
-                                            (mapconcat 'identity
-                                                       (delq nil args)
-                                                       " "))
-                                    t)
-                     (buffer-substring-no-properties (point-min)
-                                                     (point-max)))))
-    (setq p (car ls))
-    (setq op (cdr ls))
+  (let ((process-environment (cons "GIT_PAGER="
+                                   process-environment))
+        start)
     (with-current-buffer (get-buffer-create sgit-log-buffer)
-      (goto-char (point-max))
-      (insert op))
-    (message op)
-    (and (eq 0 p)
-         op)))
+      (setq start (goto-char (point-max)))
+      (shell-command (concat "git "
+                             option)
+                     t)
+      (message (buffer-substring-no-properties start
+                                               (point-max))))))
 
 (defun sgit-init ()
   ""
@@ -314,7 +334,7 @@ it uses `shell-command', so args including whitespace must be `shell-quote-argum
 (defun sgit-tag (&optional name comment)
   ""
   (interactive "sTag name: \nsComment for tag: ")
-  (sgit-git "tag" "-a" name "-m" (shell-quote-argument comment)))
+  (sgit-git "tag" "-a" name "-m" comment))
 
 (defun sgit-clone (url)
   ""
