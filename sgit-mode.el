@@ -25,14 +25,14 @@
                               (sgit--display-mode-line)
                               (sgit-when-change-branch)
                               (setq sgit-repository-path (sgit--find-repository-path))
-                              (setq sgit-mode-line-format (list "SGit:" 'sgit-branch-name)))
+                              (setq sgit-mode-line-format (list " SGit:" 'sgit-branch-name)))
 
 (defvar sgit-prefix-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (define-key map (kbd "i") 'sgit-add-current-file)
     (define-key map (kbd "v") 'sgit-commit-update)
-    (define-key map (kbd "g") 'sgit-git)
+    (define-key map (kbd "g") 'sgit-command)
     ;; (define-key map (kbd "b") 'sgit-checkout)
     (define-key map (kbd "=") 'sgit-diff)
     (define-key map (kbd "u") 'sgit-reset-hard)
@@ -121,7 +121,8 @@ it may be called even if branch does not changed."
 
 (defun sgit--display-mode-line ()
   ""
-  (if (and sgit-mode (not (member 'sgit-mode-line-format mode-line-format)))
+  (if (and sgit-mode
+           (not (member 'sgit-mode-line-format mode-line-format)))
       (let ((ls (member 'mode-line-position
                         mode-line-format)))
         (setcdr ls (cons 'sgit-mode-line-format (cdr ls))))))
@@ -249,12 +250,13 @@ about arg REQUIRE-MATCH refer to `completing-read'"
                               (buffer-substring-no-properties (point-max)
                                                               (point-min))))
               (set-window-configuration sgit--wc)
-              (kill-buffer "*sgit commit*")
-              (setq sgit--commit-initial-message ""))
+              (kill-buffer "*sgit commit*"))
             t
             nil
             (get-buffer-create "*sgit commit*"))
-  (insert sgit--commit-initial-message))
+  (insert sgit--commit-initial-message)
+  (setq sgit--commit-initial-message ""))
+
 
 ;; (add-hook 'log-edit-hook
 ;;           (lambda ()
@@ -305,9 +307,9 @@ about arg REQUIRE-MATCH refer to `completing-read'"
   (interactive "p")
   (sgit-log (or num
                 5)
-            (shell-quote-argument (concat "--pretty=format:"
-                                          (or format
-                                              "%h - %an, %ad : %s")))
+            (concat "--pretty=format:"
+                    (or format
+                        "%h - %an, %ad : %s"))
             "--graph"))
 
 (defun sgit-diff (&optional switches)
