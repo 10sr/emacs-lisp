@@ -12,7 +12,7 @@
 
 (defvar pack-program-alist
   `(
-    ("\\.7z\\'" ,(concat my-7z-program-name " a") ,(concat my-7z-program-name " x"))
+    ("\\.7z\\'" ,(concat 7z-program-name " a") ,(concat 7z-program-name " x"))
     ("\\.zip\\'" "zip -r" "unzip")
     ("\\.tar\\'" "tar cf" "tar xf")
     ("\\.tgz\\'" "tar czf" "tar xzf")
