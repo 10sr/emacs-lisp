@@ -98,3 +98,5 @@ Otherwise, use `pack-default-extension' for pack."
                                           files
                                           " ")))
       (message "invalid extension for packing!"))))
+
+(provide 'pack)
