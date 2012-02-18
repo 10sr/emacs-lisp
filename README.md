@@ -1,8 +1,7 @@
 # emacs lisp
-* elisp i wrote.
-* currently these libraries do not follow conventions.
+elisp i wrote.
 
-## smallgit-mode.el
+currently these libraries do not follow conventions.
 
 ## dirdired.el
 
