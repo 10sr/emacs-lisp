@@ -1,5 +1,8 @@
 ;; original is available at http://www.bookshelf.jp/soft/meadow_30.html#SEC419
 
+(defvar save-window-size-filename (concat user-emacs-directory
+                                      "framesize.el"))
+
 (defun window-size-save ()
   (let* ((rlist (frame-parameters (selected-frame)))
          (ilist initial-frame-alist)
@@ -10,8 +13,8 @@
          (lMargin (if (integerp (cdr (assoc 'left rlist)))
                       (cdr (assoc 'left rlist)) 0))
          buf
-         (file "~/.emacs.d/framesize.el")
-         (recentf-exclude '("\\.emacs\\.d/framesize\\.el$")))
+         (file save-window-size-filename)
+         (recentf-exclude '(".+")))
     (if (get-file-buffer (expand-file-name file))
         (setq buf (get-file-buffer (expand-file-name file)))
       (setq buf (find-file-noselect file)))
@@ -36,7 +39,7 @@
     ))
 
 (defun window-size-load ()
-  (let* ((file "~/.emacs.d/framesize.el"))
+  (let* ((file save-window-size-filename))
     (if (file-exists-p file)
         (load file))))
 
