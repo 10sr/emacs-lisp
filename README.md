@@ -1,7 +1,8 @@
 # emacs lisp
-elisp i wrote.
 
-currently these libraries do not follow conventions.
+Emacs lisp libraries I wrote.
+
+Currently these libraries do not follow conventions.
 
 ## pack.el
 
@@ -15,7 +16,6 @@ Library version of <http://www.bookshelf.jp/soft/meadow_30.html#SEC419>.
 
 Automatically save and restore window size and position.
 
-## dirdired.el
-
 ## gtkbm.el
-Handle .gtk-bookmarks.
+
+Handle ~/.gtk-bookmarks.
