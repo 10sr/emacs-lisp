@@ -12,21 +12,21 @@
   nil)
 
 (defun afx-mode-on ()
-  ""
+  "Turn on `afx-mode'."
   (afx-mode 1))
 
 (defun afx-mode-off ()
-  ""
+  "Turn off `afx-mode'."
   (afx-mode 0))
 
 (defun afx-always-enable-on-dired ()
-  ""
+  "Always enable `afx-mode' when viewing directory using `dired'."
   (interactive)
   (add-hook 'dired-mode-hook
             'afx-mode-on))
 
 (defun afx (dirname &optional switches)
-  "afx"
+  "Open `dired' buffer with `afx-mode' enabled."
   (interactive (dired-read-dir-and-switches "with AFX keymap "))
   (switch-to-buffer (dired dirname switches))
   (afx-mode-on))
