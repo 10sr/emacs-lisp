@@ -55,3 +55,5 @@
             t)
   (add-hook 'kill-emacs-hook
             'window-size-save))
+
+(provide 'save-window-size)
