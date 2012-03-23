@@ -6,10 +6,10 @@
 (defvar gtkbm-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
-    (define-key map "j" 'next-line)
-    (define-key map "k" 'previous-line)
-    (define-key map (kbd "<up>") 'previous-line)
-    (define-key map (kbd "<down>") 'next-line)
+    (define-key map "j" 'gtkbm-next-line)
+    (define-key map "k" 'gtkbm-previous-line)
+    (define-key map (kbd "<up>") 'gtkbm-previous-line)
+    (define-key map (kbd "<down>") 'gtkbm-next-line)
     (define-key map "o" 'gtkbm-open)
     (define-key map "d" 'kill-whole-line)
     (define-key map "u" 'undo)
@@ -47,7 +47,8 @@
   (let ((bf (find-file-noselect gtkbm-file-path)))
     (with-current-buffer bf
       (gtkbm-mode)
-      (rename-buffer "*gtkbm*" t))
+      (rename-buffer "*gtkbm*" t)
+      (setq buffer-read-only t))
     (shrink-window-if-larger-than-buffer (get-buffer-window (pop-to-buffer bf t t)))))
 
 (defun gtkbm-open ()
@@ -91,8 +92,9 @@
   ""
   (interactive)
   (let* ((dir (directory-file-name (expand-file-name default-directory)))
-        (dirname (file-name-nondirectory dir))
-        (bf (find-file-noselect gtkbm-file-path)))
+         (dirname (file-name-nondirectory dir))
+         (bf (find-file-noselect gtkbm-file-path))
+         (inhibit-read-only t))
     (with-current-buffer bf
       (goto-char (point-max))
       (unless (eq (point) (point-at-bol))
@@ -108,7 +110,8 @@
   ""
   (interactive)
   (let ((st (buffer-substring-no-properties (point-at-bol)
-                                            (point-at-eol))))
+                                            (point-at-eol)))
+        (inhibit-read-only t))
     (kill-whole-line)
     (forward-line -1)
     (insert st
@@ -119,12 +122,27 @@
   ""
   (interactive)
   (let ((st (buffer-substring-no-properties (point-at-bol)
-                                            (point-at-eol))))
+                                            (point-at-eol)))
+        (inhibit-read-only t))
     (kill-whole-line)
     (forward-line 1)
     (insert st
             "\n")
     (forward-line -1)))
+
+(defun gtkbm-forward-line (arg)
+  ""
+  (interactive "p")
+  (forward-line arg)
+  (goto-char (+ (point-at-bol)
+                7)))
+
+(defun gtkbm-backward-line (arg)
+  ""
+  (interactive "p")
+  (forward-line (- 0 arg))
+  (goto-char (+ (point-at-bol)
+                7)))
 
 (provide 'gtkbm)
 
