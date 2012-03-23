@@ -78,7 +78,7 @@
                                                            (progn
                                                              (while (not (or (eq (aref (thing-at-point 'char)
                                                                                        0)
-                                                                                 ?\ )
+                                                                                 ? )
                                                                              (eq (point)
                                                                                  (point-at-eol))))
                                                                (forward-char 1))

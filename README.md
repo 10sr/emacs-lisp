@@ -1,9 +1,5 @@
 # emacs lisp
 
-Emacs lisp libraries I wrote.
-
-Currently these libraries do not follow conventions.
-
 ## pack.el
 
 Pack or unpack files.
@@ -16,3 +12,6 @@ Library version of <http://www.bookshelf.jp/soft/meadow_30.html#SEC419>.
 
 Automatically save and restore window size and position.
 
+## gtkbm.el
+
+Handle ~/.gtk-bookmarks
