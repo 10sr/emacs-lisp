@@ -130,14 +130,14 @@
             "\n")
     (forward-line -1)))
 
-(defun gtkbm-forward-line (arg)
+(defun gtkbm-next-line (arg)
   ""
   (interactive "p")
   (forward-line arg)
   (goto-char (+ (point-at-bol)
                 7)))
 
-(defun gtkbm-backward-line (arg)
+(defun gtkbm-previous-line (arg)
   ""
   (interactive "p")
   (forward-line (- 0 arg))
