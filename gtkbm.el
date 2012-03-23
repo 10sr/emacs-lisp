@@ -1,3 +1,5 @@
+;; usage: bind some keys to `gtkbm' and `gtkbm-add-current-dir'.
+
 (require 'url-util)
 
 (defvar gtkbm-mode-map
