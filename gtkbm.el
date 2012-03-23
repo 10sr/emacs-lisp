@@ -1,3 +1,5 @@
+(require 'url-util)
+
 (defvar gtkbm-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
@@ -51,22 +53,24 @@
 (defun gtkbm-get-dir ()
   ""
   (interactive)
-  (buffer-substring-no-properties (save-excursion
-                                    (goto-char (point-at-bol))
-                                    (forward-char 7)
-                                    (point))
-                                  (save-excursion
-                                    (goto-char (point-at-eol))
-                                    (while (not (eq (aref (thing-at-point 'char)
-                                                          0)
-                                                    ?\ ))
-                                      (forward-char -1))
-                                    (point))))
+  (url-unhex-string (save-excursion
+                      (buffer-substring-no-properties (progn
+                                                        (goto-char (point-at-bol))
+                                                        (forward-char 7)
+                                                        (point))
+                                                      (progn
+                                                        (while (not (eq (aref (thing-at-point 'char)
+                                                                              0)
+                                                                        ?\ ))
+                                                          (forward-char 1))
+                                                        (point))))
+                    t))
 
 (defun gtkbm-add-current-dir ()
   ""
   (interactive)
-  (let* ((dir (expand-file-name default-directory))
+  (let* ((dir (directory-file-name (expand-file-name default-directory)))
+         (dirname (file-name-nondirectory dir))
          (recentf-exclude (list gtkbm-file-path))
          (bf (find-file-noselect gtkbm-file-path)))
     (with-current-buffer bf
@@ -74,7 +78,12 @@
       (unless (eq (point) (point-at-bol))
         (newline))
       (insert "file://"
-              dir)
+              (mapconcat 'url-hexify-string
+                         (split-string dir
+                                       "/")
+                         "/")
+              " "
+              dirname)
       (save-buffer))
     (kill-buffer bf)
     (message "%s added to %s." dir gtkbm-file-path)))
