@@ -23,7 +23,12 @@
 
 (define-derived-mode gtkbm-mode fundamental-mode "gtkbm"
   "major mode handling gtk-bookmark"
-  t)
+  (set (make-local-variable 'scroll-margin)
+       0))
+
+(eval-after-load "recentf"
+  '(add-to-list 'recentf-exclude
+               (rx-to-string gtkbm-file-path)))
 
 (defun gtkbm-close ()
   ""
@@ -36,8 +41,7 @@
   ""
   (interactive)
   (setq gtkbm--window-configuration (current-window-configuration))
-  (let* ((recentf-exclude (list gtkbm-file-path))
-         (bf (find-file-noselect gtkbm-file-path)))
+  (let ((bf (find-file-noselect gtkbm-file-path)))
     (with-current-buffer bf
       (gtkbm-mode)
       (rename-buffer "*gtkbm*" t))
@@ -50,38 +54,47 @@
     (gtkbm-close)
     (dired dir)))
 
+(defun gtkbm-encode-filename (string)
+  (concat "file://"
+          (mapconcat 'url-hexify-string
+                     (split-string string
+                                   "/")
+                     "/")))
+
+(defun gtkbm-decode-filename (string)
+  (decode-coding-string (url-unhex-string (replace-regexp-in-string "^file://"
+                                                                    ""
+                                                                    string)
+                                          t)
+                        (or file-name-coding-system
+                            default-file-name-coding-system
+                            'utf-8)))
+
 (defun gtkbm-get-dir ()
   ""
   (interactive)
-  (url-unhex-string (save-excursion
-                      (buffer-substring-no-properties (progn
-                                                        (goto-char (point-at-bol))
-                                                        (forward-char 7)
-                                                        (point))
-                                                      (progn
-                                                        (while (not (eq (aref (thing-at-point 'char)
-                                                                              0)
-                                                                        ?\ ))
-                                                          (forward-char 1))
-                                                        (point))))
-                    t))
+  (gtkbm-decode-filename (save-excursion
+                           (buffer-substring-no-properties (goto-char (point-at-bol))
+                                                           (progn
+                                                             (while (not (or (eq (aref (thing-at-point 'char)
+                                                                                       0)
+                                                                                 ?\ )
+                                                                             (eq (point)
+                                                                                 (point-at-eol))))
+                                                               (forward-char 1))
+                                                             (point))))))
 
 (defun gtkbm-add-current-dir ()
   ""
   (interactive)
   (let* ((dir (directory-file-name (expand-file-name default-directory)))
-         (dirname (file-name-nondirectory dir))
-         (recentf-exclude (list gtkbm-file-path))
-         (bf (find-file-noselect gtkbm-file-path)))
+        (dirname (file-name-nondirectory dir))
+        (bf (find-file-noselect gtkbm-file-path)))
     (with-current-buffer bf
       (goto-char (point-max))
       (unless (eq (point) (point-at-bol))
         (newline))
-      (insert "file://"
-              (mapconcat 'url-hexify-string
-                         (split-string dir
-                                       "/")
-                         "/")
+      (insert (gtkbm-encode-filename dir)
               " "
               dirname)
       (save-buffer))
