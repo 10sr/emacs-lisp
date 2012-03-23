@@ -1,3 +1,4 @@
+;; gtkbm.el: Handle ~/.gtk-bookmarks with emacs.
 ;; usage: bind some keys to `gtkbm' and `gtkbm-add-current-dir'.
 
 (require 'url-util)
