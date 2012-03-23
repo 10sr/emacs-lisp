@@ -11,8 +11,8 @@
     (define-key map (kbd "<up>") 'gtkbm-previous-line)
     (define-key map (kbd "<down>") 'gtkbm-next-line)
     (define-key map "o" 'gtkbm-open)
-    (define-key map "d" 'kill-whole-line)
-    (define-key map "u" 'undo)
+    (define-key map "d" 'gtkbm-remove-dir)
+    (define-key map "u" 'gtkbm-undo)
     (define-key map "p" 'gtkbm-move-upward)
     (define-key map "n" 'gtkbm-move-downward)
     (define-key map "q" 'gtkbm-close)
@@ -105,6 +105,22 @@
       (save-buffer))
     (kill-buffer bf)
     (message "%s added to %s." dir gtkbm-file-path)))
+
+(defun gtkbm-remove-dir ()
+  ""
+  (interactive)
+  (let ((inhibit-read-only t))
+    (delete-region (point-at-bol) (point-at-eol))
+    (delete-char 1)
+    )
+  (goto-char (+ (point-at-bol)
+                7)))
+
+(defun gtkbm-undo ()
+  ""
+  (interactive)
+  (let ((inhibit-read-only t))
+    (undo)))
 
 (defun gtkbm-move-upward ()
   ""
