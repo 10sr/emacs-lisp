@@ -1,14 +1,17 @@
 (require 'dired-aux) ;; needed to use dired-dwim-target-directory
+(require 'simple)
 
 (defvar 7z-program-name
   (or (executable-find "7z")
       (executable-find "7za")
       (executable-find "7zr"))
-  "7z program.")
+  "Path to 7z program.")
+(defvar pack-buffer-name "*Pack*"
+  "Buffer name for `pack'")
 
 (defvar pack-default-extension
   "7z"
-  "default suffix for packing. filename with this suffix must matches one of `pack-program-alist'")
+  "Default suffix for packing. Filename with this suffix must matches one of `pack-program-alist'.")
 
 (defvar pack-program-alist
   `(
@@ -24,7 +27,7 @@ PACKING-COMMAND and UNPACKING-COMMAND can be nil if the command is not available
 Alist is searched from the beginning so pattern for \".tar.gz\" should be ahead of pattern for \".gz\"")
 
 (defun dired-do-pack-or-unpack ()
-  "Pack or unpack files.
+  "Pack or unpack files in dired.
 If targetting one file and that is archive file defined in `pack-program-alist', unpack that.
 Otherwise, pack marked files, prompting user to decide filename for archive."
   (interactive)
@@ -77,26 +80,28 @@ Otherwise, return nil."
                    (pack-file-name-association earchive)))
          )
     (if cmd
-        (shell-command (concat cmd 
+        (async-shell-command (concat cmd 
                                " "
-                               (shell-quote-argument earchive)))
+                               (shell-quote-argument earchive))
+                       (get-buffer-create pack-buffer-name))
       (message "this is not archive file defined in `pack-program-alist'!"))))
 
 (defun pack (archive &rest files)
   "Pack FILES into ARCHIVE.
-if ARCHIVE have extension defined in `pack-program-alist', use that command.
+If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
   (let* ((archive-ext (pack-file-extension (expand-file-name archive)))
          (cmd (car (pack-file-name-association archive-ext)))
          )
     (if cmd
-        (shell-command (concat cmd
+        (async-shell-command (concat cmd
                                " "
                                (shell-quote-argument archive-ext)
                                " "
                                (mapconcat 'shell-quote-argument
                                           files
-                                          " ")))
+                                          " "))
+                       (get-buffer-create pack-buffer-name))
       (message "invalid extension for packing!"))))
 
 (provide 'pack)
