@@ -11,9 +11,13 @@
     (define-key map "p" 'gtkbm-move-upward)
     (define-key map "n" 'gtkbm-move-downward)
     (define-key map "q" 'gtkbm-close)
-    (define-key map (kbd "<return>") 'gtkbm-open)
+    (define-key map (kbd "C-m") 'gtkbm-open)
     (define-key map (kbd "C-g") 'gtkbm-close)
     map))
+
+(defvar gtkbm-file-path (expand-file-name "~/.gtk-bookmarks"))
+
+(defvar gtkbm--window-configuration nil "")
 
 (define-derived-mode gtkbm-mode fundamental-mode "gtkbm"
   "major mode handling gtk-bookmark"
@@ -37,8 +41,6 @@
       (rename-buffer "*gtkbm*" t))
     (shrink-window-if-larger-than-buffer (get-buffer-window (pop-to-buffer bf t t)))))
 
-(defvar gtkbm--window-configuration nil "")
-
 (defun gtkbm-open ()
   ""
   (interactive)
@@ -53,9 +55,13 @@
                                     (goto-char (point-at-bol))
                                     (forward-char 7)
                                     (point))
-                                  (point-at-eol)))
-
-(defvar gtkbm-file-path (expand-file-name "~/.gtk-bookmarks"))
+                                  (save-excursion
+                                    (goto-char (point-at-eol))
+                                    (while (not (eq (aref (thing-at-point 'char)
+                                                          0)
+                                                    ?\ ))
+                                      (forward-char -1))
+                                    (point))))
 
 (defun gtkbm-add-current-dir ()
   ""
