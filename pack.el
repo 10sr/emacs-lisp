@@ -1,4 +1,3 @@
-(require 'dired-aux) ;; needed to use dired-dwim-target-directory
 (require 'simple)
 
 (defvar 7z-program-name
@@ -39,7 +38,9 @@ Otherwise, pack marked files, prompting user to decide filename for archive."
              (pack-file-name-association onefile))
         (when (y-or-n-p (format "unpack %s? " onefile))
           (unpack onefile))
-      (let* ((dir-default (dired-dwim-target-directory))
+      (let* ((dir-default (if (require 'dired-aux nil t)
+                              (dired-dwim-target-directory)
+                            default-directory))
              (archive-default (pack-file-extension (file-name-nondirectory (car infiles))))
              (archive ;; (if (interactive-p)
               (read-file-name "Output file to pack : "
