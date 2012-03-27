@@ -1,6 +1,6 @@
 (require 'simple)
 
-(declare-function dired-dwim-terget-directory "dired-aux")
+(declare-function dired-dwim-target-directory "dired-aux")
 
 (defvar 7z-program-name
   (or (executable-find "7z")
