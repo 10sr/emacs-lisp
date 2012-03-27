@@ -1,9 +1,10 @@
-;; (and (require 'dired-list-all-mode nil t)
-;;      (setq dired-listing-switches "-lhFG")
-;;      (add-hook 'dired-mode-hook
-;;                (lambda ()
-;;                  (define-key dired-mode-map "a" 'dired-list-all-mode)
-;;                  )))
+;; add to your dot.emacs as below:
+;; (when (require 'dired-list-all-mode nil t)
+;;    (setq dired-listing-switches "-lhFG")
+;;    (add-hook 'dired-mode-hook
+;;              (lambda ()
+;;                (define-key dired-mode-map "a" 'dired-list-all-mode)
+;;                )))
 
 
 (defvar dired-list-all-switch "-A"
