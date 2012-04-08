@@ -2,17 +2,12 @@
 ;; usage: (require 'set-modeline-color nil t)
 
 (defvar set-modeline-color-color-alist
-  (if window-system
-      `((readonly "white" "blue")
-        (overwrite "white" "red")
-        (insert ,(face-foreground 'modeline) ,(face-background 'modeline)))
-    `((readonly "blue" "white")
-      (overwrite "red" "white")
-      (insert ,(face-foreground 'modeline) ,(face-background 'modeline))))
-  "Alist of write state and modeline color.
+  `((readonly "white" "blue")
+    (overwrite "white" "red")
+    (insert ,(face-foreground 'modeline) ,(face-background 'modeline)))
+"Alist of write state and modeline color.
 Each element looks like (STATE FOREGROUND-COLOR BACKGROUND-COLOR).
-STATE should be `insert', `readonly', or `overwrite'.
-Note that when running emacs in terminal foreground color and background color seem to be swapped.")
+STATE should be `insert', `readonly', or `overwrite'.")
 
 (defvar set-modeline-color-state nil)
 
@@ -24,15 +19,26 @@ Note that when running emacs in terminal foreground color and background color s
                      'overwrite
                    'insert))))
     (unless (eq state set-modeline-color-state)
-      (set-face-foreground 'modeline
-                           (nth 1
-                                (assq state
-                                      set-modeline-color-color-alist)))
-      (set-face-background 'modeline
-                           (nth 2
-                                (assq state
-                                      set-modeline-color-color-alist)))
-      (setq set-modeline-color-state state))))
+      (if (face-inverse-video-p 'modeline)
+          (progn
+            (set-face-foreground 'modeline
+                                 (nth 2
+                                      (assq state
+                                            set-modeline-color-color-alist)))
+            (set-face-background 'modeline
+                                 (nth 1
+                                      (assq state
+                                            set-modeline-color-color-alist))))
+        (progn
+          (set-face-foreground 'modeline
+                               (nth 1
+                                    (assq state
+                                          set-modeline-color-color-alist)))
+          (set-face-background 'modeline
+                               (nth 2
+                                    (assq state
+                                          set-modeline-color-color-alist))))
+        (setq set-modeline-color-state state)))))
 (add-hook 'post-command-hook 'set-modeline-color-according-to-write-mode)
 (add-hook 'after-init-hook 'set-modeline-color-according-to-write-mode)
 
