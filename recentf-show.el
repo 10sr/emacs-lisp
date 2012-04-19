@@ -1,3 +1,5 @@
+(require 'recentf)
+
 (defvar recentf-show-window-height 10)
 
 (defvar recentf-show-mode-map
