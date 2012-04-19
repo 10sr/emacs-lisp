@@ -31,7 +31,7 @@
 
 (eval-after-load "recentf"
   '(add-to-list 'recentf-exclude
-               (rx-to-string gtkbm-file-path)))
+               (regexp-quote gtkbm-file-path)))
 
 (defun gtkbm-close ()
   ""
