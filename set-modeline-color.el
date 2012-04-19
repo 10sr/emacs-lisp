@@ -19,7 +19,7 @@ STATE should be `insert', `readonly', or `overwrite'.")
                      'overwrite
                    'insert))))
     (unless (eq state set-modeline-color-state)
-      (if (face-inverse-video-p 'modeline)
+      (if (face-inverse-video-p 'mode-line)
           (progn
             (set-face-foreground 'mode-line
                                  (nth 2

@@ -1,6 +1,7 @@
 (require 'recentf)
 
-(defvar recentf-show-window-height 10)
+(defvar recentf-show-window-height 10
+  "Max height for window of `recentf-show'")
 
 (defvar recentf-show-mode-map
   (let ((map (make-sparse-keymap)))
@@ -15,7 +16,7 @@
 (defvar recentf-show-window-configuration nil)
 
 (defvar recentf-show-abbreviate t
-  "Non-nil means `abbreviate-file-name' in `recentf-show'.")
+  "Non-nil means `abbreviate-file-name' in `recentf-show' buffer.")
 
 (define-derived-mode recentf-show-mode fundamental-mode "recentf-show"
   "major mode for `recentf-show'"
@@ -24,6 +25,7 @@
   )
 
 (defun recentf-show ()
+  "Show simplified list of `recentf-list'."
   (interactive)
   (setq recentf-show-window-configuration (current-window-configuration))
   (pop-to-buffer (recentf-show-create-buffer) t t)
