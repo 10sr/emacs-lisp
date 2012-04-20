@@ -82,7 +82,7 @@
     (recentf-show-close)
     (dired (if (file-directory-p f)
                f
-             (or (file-name-directory g)
+             (or (file-name-directory f)
                  ".")))))
 
 (provide 'recentf-show)
