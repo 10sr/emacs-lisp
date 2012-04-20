@@ -78,7 +78,11 @@
 
 (defun recentf-show-dired()
   (interactive)
-  (dired (or (file-name-directory (recentf-show-dired))
-             ".")))
+  (let ((f (recentf-show-get-filename)))
+    (recentf-show-close)
+    (dired (if (file-directory-p f)
+               f
+             (or (file-name-directory g)
+                 ".")))))
 
 (provide 'recentf-show)
