@@ -1,7 +1,7 @@
 (require 'recentf)
 
 (defvar recentf-show-window-height 10
-  "Max height for window of `recentf-show'")
+  "Max height of window of `recentf-show'")
 
 (defvar recentf-show-mode-map
   (let ((map (make-sparse-keymap)))
@@ -11,8 +11,10 @@
     (define-key map (kbd "C-m") 'recentf-show-find-file)
     (define-key map (kbd "SPC") 'recentf-show-find-file)
     (define-key map "v" 'recentf-show-view-file)
+    (define-key map "@" 'recentf-show-dired)
     (define-key map "q" 'recentf-show-close)
     (define-key map (kbd "C-g") 'recentf-show-close)
+    (define-key map "?" 'describe-mode)
     map))
 
 (defvar recentf-show-window-configuration nil)
@@ -21,7 +23,7 @@
   "Non-nil means `abbreviate-file-name' in `recentf-show' buffer.")
 
 (define-derived-mode recentf-show-mode fundamental-mode "recentf-show"
-  "major mode for `recentf-show'"
+  "Major mode for `recentf-show'"
   ;; (set (make-local-variable 'scroll-margin)
   ;;      0)
   )
@@ -29,6 +31,7 @@
 (defun recentf-show ()
   "Show simplified list of `recentf-list'."
   (interactive)
+  (recentf-save-list)
   (setq recentf-show-window-configuration (current-window-configuration))
   (pop-to-buffer (recentf-show-create-buffer) t t)
   (set-window-text-height (selected-window)
@@ -72,5 +75,10 @@
 (defun recentf-show-get-filename ()
   (buffer-substring-no-properties (point-at-bol)
                                   (point-at-eol)))
+
+(defun recentf-show-dired()
+  (interactive)
+  (dired (or (file-name-directory (recentf-show-dired))
+             ".")))
 
 (provide 'recentf-show)
