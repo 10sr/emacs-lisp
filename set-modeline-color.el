@@ -4,7 +4,7 @@
 (defvar set-modeline-color-color-alist
   `((readonly "white" "blue")
     (overwrite "white" "red")
-    (insert ,(face-foreground 'mode-line) ,(face-background 'mode-line)))
+    (insert "white" "black"))
 "Alist of write state and modeline color.
 Each element looks like (STATE FOREGROUND-COLOR BACKGROUND-COLOR).
 STATE should be `insert', `readonly', or `overwrite'.")
