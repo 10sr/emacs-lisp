@@ -150,6 +150,9 @@
   ""
   (interactive "p")
   (forward-line arg)
+  (when (eq (point)
+            (point-max))
+    (forward-line -1))
   (goto-char (+ (point-at-bol)
                 7)))
 
