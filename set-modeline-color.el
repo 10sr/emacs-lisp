@@ -25,23 +25,23 @@ STATE should be `insert', `readonly', or `overwrite'.")
                                  (or (nth 2
                                       (assq state
                                             set-modeline-color-color-alist))
-                                     "unspecified-fg"))
+                                     (face-foreground 'default)))
             (set-face-background 'mode-line
                                  (or (nth 1
                                       (assq state
                                             set-modeline-color-color-alist))
-                                     "unspecified-bg")))
+                                     (face-background 'default))))
         (progn
           (set-face-foreground 'mode-line
                                (or (nth 1
                                     (assq state
                                           set-modeline-color-color-alist))
-                                   "unspecified-bg"))
+                                   (face-background 'default)))
           (set-face-background 'mode-line
                                (or (nth 2
                                     (assq state
                                           set-modeline-color-color-alist))
-                                   "unspecified-fg"))))
+                                   (face-foreground 'default)))))
       (setq set-modeline-color-state state))))
 (add-hook 'post-command-hook 'set-modeline-color-according-to-write-mode)
 (add-hook 'after-init-hook 'set-modeline-color-according-to-write-mode)
