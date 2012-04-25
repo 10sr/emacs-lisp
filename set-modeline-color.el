@@ -4,7 +4,7 @@
 (defvar set-modeline-color-color-alist
   `((readonly "white" "blue")
     (overwrite "white" "red")
-    (insert "white" "black"))
+    (insert nil nil))
 "Alist of write state and modeline color.
 Each element looks like (STATE FOREGROUND-COLOR BACKGROUND-COLOR).
 STATE should be `insert', `readonly', or `overwrite'.")
@@ -22,22 +22,26 @@ STATE should be `insert', `readonly', or `overwrite'.")
       (if (face-inverse-video-p 'mode-line)
           (progn
             (set-face-foreground 'mode-line
-                                 (nth 2
+                                 (or (nth 2
                                       (assq state
-                                            set-modeline-color-color-alist)))
+                                            set-modeline-color-color-alist))
+                                     "unspecified-fg"))
             (set-face-background 'mode-line
-                                 (nth 1
+                                 (or (nth 1
                                       (assq state
-                                            set-modeline-color-color-alist))))
+                                            set-modeline-color-color-alist))
+                                     "unspecified-bg")))
         (progn
           (set-face-foreground 'mode-line
-                               (nth 1
+                               (or (nth 1
                                     (assq state
-                                          set-modeline-color-color-alist)))
+                                          set-modeline-color-color-alist))
+                                   "unspecified-bg"))
           (set-face-background 'mode-line
-                               (nth 2
+                               (or (nth 2
                                     (assq state
-                                          set-modeline-color-color-alist)))))
+                                          set-modeline-color-color-alist))
+                                   "unspecified-fg"))))
       (setq set-modeline-color-state state))))
 (add-hook 'post-command-hook 'set-modeline-color-according-to-write-mode)
 (add-hook 'after-init-hook 'set-modeline-color-according-to-write-mode)
