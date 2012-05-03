@@ -1,5 +1,6 @@
 (defvar git-command-history nil
   "History list for `git-command'.")
+
 (defun git-command-ps1 (str)
   (let ((gcmpl "/etc/bash_completion.d/git"))
     (if (file-readable-p gcmpl)
@@ -16,6 +17,7 @@
           (buffer-substring-no-properties (point-min)
                                           (point-max)))
       "")))
+
 (defun git-command (cmd)
   "Shell like git command interface."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
@@ -38,3 +40,5 @@
       (setq buffer-read-only t)
       (view-mode 1)
       )))
+
+(provide 'git-command)
