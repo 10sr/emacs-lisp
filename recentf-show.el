@@ -15,6 +15,7 @@
     (define-key map "q" 'recentf-show-close)
     (define-key map (kbd "C-g") 'recentf-show-close)
     (define-key map "?" 'describe-mode)
+    (define-key map "/" 'isearch-forward)
     map))
 
 (defvar recentf-show-window-configuration nil)
@@ -39,6 +40,7 @@
   (shrink-window-if-larger-than-buffer (selected-window)))
 
 (defun recentf-show-create-buffer ()
+  "Make buffer listing recentf files"
   (let ((bname "*recentf-show*"))
     (and (get-buffer bname)
          (kill-buffer bname))
