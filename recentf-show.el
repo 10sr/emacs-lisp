@@ -32,12 +32,16 @@
 (defun recentf-show ()
   "Show simplified list of `recentf-list'."
   (interactive)
-  (recentf-save-list)
-  (setq recentf-show-window-configuration (current-window-configuration))
-  (pop-to-buffer (recentf-show-create-buffer) t t)
-  (set-window-text-height (selected-window)
-                          recentf-show-window-height)
-  (shrink-window-if-larger-than-buffer (selected-window)))
+  (if recentf-list
+      (progn
+        (recentf-save-list)
+        (setq recentf-show-window-configuration (current-window-configuration))
+        (pop-to-buffer (recentf-show-create-buffer) t t)
+        (set-window-text-height (selected-window)
+                                recentf-show-window-height)
+        (shrink-window-if-larger-than-buffer (selected-window)))
+    (message "No recent file!")))
+  
 
 (defun recentf-show-create-buffer ()
   "Make buffer listing recentf files"
