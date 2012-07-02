@@ -39,12 +39,16 @@ files to choose from. It defaults to the whole recent list.
 If optional argument BUFFER-NAME is non-nil, it is a buffer name to
 use for the buffer. It defaults to \"*recetf-show*\"."
   (interactive)
-  ;; (recentf-save-list)
-  (setq recentf-show-window-configuration (current-window-configuration))
-  (pop-to-buffer (recentf-show-create-buffer files buffer-name) t t)
-  (set-window-text-height (selected-window)
-                          recentf-show-window-height)
-  (shrink-window-if-larger-than-buffer (selected-window)))
+  (if (or files
+          recentf-list)
+      (progn
+        ;; (recentf-save-list)
+        (setq recentf-show-window-configuration (current-window-configuration))
+        (pop-to-buffer (recentf-show-create-buffer files buffer-name) t t)
+        (set-window-text-height (selected-window)
+                                recentf-show-window-height)
+        (shrink-window-if-larger-than-buffer (selected-window)))
+    (message "No recent file!")))
 
 (defun recentf-show-create-buffer (&optional files buffer-name)
   "Create buffer listing recentf files"
