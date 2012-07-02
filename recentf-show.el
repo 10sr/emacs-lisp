@@ -18,6 +18,9 @@
     (define-key map "/" 'isearch-forward)
     map))
 
+(defvar recentf-show-before-listing-hook nil
+  "Hook run before creating buffer of `recentf-show'.")
+
 (defvar recentf-show-window-configuration nil)
 
 (defvar recentf-show-abbreviate t
@@ -49,6 +52,7 @@ use for the buffer. It defaults to \"*recetf-show*\"."
                    "*recentf-show*")))
     (and (get-buffer bname)
          (kill-buffer bname))
+    (run-hooks 'recentf-show-before-listing-hook)
     (let ((bf (get-buffer-create bname)))
       (with-current-buffer bf
         (recentf-show-mode)
