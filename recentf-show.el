@@ -32,7 +32,7 @@
 (defun recentf-show ()
   "Show simplified list of `recentf-list'."
   (interactive)
-  (recentf-save-list)
+  ;; (recentf-save-list)
   (setq recentf-show-window-configuration (current-window-configuration))
   (pop-to-buffer (recentf-show-create-buffer) t t)
   (set-window-text-height (selected-window)
