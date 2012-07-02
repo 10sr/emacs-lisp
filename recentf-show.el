@@ -39,37 +39,39 @@ files to choose from. It defaults to the whole recent list.
 If optional argument BUFFER-NAME is non-nil, it is a buffer name to
 use for the buffer. It defaults to \"*recetf-show*\"."
   (interactive)
-  (if (or files
-          recentf-list)
-      (progn
-        ;; (recentf-save-list)
-        (setq recentf-show-window-configuration (current-window-configuration))
-        (pop-to-buffer (recentf-show-create-buffer files buffer-name) t t)
-        (set-window-text-height (selected-window)
-                                recentf-show-window-height)
-        (shrink-window-if-larger-than-buffer (selected-window)))
-    (message "No recent file!")))
+  (let ((bf (recentf-show-create-buffer files buffer-name)))
+    (if bf
+        (progn
+          ;; (recentf-save-list)
+          (setq recentf-show-window-configuration (current-window-configuration))
+          (pop-to-buffer bf t t)
+          (set-window-text-height (selected-window)
+                                  recentf-show-window-height)
+          (shrink-window-if-larger-than-buffer (selected-window)))
+      (message "No recent file!"))))
 
 (defun recentf-show-create-buffer (&optional files buffer-name)
   "Create buffer listing recentf files"
   (let ((bname (or buffer-name
-                   "*recentf-show*")))
-    (and (get-buffer bname)
-         (kill-buffer bname))
-    (run-hooks 'recentf-show-before-listing-hook)
-    (let ((bf (get-buffer-create bname)))
-      (with-current-buffer bf
-        (recentf-show-mode)
-        (mapc (lambda (f)
-                (insert (if recentf-show-abbreviate
-                            (abbreviate-file-name f)
-                          f)
-                        "\n"))
-              (or files
-                  recentf-list))
-        (goto-char (point-min))
-        (setq buffer-read-only t))
-      bf)))
+                   "*recentf-show*"))
+        (list (or files
+                  recentf-list)))
+    (when list
+      (and (get-buffer bname)
+           (kill-buffer bname))
+      (run-hooks 'recentf-show-before-listing-hook)
+      (let ((bf (get-buffer-create bname)))
+        (with-current-buffer bf
+          (recentf-show-mode)
+          (mapc (lambda (f)
+                  (insert (if recentf-show-abbreviate
+                              (abbreviate-file-name f)
+                            f)
+                          "\n"))
+                list)
+          (goto-char (point-min))
+          (setq buffer-read-only t))
+        bf))))
 
 (defun recentf-show-close ()
   (interactive)
