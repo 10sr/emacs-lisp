@@ -21,7 +21,7 @@
 (defvar recentf-show-window-configuration nil)
 
 (defvar recentf-show-abbreviate t
-  "Non-nil means `abbreviate-file-name' in `recentf-show' buffer.")
+  "Non-nil means use `abbreviate-file-name' when listing recently opened files.")
 
 (define-derived-mode recentf-show-mode fundamental-mode "recentf-show"
   "Major mode for `recentf-show'"
@@ -29,19 +29,24 @@
   ;;      0)
   )
 
-(defun recentf-show ()
-  "Show simplified list of `recentf-list'."
+(defun recentf-show (&optional files buffer-name)
+  "Show simplified list of recently opened files.
+If optional argument FILES is non-nil, it is a list of recently-opened
+files to choose from. It defaults to the whole recent list.
+If optional argument BUFFER-NAME is non-nil, it is a buffer name to
+use for the buffer. It defaults to \"*recetf-show*\"."
   (interactive)
   ;; (recentf-save-list)
   (setq recentf-show-window-configuration (current-window-configuration))
-  (pop-to-buffer (recentf-show-create-buffer) t t)
+  (pop-to-buffer (recentf-show-create-buffer files buffer-name) t t)
   (set-window-text-height (selected-window)
                           recentf-show-window-height)
   (shrink-window-if-larger-than-buffer (selected-window)))
 
-(defun recentf-show-create-buffer ()
-  "Make buffer listing recentf files"
-  (let ((bname "*recentf-show*"))
+(defun recentf-show-create-buffer (&optional files buffer-name)
+  "Create buffer listing recentf files"
+  (let ((bname (or buffer-name
+                   "*recentf-show*")))
     (and (get-buffer bname)
          (kill-buffer bname))
     (let ((bf (get-buffer-create bname)))
@@ -52,7 +57,8 @@
                             (abbreviate-file-name f)
                           f)
                         "\n"))
-              recentf-list)
+              (or files
+                  recentf-list))
         (goto-char (point-min))
         (setq buffer-read-only t))
       bf)))
