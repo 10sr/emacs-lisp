@@ -52,6 +52,7 @@ use for the buffer. It defaults to \"*recetf-show*\"."
 
 (defun recentf-show-create-buffer (&optional files buffer-name)
   "Create buffer listing recentf files"
+  (run-hooks 'recentf-show-before-listing-hook)
   (let ((bname (or buffer-name
                    "*recentf-show*"))
         (list (or files
@@ -59,7 +60,6 @@ use for the buffer. It defaults to \"*recetf-show*\"."
     (when list
       (and (get-buffer bname)
            (kill-buffer bname))
-      (run-hooks 'recentf-show-before-listing-hook)
       (let ((bf (get-buffer-create bname)))
         (with-current-buffer bf
           (recentf-show-mode)
