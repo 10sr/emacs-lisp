@@ -2,7 +2,7 @@
   "Visit all files in view mode."
   :global t
   :init-value nil
-  :lighter " RO"
+  :lighter " ROO"
   (ignore)
   ;; (if read-only-only-mode
   ;;     (add-hook 'find-file-hook
