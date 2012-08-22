@@ -18,6 +18,14 @@ Show recentf file list in a simplified way inspired by bs-show.
 
 Dead simple git interface.
 
+## read-only-only-mode.el
+
+Visit all files with view mode enabled.
+
+## pasteborad.el
+
+Use osx pasteboard for yank and paste.
+
 ## gtkbm.el
 
 Handle ~/.gtk-bookmarks
@@ -31,4 +39,3 @@ Add buffer local minor mode for dired to toggle whether list dot files.
 Library version of <http://www.bookshelf.jp/soft/meadow_30.html#SEC419>.
 
 Automatically save and restore window size and position.
-
