@@ -16,12 +16,15 @@
       (process-send-eof proc))))
 
 (defun turn-on-pasteboard ()
+  "Enable pasteboard for yank and paste."
+  (interactive)
   (setq interprogram-paste-function 'pasteboard-paste)
   (setq interprogram-cut-function 'pasteboard-cut))
 
 (defun turn-off-pasteboard ()
+  "Disable pasteboard for yank and paste."
+  (interactive)
   (setq interprogram-paste-function nil)
   (setq interprogram-cut-function nil))
 
 (provide 'pasteboard)
-
