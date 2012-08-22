@@ -1,8 +1,16 @@
 (defvar git-command-history nil
   "History list for `git-command'.")
 
+(defvar git-command-completion-file (or (git-command-file-find "/etc/bash_completion.d/git")
+                                        (git-command-file-find "/opt/local/etc/bash_completion.d/git")))
+
+(defun git-command-file-find (f)
+  "Return F if F exists, otherwise return nil."
+  (and (file-readable-p f)
+       f))
+
 (defun git-command-ps1 (str)
-  (let ((gcmpl "/etc/bash_completion.d/git"))
+  (let ((gcmpl git-command-completion-file))
     (if (file-readable-p gcmpl)
         (with-temp-buffer
           (insert ". " gcmpl
