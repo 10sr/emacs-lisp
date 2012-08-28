@@ -52,7 +52,6 @@
                                        (point-max)))
       (setq buffer-read-only t)
       (view-mode 1)
-      (message cmd1)
       (funcall (or (cdr (assoc cmd1
                                git-command-modes-alist))
                    'fundamental-mode))
