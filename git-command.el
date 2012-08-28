@@ -1,6 +1,11 @@
 (defvar git-command-history nil
   "History list for `git-command'.")
 
+(defvar git-command-modes-alist
+  '(("diff" . diff-mode)
+    ("di" . diff-mode))
+  "Alist of modes for each git command.")
+
 (defun git-command-file-find (f)
   "Return F if F exists, otherwise return nil."
   (and (file-readable-p f)
@@ -35,7 +40,7 @@
                                          'git-command-history)))
   (let ((dir default-directory)
         (bf (get-buffer-create "*Git Output*"))
-        )
+        (cmd1 (car (split-string cmd ))))
     (delete-windows-on bf t)
     (shell-command (concat "git "
                            cmd)
@@ -47,6 +52,10 @@
                                        (point-max)))
       (setq buffer-read-only t)
       (view-mode 1)
+      (message cmd1)
+      (funcall (or (cdr (assoc cmd1
+                               git-command-modes-alist))
+                   'fundamental-mode))
       )))
 
 (provide 'git-command)
