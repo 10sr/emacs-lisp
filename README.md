@@ -22,7 +22,7 @@ Dead simple git interface.
 
 Visit all files with view mode enabled.
 
-## pasteborad.el
+## pasteboard.el
 
 Use osx pasteboard for yank and paste.
 
