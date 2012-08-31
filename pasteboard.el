@@ -7,6 +7,7 @@
 
 (defun pasteboard-paste ()
   (shell-command-to-string pasteboard-paste-program))
+
 (defun pasteboard-cut (text &optional push)
   (let ((process-connection-type nil))
     (let ((proc (start-process pasteboard-copy-program
