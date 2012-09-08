@@ -1,7 +1,10 @@
 ;; original is available at http://www.bookshelf.jp/soft/meadow_30.html#SEC419
 
 (defvar save-window-size-filename (concat user-emacs-directory
-                                      "framesize.el"))
+                                          "framesize.el"))
+
+(defvar window-size-apply-delay 1
+  "If non-nil, time in seconds before applying window size settings after init")
 
 (defun window-size-save ()
   (let* ((rlist (frame-parameters (selected-frame)))
@@ -43,15 +46,18 @@
     (if (file-exists-p file)
         (load file))))
 
+(defun window-size-apply-with-delay ()
+  (when window-size-apply-delay
+    (run-with-timer window-size-apply-delay
+                    nil
+                    (lambda ()
+                      (modify-frame-parameters (selected-frame)
+                                               default-frame-alist)))))
+
 (when window-system
   (window-size-load)
   (add-hook 'after-init-hook      ;何かがframeの大きさ勝手に変えやがる
-            (lambda ()
-              (run-with-timer 1
-                              nil
-                              (lambda ()
-                                (modify-frame-parameters (selected-frame)
-                                                         default-frame-alist))))
+            'window-size-apply-with-delay
             t)
   (add-hook 'kill-emacs-hook
             'window-size-save))
