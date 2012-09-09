@@ -6,10 +6,10 @@
     ("di" . diff-mode))
   "Alist of modes for each git command.")
 
-(defun git-command-file-find (f)
+(defmacro git-command-file-find (f)
   "Return F if F exists, otherwise return nil."
-  (and (file-readable-p f)
-       f))
+  `(and (file-readable-p ,f)
+        ,f))
 
 (defvar git-command-completion-file (or (git-command-file-find "/etc/bash_completion.d/git")
                                         (git-command-file-find "/opt/local/etc/bash_completion.d/git")))
