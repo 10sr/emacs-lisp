@@ -6,16 +6,26 @@
     ("di" . diff-mode))
   "Alist of modes for each git command.")
 
-(defmacro git-command-file-find (f)
-  "Return F if F exists, otherwise return nil."
-  `(and (file-readable-p ,f)
-        ,f))
+(defun git-command-find-git-ps1 (f)
+  "Return F if F exists and it contains function \"__git_ps1\"."
+  (and (file-readable-p f)
+       (with-temp-buffer
+         (insert ". " f "; "
+                 "__git_ps1 %s;")
+         (eq 0 (shell-command-on-region (point-min)
+                                        (point-max)
+                                        "bash -s"
+                                        nil
+                                        t)))
+       f))
 
-(defvar git-command-completion-file (or (git-command-file-find "/etc/bash_completion.d/git")
-                                        (git-command-file-find "/opt/local/etc/bash_completion.d/git")))
+(defvar git-command-completion-file
+  (or (git-command-find-git-ps1 "/etc/bash_completion.d/git")
+      (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
 
-(defvar git-command-prompt-file (or (git-command-file-find "/usr/share/git/completion/git-prompt.sh")
-                                    (git-command-file-find "/opt/local/share/git/completion/git-prompt.sh")))
+(defvar git-command-prompt-file
+  (or (git-command-file-git-ps1 "/usr/share/git/completion/git-prompt.sh")
+      (git-command-file-git-ps1 "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")))
 
 (defun git-command-ps1 (str)
   (let ((gcmpl (or git-command-prompt-file
