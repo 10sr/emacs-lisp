@@ -1,10 +1,22 @@
-(defvar git-command-history nil
-  "History list for `git-command'.")
-
 (defvar git-command-modes-alist
   '(("diff" . diff-mode)
     ("di" . diff-mode))
   "Alist of modes for each git command.")
+
+(defvar git-command-ps1-showdirtystate "t"
+  "GIT_PS1_SHOWDIRTYSTATE is set to this value when running __git_ps1.")
+
+(defvar git-command-ps1-showstashstate ""
+  "GIT_PS1_SHOWSTASHSTATE is set to this value when running __git_ps1.")
+
+(defvar git-command-ps1-showuntrackedfiles ""
+  "GIT_PS1_SHOWUNTRACKEDFILES is set to this value when running __git_ps1.")
+
+(defvar git-command-ps1-showupstream "auto"
+  "GIT_PS1_SHOWUPSTREAM is set to this value when running __git_ps1.")
+
+(defvar git-command-history nil
+  "History list for `git-command'.")
 
 (defun git-command-find-git-ps1 (f)
   "Return F if F exists and it contains function \"__git_ps1\"."
@@ -26,7 +38,12 @@
       (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
 
 (defun git-command-ps1 (str)
-  (let ((gcmpl (or git-command-prompt-file)))
+  (let ((gcmpl (or git-command-prompt-file))
+        (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE=" git-command-ps1-showdirtystate)
+                               ,(concat "GIT_PS1_SHOWSTASHSTATE=" git-command-ps1-showstashstate)
+                               ,(concat "GIT_PS1_SHOWUNTRACKEDFILES=" git-command-ps1-showuntrackedfiles)
+                               ,(concat "GIT_PS1_SHOWUPSTREAM=" git-command-ps1-showupstream)
+                               ,@process-environment)))
     (if (and gcmpl
              (file-readable-p gcmpl))
         (with-temp-buffer
