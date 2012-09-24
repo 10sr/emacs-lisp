@@ -19,17 +19,14 @@
                                         t)))
        f))
 
-(defvar git-command-completion-file
-  (or (git-command-find-git-ps1 "/etc/bash_completion.d/git")
-      (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
-
 (defvar git-command-prompt-file
   (or (git-command-file-git-ps1 "/usr/share/git/completion/git-prompt.sh")
-      (git-command-file-git-ps1 "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")))
+      (git-command-file-git-ps1 "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")
+      (git-command-find-git-ps1 "/etc/bash_completion.d/git")
+      (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
 
 (defun git-command-ps1 (str)
-  (let ((gcmpl (or git-command-prompt-file
-                   git-command-completion-file)))
+  (let ((gcmpl (or git-command-prompt-file)))
     (if (and gcmpl
              (file-readable-p gcmpl))
         (with-temp-buffer
