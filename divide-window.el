@@ -31,7 +31,6 @@
 
 (defun divide-window--internal (window num size side)
   "Used for internal"
-  (message "%d" num)
   (when (not (eq num
                  1))
     (let ((nw (split-window window
