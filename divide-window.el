@@ -31,12 +31,10 @@
 
 (defun divide-window--internal (window num size side)
   "Used for internal"
-  (when (not (eq num
-                 1))
+  (unless (eq num 1)
     (let ((nw (split-window window
                             size
-                            side)
-              ))
+                            side)))
       (divide-window--internal nw
                                (- num 1)
                                size
