@@ -3,28 +3,28 @@
   "Default number of windows `divide-window-vertically' and
 `divide-window-horizontally' make.")
 
-(defun divide-window-vertically (arg)
+(defun divide-window-vertically (arg &optional window)
   "Divide window equally vertically."
   (interactive "p")
   (let ((n (if (eq arg 1)
                (or divide-window-default-num
                    3)
              arg))
-        (height (window-height)))
-    (divide-window--internal nil
+        (height (window-height window)))
+    (divide-window--internal window
                              n
                              (/ height n)
                              nil)))
 
-(defun divide-window-horizontally (arg)
+(defun divide-window-horizontally (arg &optional window)
   "Divide window equally horizontally."
   (interactive "p")
   (let ((n (if (eq arg 1)
                (or divide-window-default-num
                    3)
              arg))
-        (width (window-width)))
-    (divide-window--internal nil
+        (width (window-width window)))
+    (divide-window--internal window
                              n
                              (/ width n)
                              t)))
