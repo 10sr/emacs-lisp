@@ -49,12 +49,9 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
         (list pasteboard-copy-program)))
 
 (defun pasteboard-paste ()
-  (apply 'call-process
-         (car pasteboard-paste-command)
-         nil
-         t
-         t
-         (cdr pasteboard-paste-command)))
+  (shell-command-to-string (mapconcat 'shell-quote-argument
+                                      pasteboard-paste-command
+                                      " ")))
 
 (defun pasteboard-cut (text &optional push)
   (let ((process-connection-type nil))
