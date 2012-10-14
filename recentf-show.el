@@ -21,13 +21,14 @@
 (defvar recentf-show-before-listing-hook nil
   "Hook run before creating buffer of `recentf-show'.")
 
-(defvar recentf-show-window-configuration nil)
+(defvar recentf-show-window-configuration nil
+  "Used for internal")
 
 (defvar recentf-show-abbreviate t
   "Non-nil means use `abbreviate-file-name' when listing recently opened files.")
 
 (define-derived-mode recentf-show-mode fundamental-mode "recentf-show"
-  "Major mode for `recentf-show'"
+  "Major mode for `recentf-show'."
   ;; (set (make-local-variable 'scroll-margin)
   ;;      0)
   )
@@ -51,7 +52,7 @@ use for the buffer. It defaults to \"*recetf-show*\"."
       (message "No recent file!"))))
 
 (defun recentf-show-create-buffer (&optional files buffer-name)
-  "Create buffer listing recentf files"
+  "Create buffer listing recentf files."
   (run-hooks 'recentf-show-before-listing-hook)
   (let ((bname (or buffer-name
                    "*recentf-show*"))
@@ -74,27 +75,32 @@ use for the buffer. It defaults to \"*recetf-show*\"."
         bf))))
 
 (defun recentf-show-close ()
+  "Close recentf-show window."
   (interactive)
   (kill-buffer (current-buffer))
   (set-window-configuration recentf-show-window-configuration))
 
 (defun recentf-show-find-file ()
+  "Fine file of current line."
   (interactive)
   (let ((f (recentf-show-get-filename)))
     (recentf-show-close)
     (find-file f)))
 
 (defun recentf-show-view-file ()
+  "view file of current line."
   (interactive)
   (let ((f (recentf-show-get-filename)))
     (recentf-show-close)
     (view-file f)))
 
 (defun recentf-show-get-filename ()
+  "Get filename of current line."
   (buffer-substring-no-properties (point-at-bol)
                                   (point-at-eol)))
 
 (defun recentf-show-dired()
+  "Open dired buffer of directory containing file of current line."
   (interactive)
   (let ((f (recentf-show-get-filename)))
     (recentf-show-close)
