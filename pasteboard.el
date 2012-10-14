@@ -9,9 +9,9 @@
 within tmux. For details see
 https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
 
-(defvar pasteboard-paste-command (list pasteboard-paste-program)
+(defvar pasteboard-paste-command pasteboard-paste-program
   "Command run to get text.")
-(defvar pasteboard-copy-command (list pasteboard-copy-program)
+(defvar pasteboard-copy-command pasteboard-copy-program
   "Command run to put text.")
 
 (defun turn-on-pasteboard ()
@@ -32,11 +32,13 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
   (if pasteboard-rtun-program
       (progn
         (setq pasteboard-paste-command
-              (list pasteboard-rtun-program
-                    pasteboard-paste-program))
+              (concat pasteboard-rtun-program
+                      " "
+                      pasteboard-paste-program))
         (setq pasteboard-copy-command
-              (list pasteboard-rtun-program
-                    pasteboard-copy-program)))
+              (concat pasteboard-rtun-program
+                      " "
+                      pasteboard-copy-program)))
     (message
      "Cannot find reattach-to-user-namespace. First you must install it!")))
 
@@ -44,21 +46,18 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
   "Set not to use reattach-to-user-namespace."
   (interactive)
   (setq pasteboard-paste-command
-        (list pasteboard-paste-program))
+        pasteboard-paste-program)
   (setq pasteboard-copy-command
-        (list pasteboard-copy-program)))
+        pasteboard-copy-program))
 
 (defun pasteboard-paste ()
-  (shell-command-to-string (mapconcat 'shell-quote-argument
-                                      pasteboard-paste-command
-                                      " ")))
+  (shell-command-to-string pasteboard-paste-command))
 
 (defun pasteboard-cut (text &optional push)
   (let ((process-connection-type nil))
-    (let ((proc (apply 'start-process
-                       pasteboard-copy-program
-                       "*Messages*"
-                       pasteboard-copy-command)))
+    (let ((proc (start-process-shell-command pasteboard-copy-program
+                                             "*Messages*"
+                                             pasteboard-copy-command)))
       (process-send-string proc text)
       (process-send-eof proc))))
 
