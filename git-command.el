@@ -4,8 +4,12 @@
   "Alist of modes for each git command.")
 
 (defvar git-command-default-options
-  "-c color.ui=always"
+  ""
   "Options always passed to git.")
+
+(defvar git-command-max-mini-window-height
+  4
+  "Maximum height for resizing mini-window when showing result.")
 
 (defvar git-command-ps1-showdirtystate "t"
   "GIT_PS1_SHOWDIRTYSTATE is set to this value when running __git_ps1.")
@@ -74,7 +78,7 @@
   (let ((dir default-directory)
         (bf (get-buffer-create "*Git Output*"))
         (cmd1 (car (split-string cmd )))
-        (resize-mini-windows nil))
+        (max-mini-window-height git-command-max-mini-window-height))
     (delete-windows-on bf t)
     (shell-command (concat "git "
                            git-command-default-options
