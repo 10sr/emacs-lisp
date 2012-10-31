@@ -8,20 +8,21 @@
   "Options always passed to git.")
 
 (defvar git-command-max-mini-window-height
-  4
-  "Maximum height for resizing mini-window when showing result.")
+  max-mini-window-height
+  "Maximum height for resizing mini-window when showing result.
+This value means nothing when `resize-mini-window' is nil.")
 
 (defvar git-command-ps1-showdirtystate "t"
-  "GIT_PS1_SHOWDIRTYSTATE is set to this value when running __git_ps1.")
+  "Set the value of GIT_PS1_SHOWDIRTYSTATE to this when running __git_ps1.")
 
 (defvar git-command-ps1-showstashstate ""
-  "GIT_PS1_SHOWSTASHSTATE is set to this value when running __git_ps1.")
+  "Set the value of GIT_PS1_SHOWSTASHSTATE to this when running __git_ps1.")
 
 (defvar git-command-ps1-showuntrackedfiles ""
-  "GIT_PS1_SHOWUNTRACKEDFILES is set to this value when running __git_ps1.")
+  "Set the value of GIT_PS1_SHOWUNTRACKEDFILES to this when running __git_ps1.")
 
 (defvar git-command-ps1-showupstream "auto"
-  "GIT_PS1_SHOWUPSTREAM is set to this value when running __git_ps1.")
+  "Set the value of GIT_PS1_SHOWUPSTREAM to this when running __git_ps1.")
 
 (defvar git-command-history nil
   "History list for `git-command'.")
