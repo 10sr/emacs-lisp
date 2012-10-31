@@ -3,6 +3,10 @@
     ("di" . diff-mode))
   "Alist of modes for each git command.")
 
+(defvar git-command-default-options
+  "-c color.ui=always"
+  "Options always passed to git.")
+
 (defvar git-command-ps1-showdirtystate "t"
   "GIT_PS1_SHOWDIRTYSTATE is set to this value when running __git_ps1.")
 
@@ -69,9 +73,12 @@
                                          'git-command-history)))
   (let ((dir default-directory)
         (bf (get-buffer-create "*Git Output*"))
-        (cmd1 (car (split-string cmd ))))
+        (cmd1 (car (split-string cmd )))
+        (resize-mini-windows nil))
     (delete-windows-on bf t)
     (shell-command (concat "git "
+                           git-command-default-options
+                           " "
                            cmd)
                    bf)
     (with-current-buffer bf
