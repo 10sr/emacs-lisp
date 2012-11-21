@@ -111,9 +111,10 @@ COMMAND."
       (term-mode)
       (term-exec buf
                  name
-                 "/bin/sh"
+                 shell-file-name
                  nil
-                 (list "-c" command))
+                 (list shell-command-switch
+                       command))
       (term-char-mode)
       )
     (display-buffer buf)))
