@@ -48,7 +48,8 @@ This value means nothing when `resize-mini-window' is nil.")
                                ,(concat "GIT_PS1_SHOWUNTRACKEDFILES=" git-command-ps1-showuntrackedfiles)
                                ,(concat "GIT_PS1_SHOWUPSTREAM=" git-command-ps1-showupstream)
                                ,@process-environment)))
-    (if (and gcmpl
+    (if (and (executable-find "bash")
+             gcmpl
              (file-readable-p gcmpl))
         (with-temp-buffer
           (insert ". " gcmpl
