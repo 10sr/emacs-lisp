@@ -84,10 +84,12 @@ This value means nothing when `resize-mini-window' is nil.")
     (git-command-term-shell-command (concat "git "
                                             git-command-default-options
                                             " "
-                                            cmd))
+                                            cmd)
+                                    (generate-new-buffer "*Git Command*"))
     ))
 
-(require 'term nil t)
+(eval-when-compile
+  (require 'term nil t))
 (defvar term-shell-command-history nil
   "History for term-shell-command")
 (defun git-command-term-shell-command (command &optional buffer-or-name)
