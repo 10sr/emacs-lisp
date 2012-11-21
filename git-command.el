@@ -81,21 +81,39 @@ This value means nothing when `resize-mini-window' is nil.")
         (cmd1 (car (split-string cmd )))
         (max-mini-window-height git-command-max-mini-window-height))
     (delete-windows-on bf t)
-    (shell-command (concat "git "
-                           git-command-default-options
-                           " "
-                           cmd)
-                   bf)
-    (with-current-buffer bf
-      (cd dir)
-      (and (require 'ansi-color nil t)
-           (ansi-color-apply-on-region (point-min)
-                                       (point-max)))
-      (setq buffer-read-only t)
-      (view-mode 1)
-      (funcall (or (cdr (assoc cmd1
-                               git-command-modes-alist))
-                   'fundamental-mode))
-      )))
+    (git-command-term-shell-command (concat "git "
+                                            git-command-default-options
+                                            " "
+                                            cmd))
+    ))
+
+(require 'term nil t)
+(defvar term-shell-command-history nil
+  "History for term-shell-command")
+(defun git-command-term-shell-command (command &optional buffer-or-name)
+  "Run COMMAND in terminal emulator.
+If buffer-or-name is given, use this buffer. In this case, old process in the
+buffer is destroyed. Otherwise, new buffer is generated automatically from
+COMMAND."
+  (interactive (list (read-shell-command "Run program: "
+                                         shell-file-name
+                                         'term-shell-command-history)))
+  (let* ((name (car (split-string command
+                                  " ")))
+         (buf (if buffer-or-name
+                  (get-buffer-create buffer-or-name)
+                (generate-new-buffer (concat "*"
+                                             name
+                                             "*")))))
+    (with-current-buffer buf
+      (term-mode)
+      (term-exec buf
+                 name
+                 "sh"
+                 nil
+                 (list "-c" command))
+      (term-char-mode)
+      )
+    (display-buffer buf)))
 
 (provide 'git-command)
