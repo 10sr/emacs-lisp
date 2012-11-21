@@ -76,16 +76,15 @@ This value means nothing when `resize-mini-window' is nil.")
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
                                          'git-command-history)))
-  (git-command-term-shell-command
-   (concat "git "
-           git-command-default-options
-           " "
-           cmd)
-   (concat "*"
-           "git "
-           (car (split-string cmd
-                              " "))
-           "*")))
+  (git-command-term-shell-command (concat "git "
+                                          git-command-default-options
+                                          " "
+                                          cmd)
+                                  (concat "*"
+                                          "git "
+                                          (car (split-string cmd
+                                                             " "))
+                                          "*")))
 
 (eval-when-compile
   (require 'term nil t))
