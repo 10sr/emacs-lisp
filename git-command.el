@@ -1,8 +1,3 @@
-(defvar git-command-modes-alist
-  '(("diff" . diff-mode)
-    ("di" . diff-mode))
-  "Alist of modes for each git command.")
-
 (defvar git-command-default-options
   ""
   "Options always passed to git.")
