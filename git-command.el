@@ -111,7 +111,7 @@ COMMAND."
       (term-mode)
       (term-exec buf
                  name
-                 "sh"
+                 "/bin/sh"
                  nil
                  (list "-c" command))
       (term-char-mode)
