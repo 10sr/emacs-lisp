@@ -1,21 +1,24 @@
-(defun autosave-save-current-buffer ()
-  "Save current buffer. The variable `autosave-functions' decides if
-current buffer should be saved or not."
-  (when (run-hook-with-args-until-failure 'autosave-functions)
-    (save-buffer)))
+(defun autosave-save-buffers ()
+  "Save buffers. The variable `autosave-functions' decides if each buffer
+should be saved or not."
+  (mapc (lambda (buf)
+          (with-current-buffer buf
+            (when (run-hook-with-args-until-failure 'autosave-functions)
+              (save-buffer))))
+        (buffer-list)))
 
 (defvar autosave-functions nil
-  "A list of functions be called before autosaving current buffer.
+  "A list of functions be called before autosaving buffers.
 Each function is called with no argument. Current buffer is set to the buffer
 to save while these functions are called. If any of these functions return nil,
-autosaving will not happen.")
+the buffer will not saved.")
 
 (defvar autosave-timer nil "Autosave timer object.")
 
 (defun autosave-enable (secs)
-  "Register timer so that current buffer will be saved automatically each time
+  "Register timer so that buffers will be saved automatically each time
 when Emacs is idle for SECS. When SECS is 0 or nil, stop the timer and disable
-autosaving. The variable `autosave-functions' decides if current buffer
+autosaving. The variable `autosave-functions' decides if each buffer
 should be saved automatically or not."
   (interactive "nSeconds until autosaving (0 to disable autosaving.): ")
   (if (and secs
@@ -25,12 +28,12 @@ should be saved automatically or not."
              (setq autosave-timer
                    (run-with-idle-timer secs
                                         t
-                                        'autosave-save-current-buffer))
+                                        'autosave-save-buffers))
              (message "Autosaving enabled (%d seconds)." secs))
     (autosave-disable)))
 
 (defun autosave-disable ()
-  "Disable autosaving current buffer."
+  "Disable autosaving buffers."
   (interactive)
   (when autosave-timer
     (cancel-timer autosave-timer)
@@ -44,7 +47,8 @@ should be saved automatically or not."
 
 (defun autosave-file-exists-p ()
   "Return nil if the file current buffer is visiting is not exist."
-  (file-exists-p buffer-file-name))
+  (and buffer-file-name
+       (file-exists-p buffer-file-name)))
 
 (defun autosave-buffer-writable-p ()
   "Return nil if current buffer is read only."
@@ -56,15 +60,17 @@ should be saved automatically or not."
 
 (defun autosave-buffer-file-writable-p ()
   "Return nil if the file current buffer is visiting is not writable."
-  (file-writable-p buffer-file-name))
+  (and buffer-file-name
+       (file-writable-p buffer-file-name)))
 
 (mapc (lambda (f)
-          (add-hook 'autosave-functions
-                    f))
-        '(autosave-buffer-file-name
-          autosave-file-exists-p
-          autosave-buffer-writable-p
-          autosave-buffer-modified-p
-          autosave-buffer-file-writable-p))
+        (add-hook 'autosave-functions
+                  f
+                  t))                   ; append
+      '(autosave-buffer-file-name
+        autosave-file-exists-p
+        autosave-buffer-writable-p
+        autosave-buffer-modified-p
+        autosave-buffer-file-writable-p))
 
 (provide 'autosave)
