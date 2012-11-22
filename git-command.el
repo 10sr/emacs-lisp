@@ -109,7 +109,7 @@ COMMAND."
            t)
       (term-mode)
       (term-exec buf
-                 name
+                 (concat "term-" name)
                  shell-file-name
                  nil
                  (list shell-command-switch
