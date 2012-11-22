@@ -21,20 +21,22 @@ should be saved automatically or not."
   (if (and secs
            (not (eq secs
                     0)))
-      (progn (when autosave-timer
-               (autosave-disable))
+      (progn (autosave-disable)
              (setq autosave-timer
                    (run-with-idle-timer secs
                                         t
-                                        'autosave-save-current-buffer)))
-    (when autosave-timer
-      (autosave-disable))))
+                                        'autosave-save-current-buffer))
+             (message "Autosaving enabled (%d seconds)." secs))
+    (autosave-disable)))
 
 (defun autosave-disable ()
   "Disable autosaving current buffer."
   (interactive)
-  (cancel-timer autosave-timer)
-  (setq autosave-timer nil))
+  (when autosave-timer
+    (cancel-timer autosave-timer)
+    (setq autosave-timer nil)
+    (message "Autosaving disabled."))
+  nil)
 
 (defun autosave-buffer-file-name ()
   "Return nil if current buffer is not visiting any file."
