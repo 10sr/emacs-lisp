@@ -100,9 +100,13 @@ COMMAND."
                   (get-buffer-create buffer-or-name)
                 (generate-new-buffer (concat "*"
                                              name
-                                             "*")))))
+                                             "*"))))
+         (dir default-directory))
     (display-buffer buf)
     (with-current-buffer buf
+      (cd dir)
+      (set (make-local-variable 'term-scroll-to-bottom-on-output)
+           t)
       (term-mode)
       (term-exec buf
                  name
@@ -110,6 +114,16 @@ COMMAND."
                  nil
                  (list shell-command-switch
                        command))
-      (term-char-mode))))
+      (term-char-mode)
+      ;; (if (ignore-errors (get-buffer-process buf))
+      ;;     (set-process-sentinel (get-buffer-process buf)
+      ;;                           (lambda (proc change)
+      ;;                             (when (string-match "\\(finished\\|exited\\)"
+      ;;                                                 change)
+      ;;                               (with-current-buffer
+      ;;                                   (process-buffer proc)
+      ;;                                 (goto-char (point-max))))))
+      ;;   (goto-char (point-max)))
+      )))
 
 (provide 'git-command)
