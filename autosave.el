@@ -1,3 +1,11 @@
+(defvar autosave-include-regexp
+  ""
+  "Regexp that matches filename to be saved.")
+
+(defvar autosave-exclude-regexp
+  "^$"
+  "Regexp that matches filename not to be saved.")
+
 (defun autosave-save-buffers ()
   "Save buffers. The variable `autosave-functions' decides if each buffer
 should be saved or not."
@@ -41,6 +49,15 @@ should be saved automatically or not."
     (message "Autosaving disabled."))
   nil)
 
+(defun autosave-file-test-regexp ()
+  "Return nil if the filename is not matched with `autosave-include-regexp'
+or matched with `autosave-exclude-regexp'"
+  (and buffer-file-name
+       (string-match autosave-include-regexp
+                     buffer-file-name)
+       (not (string-match autosave-exclude-regexp
+                          buffer-file-name))))
+
 (defun autosave-buffer-file-name ()
   "Return nil if current buffer is not visiting any file."
   buffer-file-name)
@@ -71,6 +88,8 @@ should be saved automatically or not."
         autosave-file-exists-p
         autosave-buffer-writable-p
         autosave-buffer-modified-p
-        autosave-buffer-file-writable-p))
+        autosave-buffer-file-writable-p
+        autosave-file-test-regexp))
 
 (provide 'autosave)
+
