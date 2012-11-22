@@ -99,9 +99,13 @@ COMMAND."
                   (get-buffer-create buffer-or-name)
                 (generate-new-buffer (concat "*"
                                              name
-                                             "*")))))
+                                             "*"))))
+         (dir default-directory))
     (display-buffer buf)
     (with-current-buffer buf
+      (cd dir)
+      (set (make-local-variable 'term-scroll-to-bottom-on-output)
+           t)
       (term-mode)
       (term-exec buf
                  name
