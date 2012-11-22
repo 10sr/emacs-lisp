@@ -60,3 +60,5 @@ should be saved automatically or not."
           autosave-buffer-buffer-writable-p
           autosave-buffer-buffer-modified-p
           autosave-buffer-buffer-file-writable-p))
+
+(provide 'autosave)
