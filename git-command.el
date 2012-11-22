@@ -115,15 +115,14 @@ COMMAND."
                  (list shell-command-switch
                        command))
       (term-char-mode)
-      ;; (if (ignore-errors (get-buffer-process buf))
-      ;;     (set-process-sentinel (get-buffer-process buf)
-      ;;                           (lambda (proc change)
-      ;;                             (when (string-match "\\(finished\\|exited\\)"
-      ;;                                                 change)
-      ;;                               (with-current-buffer
-      ;;                                   (process-buffer proc)
-      ;;                                 (goto-char (point-max))))))
-      ;;   (goto-char (point-max)))
+      (if (ignore-errors (get-buffer-process buf))
+          (set-process-sentinel (get-buffer-process buf)
+                                (lambda (proc change)
+                                  (with-current-buffer (process-buffer proc)
+                                    (term-sentinel proc change)
+                                    (goto-char (point-max)))))
+        ;; (goto-char (point-max))
+        )
       )))
 
 (provide 'git-command)
