@@ -32,7 +32,7 @@ return non-nil, otherwise return nil."
   "A list of functions called by `autosave-test-default'.
 Each function is called with no argument. Current buffer is set to the buffer
 to save while these functions are called.
-you can use `add-hook' and `remove-hook' to update this list.")
+You can use `add-hook' and `remove-hook' to update this list.")
 
 (defvar autosave-timer-list nil
   "A list of autosave timer objects. When new timer is set by `autosave-set',
