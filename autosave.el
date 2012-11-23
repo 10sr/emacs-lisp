@@ -1,3 +1,7 @@
+;;; usage :
+;; (and (require 'autosave nil t)
+;;      (autosave-set 2))
+
 (defun autosave-save-buffers (include exclude function)
   "Check all buffers and save the buffer if all of these are satisfied :
 
@@ -46,8 +50,9 @@ INCLUDE and EXCLUDE should be regexp to match with the filename of buffer to
 include and exclude respectively. These args can be nil, in that case all
 files are included or no files are excluded.
 
-Fourth arg FUNCTION is function to test if the buffer is saved. This function
-is called with no argument and the buffer to save being set as current buffer.
+Fourth arg FUNCTION is function to test if the buffer should be saved. This
+function is called with no argument and the buffer to save being set as
+current buffer. If this function returns non-nil, the buffer will be saved.
 If this arg is nil, the function `autosave-test-default' is used by default.
 
 This returns the created timer object. This timer object is also added to
