@@ -1,11 +1,12 @@
 (defun autosave-save-buffers (include exclude function)
-  "Check all buffers and save the buffer if :
+  "Check all buffers and save the buffer if all of these are satisfied :
 
 * the filename of the buffer matches with INCLUDE
 * the filename of the buffer does not match with EXCLUDE
-* FUNCTION return non-nil with the buffer being set as current buffer
+* FUNCTION return non-nil
 
-For details see `autosave-set' and `autosave-file-test-regexp'."
+INCLUDE and EXCLUDE should be regexp. FUNCTION is called with no argument and
+the buffer to save being set as current buffer."
   (mapc (lambda (buf)
           (with-current-buffer buf
             (and (autosave-file-test-regexp include exclude)
@@ -23,14 +24,15 @@ and is not matched with EXCLUDE."
                           buffer-file-name))))
 
 (defun autosave-test ()
-  "Return non-nil if all of functions in `autosave-functions' return non-nil,
-otherwise return nil."
-  (run-hook-with-args-until-failure 'autosave-functions))
+  "Return non-nil if all of functions in `autosave-default-functions'
+return non-nil, otherwise return nil."
+  (run-hook-with-args-until-failure 'autosave-default-functions))
 
-(defvar autosave-functions nil
+(defvar autosave-default-functions nil
   "A list of functions called by `autosave-test'.
 Each function is called with no argument. Current buffer is set to the buffer
-to save while these functions are called.")
+to save while these functions are called.
+you can use `add-hook' and `remove-hook' to update this list.")
 
 (defvar autosave-timer-list nil
   "A list of autosave timer objects. When new timer is set by `autosave-set',
@@ -38,7 +40,7 @@ the timer object is added to the top of this list.")
 
 (defun autosave-set (secs &optional include exclude function)
   "Register timer so that buffers will be saved automatically each time when
-Emacs is idle for SECS.
+Emacs is idle for SECS. Autosave is done by calling `autosave-save-buffers'.
 
 INCLUDE and EXCLUDE should be regexp to match with the filename of buffer to
 include and exclude respectively. These args can be nil, in that case all
@@ -48,8 +50,8 @@ Fourth arg FUNCTION is function to test if the buffer is saved. This function
 is called with no argument and the buffer to save being set as current buffer.
 If this arg is nil, the function `autosave-test' is used by default.
 
-This returns the created timer object, and this timer object can be disabled
-by using `autosave-remove'."
+This returns the created timer object. This timer object is also added to
+`autosave-timer-list'. This timer can be disabled by using `autosave-remove'."
   (interactive "nSeconds until autosaving: ")
   (let ((tm (run-with-idle-timer secs
                                  t
