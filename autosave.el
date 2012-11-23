@@ -29,7 +29,10 @@ and is not matched with EXCLUDE."
 
 (defun autosave-test-default ()
   "Return non-nil if all of functions in `autosave-test-default-functions'
-return non-nil, otherwise return nil."
+return non-nil, otherwise return nil.
+
+This functions is used by `autosave-set' if the fourth arg of `autosave-set'
+is set to be nil."
   (run-hook-with-args-until-failure 'autosave-test-default-functions))
 
 (defvar autosave-test-default-functions nil
@@ -52,7 +55,7 @@ files are included or no files are excluded.
 
 Fourth arg FUNCTION is function to test if the buffer should be saved. This
 function is called with no argument and the buffer to save being set as
-current buffer. If this function returns non-nil, the buffer will be saved.
+current buffer. If this function returns non-nil, the buffer is saved.
 If this arg is nil, the function `autosave-test-default' is used by default.
 
 This returns the created timer object. This timer object is also added to
@@ -70,7 +73,7 @@ This returns the created timer object. This timer object is also added to
     (setq autosave-timer-list
           (cons tm
                 autosave-timer-list))
-    (message "Autosave set (%d seconds)." secs)
+    (message "Autosave set (%S seconds)." secs)
     tm))
 
 (defun autosave-remove (timer)
