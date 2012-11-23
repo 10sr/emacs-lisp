@@ -98,7 +98,7 @@ This returns the created timer object. This timer object is also added to
        (file-writable-p buffer-file-name)))
 
 (mapc (lambda (f)
-        (add-hook 'autosave-functions
+        (add-hook 'autosave-test-default-functions
                   f
                   t))                   ; append
       '(autosave-buffer-file-name
