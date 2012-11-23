@@ -23,13 +23,13 @@ and is not matched with EXCLUDE."
        (not (string-match exclude
                           buffer-file-name))))
 
-(defun autosave-test ()
-  "Return non-nil if all of functions in `autosave-default-functions'
+(defun autosave-test-default ()
+  "Return non-nil if all of functions in `autosave-test-default-functions'
 return non-nil, otherwise return nil."
-  (run-hook-with-args-until-failure 'autosave-default-functions))
+  (run-hook-with-args-until-failure 'autosave-test-default-functions))
 
-(defvar autosave-default-functions nil
-  "A list of functions called by `autosave-test'.
+(defvar autosave-test-default-functions nil
+  "A list of functions called by `autosave-test-default'.
 Each function is called with no argument. Current buffer is set to the buffer
 to save while these functions are called.
 you can use `add-hook' and `remove-hook' to update this list.")
@@ -48,7 +48,7 @@ files are included or no files are excluded.
 
 Fourth arg FUNCTION is function to test if the buffer is saved. This function
 is called with no argument and the buffer to save being set as current buffer.
-If this arg is nil, the function `autosave-test' is used by default.
+If this arg is nil, the function `autosave-test-default' is used by default.
 
 This returns the created timer object. This timer object is also added to
 `autosave-timer-list'. This timer can be disabled by using `autosave-remove'."
@@ -61,7 +61,7 @@ This returns the created timer object. This timer object is also added to
                                  (or exclude
                                      "^$")
                                  (or function
-                                     'autosave-test))))
+                                     'autosave-test-default))))
     (setq autosave-timer-list
           (cons tm
                 autosave-timer-list))
