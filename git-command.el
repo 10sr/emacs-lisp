@@ -119,6 +119,7 @@ COMMAND."
                              (point-at-eol)
                              '(face bold))
         (insert "\n\n"))
+      (require 'term)
       (term-mode)
       (term-exec buf
                  (concat "term-" name)
