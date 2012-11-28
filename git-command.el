@@ -101,12 +101,24 @@ COMMAND."
                 (generate-new-buffer (concat "*"
                                              name
                                              "*"))))
+         (proc (get-buffer-process buf))
          (dir default-directory))
+    (and proc
+         (delete-process proc))
     (display-buffer buf)
     (with-current-buffer buf
       (cd dir)
       (set (make-local-variable 'term-scroll-to-bottom-on-output)
            t)
+      (let ((inhibit-read-only t))
+        (goto-char (point-max))
+        (insert "\n")
+        (insert "Start executing "
+                command)
+        (add-text-properties (point-at-bol)
+                             (point-at-eol)
+                             '(face bold))
+        (insert "\n\n"))
       (term-mode)
       (term-exec buf
                  (concat "term-" name)
@@ -122,7 +134,6 @@ COMMAND."
                                     (term-sentinel proc change)
                                     (goto-char (point-max)))))
         ;; (goto-char (point-max))
-        )
-      )))
+        ))))
 
 (provide 'git-command)
