@@ -1,4 +1,5 @@
-(defvar smart-revert--last-buffer nil)
+(defvar smart-revert--last-buffer nil
+  "Last buffer.")
 
 (defun smart-revert ()
   "Call `smart-revert-revert' if current buffer is changed since last call."
