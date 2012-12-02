@@ -58,8 +58,12 @@ function is called with no argument and the buffer to save being set as
 current buffer. If this function returns non-nil, the buffer is saved.
 If this arg is nil, the function `autosave-test-default' is used by default.
 
-This returns the created timer object. This timer object is also added to
-`autosave-timer-list'. This timer can be disabled by using `autosave-remove'."
+If the timer with exactly same arg as this has already set, timer is not
+created newly.
+
+This function returns the created timer object, or nil if timer is not created.
+This timer object is also added to `autosave-timer-list'. This timer can be
+disabled by using `autosave-remove'."
   (interactive "nSeconds until autosaving: ")
   (let ((tm (run-with-idle-timer secs
                                  t
@@ -70,11 +74,18 @@ This returns the created timer object. This timer object is also added to
                                      "^$")
                                  (or function
                                      'autosave-test-default))))
-    (setq autosave-timer-list
-          (cons tm
-                autosave-timer-list))
-    (message "Autosave set (%S seconds)." secs)
-    tm))
+    (if (member tm
+                autosave-timer-list)
+        (progn (cancel-timer tm)
+               (message "Same timer already set (%S)."
+                        tm)
+               nil)
+      (progn (setq autosave-timer-list
+                   (cons tm
+                         autosave-timer-list))
+             (message "Autosave set (%S)."
+                      tm)
+             tm))))
 
 (defun autosave-remove (timer)
   "Unset autosave timer object TIMER."
