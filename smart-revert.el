@@ -12,13 +12,11 @@
   (interactive)
   (when (or (and (eq major-mode 'dired-mode)
                  (dired-directory-changed-p default-directory))
-            (not (verify-visited-file-modtime (current-buffer))))
-    (if (file-readable-p buffer-file-name)
-        (progn
-          (revert-buffer t t)
-          (message "%s reverted." (buffer-name)))
-      (message "%s not found."
-               buffer-file-nmae))))
+            (and buffer-file-name
+                 (file-readable-p buffer-file-name)
+                 (not (verify-visited-file-modtime (current-buffer)))))
+    (revert-buffer t t)
+    (message "%s reverted." (buffer-name))))
 
 (defun smart-revert-on ()
   "Enable `smart-revert'"
