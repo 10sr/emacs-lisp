@@ -1,8 +1,10 @@
+;; todo: use format-mode-line
+
 (progn
   (defvar buffer-file-changed-functions nil "Hook run when buffer file changed.
 Each function is called with two args, the filename before changing and after
 changing.")
-  (declare-function run-buffer-file-changed-functions "emacs.el")
+  (declare-function run-buffer-file-changed-functions "terminal-title.el")
   (add-hook 'post-command-hook
             'run-buffer-file-changed-functions)
   (lexical-let (previous-file)
@@ -36,6 +38,15 @@ changing.")
       (send-string-to-terminal (apply 'concat
                                       "\033]0;"
                                       `(,@args "\007"))))))
+
+(defun set-screen-name(&rest args)
+  ""
+  (interactive "sString to set as title: ")
+  (when (getenv "TMUX")
+    (send-string-to-terminal (apply 'concat
+                                    "\033k"
+                                    `(,@args "\033\\")))))
+
 (defun my-set-terminal-title ()
   ""
   (set-terminal-title "["
@@ -55,9 +66,17 @@ changing.")
                       "FRAME:"
                       (frame-parameter nil 'name)
                       "]"
-                      ))
+                      )
+  (set-screen-name "em:"
+                   (file-name-nondirectory
+                    (directory-file-name default-directory))
+                   "/"))
+
 (add-hook 'buffer-file-changed-functions
           (lambda (p c)
             (my-set-terminal-title)))
+
 (add-hook 'suspend-resume-hook
           'my-set-terminal-title)
+
+(provide 'terminal-title)
