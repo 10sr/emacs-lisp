@@ -70,7 +70,7 @@ changing.")
                                          (buffer-list-not-start-with-space)))
                       "]"
                       )
-  (set-screen-name "emacs:"
+  (set-screen-name "em:"
                    (file-name-nondirectory
                     (directory-file-name default-directory))
                    "/"))
