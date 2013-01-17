@@ -81,3 +81,5 @@ changing.")
 
 (add-hook 'suspend-resume-hook
           'my-set-terminal-title)
+
+(provide 'terminal-title)
