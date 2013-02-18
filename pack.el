@@ -67,8 +67,8 @@ Otherwise, return FILENAME with `pack-default-extension'"
     (concat filename "." pack-default-extension)))
 
 (defun pack-file-name-association (filename)
-  "If the pattern matching FILENAME is found at car of the list in `pack-program-alist', return cdr of that list.
-Otherwise, return nil."
+  "If the pattern matching FILENAME is found at car of the list in
+`pack-program-alist', return cdr of that list. Otherwise, return nil."
   (let ((case-fold-search nil))
     (assoc-default filename
                    pack-program-alist
@@ -83,7 +83,7 @@ Otherwise, return nil."
                    (pack-file-name-association earchive)))
          )
     (if cmd
-        (async-shell-command (concat cmd 
+        (async-shell-command (concat cmd
                                " "
                                (shell-quote-argument earchive))
                        (get-buffer-create pack-buffer-name))
