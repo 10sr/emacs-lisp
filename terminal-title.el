@@ -65,9 +65,6 @@ changing.")
                       "]["
                       "FRAME:"
                       (frame-parameter nil 'name)
-                      ":"
-                      (number-to-string (length
-                                         (buffer-list-not-start-with-space)))
                       "]"
                       )
   (set-screen-name "em:"
