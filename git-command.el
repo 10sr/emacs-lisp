@@ -1,3 +1,46 @@
+;;; git-command.el --- Dead simple git command interface
+
+;; Author: 10sr <>
+;; URL: https://github.com/10sr/emacs-lisp/blob/master/git-command.el
+;; Version: 0.1
+;; Package-Requires: ()
+;; Keywords: utility git
+
+;; This file is not part of GNU Emacs.
+
+;; This is free and unencumbered software released into the public domain.
+
+;; Anyone is free to copy, modify, publish, use, compile, sell, or
+;; distribute this software, either in source code form or as a compiled
+;; binary, for any purpose, commercial or non-commercial, and by any
+;; means.
+
+;; In jurisdictions that recognize copyright laws, the author or authors
+;; of this software dedicate any and all copyright interest in the
+;; software to the public domain. We make this dedication for the benefit
+;; of the public at large and to the detriment of our heirs and
+;; successors. We intend this dedication to be an overt act of
+;; relinquishment in perpetuity of all present and future rights to this
+;; software under copyright law.
+
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+;; IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+;; OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+;; OTHER DEALINGS IN THE SOFTWARE.
+
+;; For more information, please refer to <http://unlicense.org/>
+
+;;; Comentary:
+
+;; Dead simple git interface. No major-mode, only provides command-line like
+;; interface using minibuffer. You need not remember additional keybinds for
+;; using git from emacs.
+
+;;; Code:
+
 (defvar git-command-default-options
   ""
   "Options always passed to git.")
@@ -37,16 +80,21 @@ This value means nothing when `resize-mini-window' is nil.")
 
 (defvar git-command-prompt-file
   (or (git-command-find-git-ps1 "/usr/share/git/completion/git-prompt.sh")
-      (git-command-find-git-ps1 "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")
+      (git-command-find-git-ps1
+       "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")
       (git-command-find-git-ps1 "/etc/bash_completion.d/git")
       (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
 
 (defun git-command-ps1 (str)
   (let ((gcmpl (or git-command-prompt-file))
-        (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE=" git-command-ps1-showdirtystate)
-                               ,(concat "GIT_PS1_SHOWSTASHSTATE=" git-command-ps1-showstashstate)
-                               ,(concat "GIT_PS1_SHOWUNTRACKEDFILES=" git-command-ps1-showuntrackedfiles)
-                               ,(concat "GIT_PS1_SHOWUPSTREAM=" git-command-ps1-showupstream)
+        (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE="
+                                        git-command-ps1-showdirtystate)
+                               ,(concat "GIT_PS1_SHOWSTASHSTATE="
+                                        git-command-ps1-showstashstate)
+                               ,(concat "GIT_PS1_SHOWUNTRACKEDFILES="
+                                        git-command-ps1-showuntrackedfiles)
+                               ,(concat "GIT_PS1_SHOWUPSTREAM="
+                                        git-command-ps1-showupstream)
                                ,@process-environment)))
     (if (and (executable-find "bash")
              gcmpl
@@ -68,7 +116,8 @@ This value means nothing when `resize-mini-window' is nil.")
 (defun git-command (cmd)
   "Shell like git command interface."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
-                                                 (abbreviate-file-name default-directory)
+                                                 (abbreviate-file-name
+                                                  default-directory)
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
                                          'git-command-history)))
@@ -138,3 +187,5 @@ COMMAND."
         ))))
 
 (provide 'git-command)
+
+;;; git-command.el ends here.
