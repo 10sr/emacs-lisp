@@ -83,7 +83,10 @@ This value means nothing when `resize-mini-window' is nil.")
       (git-command-find-git-ps1
        "/opt/local/share/doc/git-core/contrib/completion/git-prompt.sh")
       (git-command-find-git-ps1 "/etc/bash_completion.d/git")
-      (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")))
+      (git-command-find-git-ps1
+       "/opt/local/share/git-core/git-prompt.sh")
+      (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")
+      ))
 
 (defun git-command-ps1 (str)
   (let ((gcmpl (or git-command-prompt-file))
