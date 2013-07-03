@@ -1,7 +1,7 @@
 ;;; remember-major-modes-mode.el --- Remember major-modes for files
 
 ;; Author: 10sr <>
-;; URL: https://github.com/10sr/emacs-lisp/blob/master/dired-list-all-mode.el
+;; URL: https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: major-mode
