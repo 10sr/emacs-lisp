@@ -89,13 +89,15 @@
   "Remember current filename and major-mode."
   (interactive)
   (if remember-major-modes-mode
-      (progn (remember-major-modes-forget filename)
-             (setq remember-major-modes-modes-alist
-                   (cons (cons (or filename
-                                   buffer-file-name)
-                               (or mode
-                                   major-mode))
-                         remember-major-modes-modes-alist)))
+      (let ((file (or filename
+                      buffer-file-name)))
+        (when file
+          (remember-major-modes-forget file)
+          (setq remember-major-modes-modes-alist
+                (cons (cons file
+                            (or mode
+                                major-mode))
+                      remember-major-modes-modes-alist))))
     (message "remember-major-modes-mode not enabled.")))
 
 (defun remember-major-modes-forget (&optional filename)
