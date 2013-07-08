@@ -89,14 +89,16 @@
   "Remember current filename and major-mode."
   (interactive)
   (if remember-major-modes-mode
-      (let ((file (or filename
-                      buffer-file-name)))
-        (when file
-          (remember-major-modes-forget file)
+      (let ((f (or filename
+                   buffer-file-name))
+            (m (or mode
+                   major-mode)))
+        (when f
+          (remember-major-modes-forget f)
+          (message "Remember: %s => `%s'" f m)
           (setq remember-major-modes-modes-alist
-                (cons (cons file
-                            (or mode
-                                major-mode))
+                (cons (cons f
+                            m)
                       remember-major-modes-modes-alist))))
     (message "remember-major-modes-mode not enabled.")))
 
@@ -106,6 +108,7 @@
                          buffer-file-name)
                      remember-major-modes-modes-alist)))
     (and elem
+         (message "Remember: forget %s" elem)
          (setq remember-major-modes-modes-alist
                (delq elem
                      remember-major-modes-modes-alist)))))
@@ -117,8 +120,8 @@
     (let ((mode (cdr (assoc buffer-file-name
                             remember-major-modes-modes-alist))))
       (and mode
-           ;; (message "I remember the major-mode for %s!"
-           ;;          buffer-file-name)
+           (message "Remember: %s <= `%s'"
+                    buffer-file-name mode)
            (funcall mode)))))
 
 (add-hook 'find-file-hook
