@@ -73,8 +73,9 @@ is invoked. Top is current one.")
   "Push current window configuration to stack."
   nil)
 
-(defun etig--command (cmd buf color-p mode)
-  "Run git command CMD and output result to BUF."
+(defun etig--command-str (cmd buf color-p mode)
+  "Run git command CMD and output result to BUF.
+CMD should be a string of git command."
   (let ((color-enabled (and color-p
                             etig--ansi-color-library)))
     (with-current-buffer (get-buffer-create buf)
@@ -91,7 +92,15 @@ is invoked. Top is current one.")
       (when mode
         (funcall mode)))))
 
-(defun etig-git-repository-p
+(defun etig--command (cmds buf color-p mode)
+  "Run git command CMDS and output result to BUF.
+CMDS should be a list of args for git."
+  (etig--command-str (mapconcat 'shell-quote-argument
+                            cmds
+                            " ")
+                 buf color-p mode))
+
+(defun etig-git-repository-p ()
   "Return non-nil if git is installed and current directory is git repository."
   (and (executable-find "git")
        (eq 0 (call-process "git" nil nil nil "rev-parse" "--git-dir"))))
@@ -130,7 +139,12 @@ a copy of this var.")
         (etig-diff-open-buffer sha1)
       (message "No commit found in this line"))))
 
-(defun etig-diff-open-buffer (sha1))
+(defun etig-diff-open-buffer (sha1)
+  "Open etig-diff buffer of commit of SHA1."
+  (let ((buf (generate-new-buffer "*etig-diff*")))
+    (etig--command-str (concat "show " sha1)
+                       buf nil 'etig-diff-mode)
+    buf))
 
 (defun etig--diff-extract-sha1 (line)
   (let ((str
@@ -155,7 +169,7 @@ a copy of this var.")
   (let ((buf (get-buffer-create "*etig-main*")))
     (with-current-buffer buf
       (erase-buffer)
-      (etig--command etig-main-command buf t 'etig-main-mode))
+      (etig--command-str etig-main-command buf t 'etig-main-mode))
     (etig--push-window-configuration)
     (delete-other-windows)
     (switch-to-buffer buf)
@@ -170,7 +184,7 @@ a copy of this var.")
   (let ((parent (current-buffer))
         (buf (save-excursion
                (case major-mode
-                 ('etig-main-mode (message "etig-main-mode.")(etig-diff))
+                 ('etig-main-mode (message "etig-main-mode.") (etig-diff))
                  (t (message "Not etig modes.") nil)
                  ))))
     (when buf
