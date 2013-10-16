@@ -41,16 +41,6 @@
 
 ;; variables
 
-(defvar etig-sha1-regexp
-  "^[^1234567890abcdef]*\\([1234567890abcdef]*\\) "
-  "Regexp to extract commit sha1 from main buffer.")
-
-(defvar etig-main-command
-  (concat "log --graph --date-order -C -M --all --date=iso "
-          "--pretty=tformat:'%C(green)%h%C(reset) %C(white)%ad%C(reset) %C(red)%an%C(reset)%C(yellow)%d%C(reset) %C(white bold)%s%C(reset)'"
-          )
-  "git command used to open log")
-
 (defvar etig--ansi-color-library
   (locate-library "ansi-color")
   "Non-nil if library `ansi-color' exists.")
@@ -63,10 +53,19 @@ is invoked. Top is current one.")
   "etig parent buffer.")
 (make-variable-buffer-local 'etig--parent-buffer)
 
+(defvar etig--create-buffer-function nil
+  "Function to create new buffer from current line.")
+(make-variable-buffer-local 'etig--create-buffer-function)
+
 ;; utilities
 
 (defun etig--pop-window-configuration ()
   "Pop window configuation and set to current state."
+  nil)
+
+(defun etig--replace-window-configuration ()
+  "Pop and destroy window configuration, then push current window
+configuration."
   nil)
 
 (defun etig--push-window-configuration ()
@@ -96,9 +95,9 @@ CMD should be a string of git command."
   "Run git command CMDS and output result to BUF.
 CMDS should be a list of args for git."
   (etig--command-str (mapconcat 'shell-quote-argument
-                            cmds
-                            " ")
-                 buf color-p mode))
+                                cmds
+                                " ")
+                     buf color-p mode))
 
 (defun etig-git-repository-p ()
   "Return non-nil if git is installed and current directory is git repository."
@@ -119,49 +118,45 @@ CMDS should be a list of args for git."
 a copy of this var.")
 
 
-;; views
+;;; views
 
-;; diff view
+;; diff view buffer
 
 (defvar etig-diff-mode-map
   (copy-keymap etig--base-map))
 
 (define-derived-mode etig-diff-mode diff-mode
-  "diff-mode for etig.")
+  "diff-mode for etig."
+  (view-mode 1))
 
 
-(defun etig-diff ()
-  "Open commit of current line. Return buffer."
-  (let ((sha1 (etig--diff-extract-sha1
-               (buffer-substring-no-properties (point-at-bol)
-                                               (point-at-eol)))))
-    (if sha1
-        (etig-diff-open-buffer sha1)
-      (message "No commit found in this line"))))
-
-(defun etig-diff-open-buffer (sha1)
+(defun etig-diff (sha1)
   "Open etig-diff buffer of commit of SHA1."
   (let ((buf (generate-new-buffer "*etig-diff*")))
     (etig--command-str (concat "show " sha1)
                        buf nil 'etig-diff-mode)
+    (message "etig-diff: %s" sha1)
     buf))
 
-(defun etig--diff-extract-sha1 (line)
-  (let ((str
-         ;;"| * | 85d2901 2013-09-21 18:15:00 +0900 10sr alias make as compile"
-         line))
-    (and (string-match etig-sha1-regexp
-                       str)
-         (match-string 1 str))))
+;; main buffer
 
-;; main
+(defvar etig-main-sha1-regexp
+  "^[^1234567890abcdef]*\\([1234567890abcdef]*\\) "
+  "Regexp to extract commit sha1 from main buffer.")
+
+(defvar etig-main-command
+  (concat "log --graph --date-order -C -M --all --date=iso "
+          "--pretty=tformat:'%C(green)%h%C(reset) %C(white)%ad%C(reset) %C(red)%an%C(reset)%C(yellow)%d%C(reset) %C(white bold)%s%C(reset)'"
+          )
+  "git command used to open log")
 
 (defvar etig-main-mode-map
   (copy-keymap etig--base-map))
 
 (define-derived-mode etig-main-mode text-mode
-  "etig main"
-  "main mode for etig.")
+  "etig-main"
+  "main mode for etig."
+  (setq etig--create-buffer-function 'etig--main-create-buffer-function))
 
 (defun etig-main ()
   "Invole etig."
@@ -175,6 +170,23 @@ a copy of this var.")
     (switch-to-buffer buf)
     (goto-char (point-min))))
 
+(defun etig--main-create-buffer-function ()
+  "Open commit of current line. Return buffer."
+  (let ((sha1 (etig--main-extract-sha1
+               (buffer-substring-no-properties (point-at-bol)
+                                               (point-at-eol)))))
+    (if sha1
+        (etig-diff sha1)
+      (message "No commit found on this line"))))
+
+(defun etig--main-extract-sha1 (line)
+  (let ((str
+         ;;"| * | 85d2901 2013-09-21 18:15:00 +0900 10sr alias make as compile"
+         line))
+    (and (string-match etig-main-sha1-regexp
+                       str)
+         (match-string 1 str))))
+
 
 ;; interactive command for etig modes
 
@@ -182,15 +194,51 @@ a copy of this var.")
   "Function for enter key."
   (interactive)
   (let ((parent (current-buffer))
-        (buf (save-excursion
-               (case major-mode
-                 ('etig-main-mode (message "etig-main-mode.") (etig-diff))
-                 (t (message "Not etig modes.") nil)
-                 ))))
+        (buf (etig--create-buffer)))
     (when buf
       (pop-to-buffer buf)               ; switch buffer
       (setq etig--parent-buffer parent)
       (etig--push-window-configuration))))
+
+(defun etig--create-buffer (&optional parent)
+  "Create etig buffer according to current mode. Return that buffer."
+  (save-excursion
+    (if etig--create-buffer-function
+        (let ((buf (funcall etig--create-buffer-function)))
+          (when buf
+            (with-current-buffer buf
+              (goto-char (point-min))
+              (and parent
+                   (setq etig--parent-buffer parent)))
+            buf))
+      (message "I dont know how to create new buffer")
+      nil)))
+
+(defun etig-enter-next ()
+  "Enter next item."
+  (interactive)
+  (let ((win (get-buffer-window (current-buffer)))
+        (parent etig--parent-buffer))
+    (if parent
+        (with-current-buffer parent
+          (forward-line 1)
+          (let ((buf (etig--create-buffer parent)))
+            (set-window-buffer win buf)
+            (switch-to-buffer buf)))
+      (message "No parent buffer."))))
+
+(defun etig-enter-previous ()
+  "Enter previous item."
+  (interactive)
+  (let ((win (get-buffer-window (current-buffer)))
+        (parent etig--parent-buffer))
+    (if parent
+        (with-current-buffer parent
+          (forward-line -1)
+          (let ((buf (etig--create-buffer parent)))
+            (set-window-buffer win buf)
+            (switch-to-buffer buf)))
+      (message "No parent buffer."))))
 
 (defalias 'etig-next-line 'next-line)
 (defalias 'etig-previous-line 'previous-line)
