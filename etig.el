@@ -46,8 +46,8 @@
   "Non-nil if library `ansi-color' exists.")
 
 (defvar etig--window-configurations-stack nil
-  "etig configuration stack. At bottom of this stack is the one before etig
-is invoked, at top is current one.")
+  "etig window configuration stack. At bottom of this stack is the one before
+etig is invoked.")
 
 (defvar etig--parent-buffer nil
   "etig parent buffer.")
@@ -63,22 +63,27 @@ apropriate buffer.")
 
 (defun etig--pop-window-configuration (&optional destroy-p)
   "Pop window configuation and set to current state unless destroy-p is nil."
-  (let ((wc (pop etig--window-configurations-stack)))
+  (message "stack poped")
+  (let ((wc (car etig--window-configurations-stack)))
+    (setq etig--window-configurations-stack
+          (cdr etig--window-configurations-stack))
     (when (and wc
                (not destroy-p))
       (set-window-configuration wc))
     wc))
 
-(defun etig--replace-window-configuration ()
-  "Pop and destroy window configuration, then push current window
-configuration."
-  (etig--pop-window-configuration t)
-  (etig--push-window-configuration))
+;; (defun etig--replace-window-configuration ()
+;;   "Pop and destroy window configuration, then push current window
+;; configuration."
+;;   (etig--pop-window-configuration t)
+;;   (etig--push-window-configuration))
 
 (defun etig--push-window-configuration ()
   "Push current window configuration to stack."
-  (push (current-window-configuration)
-        etig--window-configurations-stack))
+  (message "stack pushed")
+  (setq etig--window-configurations-stack
+        (cons (current-window-configuration)
+              etig--window-configurations-stack)))
 
 (defun etig--command-str (cmd buf color-p mode)
   "Run git command CMD and output result to BUF.
@@ -167,14 +172,16 @@ a copy of this var.")
   "main mode for etig."
   (setq etig--create-buffer-function 'etig--main-create-buffer-function))
 
-(defun etig-main ()
+(defun etig-main (&optional dir)
   "Invole etig."
   (interactive)
+  (etig--push-window-configuration)
   (let ((buf (get-buffer-create "*etig-main*")))
     (with-current-buffer buf
       (erase-buffer)
+      (and dir
+           (cd dir))
       (etig--command-str etig-main-command buf t 'etig-main-mode))
-    (etig--push-window-configuration)
     (delete-other-windows)
     (switch-to-buffer buf)
     (goto-char (point-min))))
@@ -210,9 +217,9 @@ a copy of this var.")
   (let ((parent (current-buffer))
         (buf (etig--create-buffer)))
     (when buf
+      (etig--push-window-configuration)
       (pop-to-buffer buf)               ; switch buffer
-      (setq etig--parent-buffer parent)
-      (etig--push-window-configuration))))
+      (setq etig--parent-buffer parent))))
 
 (defun etig--create-buffer (&optional parent)
   "Create etig buffer according to current mode. Return that buffer."
@@ -234,13 +241,12 @@ a copy of this var.")
   (let ((win (get-buffer-window (current-buffer)))
         (parent etig--parent-buffer))
     (if parent
-        (with-current-buffer parent
-          (forward-line 1)
-          (let ((buf (etig--create-buffer parent)))
-            (when buf
-              (set-window-buffer win buf)
-              (switch-to-buffer buf)
-              (etig--replace-window-configuration))))
+        (let ((buf (with-current-buffer parent
+                     (forward-line 1)
+                     (etig--create-buffer parent))))
+          (when buf
+            (set-window-buffer win buf)))
+      (forward-line 1)
       (message "No parent buffer."))))
 
 (defun etig-enter-previous ()
@@ -249,13 +255,12 @@ a copy of this var.")
   (let ((win (get-buffer-window (current-buffer)))
         (parent etig--parent-buffer))
     (if parent
-        (with-current-buffer parent
-          (forward-line -1)
-          (let ((buf (etig--create-buffer parent)))
-            (when buf
-              (set-window-buffer win buf)
-              (switch-to-buffer buf)
-              (etig--replace-window-configuration))))
+        (let ((buf (with-current-buffer parent
+                     (forward-line -1)
+                     (etig--create-buffer parent))))
+          (when buf
+            (set-window-buffer win buf)))
+      (forward-line -1)
       (message "No parent buffer."))))
 
 (defalias 'etig-next-line 'next-line)
