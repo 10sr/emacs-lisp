@@ -46,31 +46,39 @@
   "Non-nil if library `ansi-color' exists.")
 
 (defvar etig--window-configurations-stack nil
-  "etig configuration stack. Bottom of this stack is the one before etig
-is invoked. Top is current one.")
+  "etig configuration stack. At bottom of this stack is the one before etig
+is invoked, at top is current one.")
 
 (defvar etig--parent-buffer nil
   "etig parent buffer.")
 (make-variable-buffer-local 'etig--parent-buffer)
 
 (defvar etig--create-buffer-function nil
-  "Function to create new buffer from current line.")
+  "Function to create new buffer from current line.
+This function accept no args and return newly created buffer or nil of no
+apropriate buffer.")
 (make-variable-buffer-local 'etig--create-buffer-function)
 
 ;; utilities
 
-(defun etig--pop-window-configuration ()
-  "Pop window configuation and set to current state."
-  nil)
+(defun etig--pop-window-configuration (&optional destroy-p)
+  "Pop window configuation and set to current state unless destroy-p is nil."
+  (let ((wc (pop etig--window-configurations-stack)))
+    (when (and wc
+               (not destroy-p))
+      (set-window-configuration wc))
+    wc))
 
 (defun etig--replace-window-configuration ()
   "Pop and destroy window configuration, then push current window
 configuration."
-  nil)
+  (etig--pop-window-configuration t)
+  (etig--push-window-configuration))
 
 (defun etig--push-window-configuration ()
   "Push current window configuration to stack."
-  nil)
+  (push (current-window-configuration)
+        etig--window-configurations-stack))
 
 (defun etig--command-str (cmd buf color-p mode)
   "Run git command CMD and output result to BUF.
@@ -126,8 +134,9 @@ a copy of this var.")
   (copy-keymap etig--base-map))
 
 (define-derived-mode etig-diff-mode diff-mode
+  "etig-diff"
   "diff-mode for etig."
-  (view-mode 1))
+  (view-mode t))
 
 
 (defun etig-diff (sha1)
@@ -177,7 +186,8 @@ a copy of this var.")
                                                (point-at-eol)))))
     (if sha1
         (etig-diff sha1)
-      (message "No commit found on this line"))))
+      (message "No commit found on this line")
+      nil)))
 
 (defun etig--main-extract-sha1 (line)
   (let ((str
@@ -185,7 +195,11 @@ a copy of this var.")
          line))
     (and (string-match etig-main-sha1-regexp
                        str)
-         (match-string 1 str))))
+         (let ((match (match-string 1 str)))
+           (if (eq 0
+                   (length match))
+               nil
+             match)))))
 
 
 ;; interactive command for etig modes
@@ -223,8 +237,10 @@ a copy of this var.")
         (with-current-buffer parent
           (forward-line 1)
           (let ((buf (etig--create-buffer parent)))
-            (set-window-buffer win buf)
-            (switch-to-buffer buf)))
+            (when buf
+              (set-window-buffer win buf)
+              (switch-to-buffer buf)
+              (etig--replace-window-configuration))))
       (message "No parent buffer."))))
 
 (defun etig-enter-previous ()
@@ -236,8 +252,10 @@ a copy of this var.")
         (with-current-buffer parent
           (forward-line -1)
           (let ((buf (etig--create-buffer parent)))
-            (set-window-buffer win buf)
-            (switch-to-buffer buf)))
+            (when buf
+              (set-window-buffer win buf)
+              (switch-to-buffer buf)
+              (etig--replace-window-configuration))))
       (message "No parent buffer."))))
 
 (defalias 'etig-next-line 'next-line)
