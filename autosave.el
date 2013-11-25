@@ -169,4 +169,4 @@ disabled by using `autosave-remove'."
 
 (provide 'autosave)
 
-;;; autosave.el ends here.
+;;; autosave.el ends here
