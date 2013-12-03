@@ -159,11 +159,15 @@ Each element should be like (CMD . MAJOR-MODE).")
               (if (featurep 'ansi-color)
                   (progn
                     (shell-command (concat "git -c color.ui=always "
+                                           git-command-default-options
+                                           " "
                                            cmd)
                                    t)
                     (ansi-color-apply-on-region (point-min)
                                                 (point-max)))
                 (shell-command (concat "git "
+                                       git-command-default-options
+                                       " "
                                        cmd)
                                t))
               (funcall majormode))))
