@@ -155,7 +155,6 @@ Each element should be like (CMD . MAJOR-MODE).")
           (with-current-buffer bname
             (let ((inhibit-read-only t))
               (erase-buffer)
-              (view-mode)
               (if (featurep 'ansi-color)
                   (progn
                     (shell-command (concat "git -c color.ui=always "
@@ -170,7 +169,8 @@ Each element should be like (CMD . MAJOR-MODE).")
                                        " "
                                        cmd)
                                t))
-              (funcall majormode))))
+              (funcall majormode))
+            (view-mode)))
       (git-command-term-shell-command (concat "git "
                                               git-command-default-options
                                               " "
