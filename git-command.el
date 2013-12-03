@@ -153,18 +153,20 @@ Each element should be like (CMD . MAJOR-MODE).")
                (kill-buffer bname))
           (display-buffer (get-buffer-create bname))
           (with-current-buffer bname
-            (erase-buffer)
-            (if (featurep 'ansi-color)
-                (progn
-                  (shell-command (concat "git -c color.ui=always "
-                                         cmd)
-                                 t)
-                  (ansi-color-apply-on-region (point-min)
-                                              (point-max)))
-              (shell-command (concat "git "
-                                     cmd)
-                             t))
-            (funcall majormode)))
+            (let ((inhibit-read-only t))
+              (erase-buffer)
+              (view-mode)
+              (if (featurep 'ansi-color)
+                  (progn
+                    (shell-command (concat "git -c color.ui=always "
+                                           cmd)
+                                   t)
+                    (ansi-color-apply-on-region (point-min)
+                                                (point-max)))
+                (shell-command (concat "git "
+                                       cmd)
+                               t))
+              (funcall majormode))))
       (git-command-term-shell-command (concat "git "
                                               git-command-default-options
                                               " "
