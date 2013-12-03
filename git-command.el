@@ -162,7 +162,8 @@ Each element should be like (CMD . MAJOR-MODE).")
                   (ansi-color-apply-on-region (point-min)
                                               (point-max)))
               (shell-command (concat "git "
-                                     cmd)))
+                                     cmd)
+                             t))
             (funcall majormode)))
       (git-command-term-shell-command (concat "git "
                                               git-command-default-options
