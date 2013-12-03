@@ -130,6 +130,9 @@ Each element should be like (CMD . MAJOR-MODE).")
   (cdr (assoc (car (split-string cmd))
               git-command-major-mode-alist)))
 
+(eval-when-compile
+  (require 'ansi-color nil t))
+
 (defun git-command (cmd)
   "Shell like git command interface.  CMD is the command to run."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
@@ -151,9 +154,15 @@ Each element should be like (CMD . MAJOR-MODE).")
           (display-buffer (get-buffer-create bname))
           (with-current-buffer bname
             (erase-buffer)
-            (shell-command (concat "git "
-                                   cmd)
-                           t)
+            (if (featurep 'ansi-color)
+                (progn
+                  (shell-command (concat "git -c color.ui=always "
+                                         cmd)
+                                 t)
+                  (ansi-color-apply-on-region (point-min)
+                                              (point-max)))
+              (shell-command (concat "git "
+                                     cmd)))
             (funcall majormode)))
       (git-command-term-shell-command (concat "git "
                                               git-command-default-options
