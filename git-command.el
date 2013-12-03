@@ -33,11 +33,11 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
-;; Dead simple git interface. No major-mode, only provides command-line like
-;; interface using minibuffer. You need not remember additional keybinds for
-;; using git from emacs.
+;; Dead simple git interface.  No major-mode, only provides command-line like
+;; interface using minibuffer.  You need not remember additional keybinds for
+;; using git from Emacs.
 
 ;;; Code:
 
@@ -65,8 +65,15 @@ This value means nothing when `resize-mini-window' is nil.")
 (defvar git-command-history nil
   "History list for `git-command'.")
 
+(defvar git-command-major-mode-alist
+  '(
+    ("diff" . diff-mode)
+    )
+  "Alist of major mode for git commands.
+Each element should be like (CMD . MAJOR-MODE).")
+
 (defun git-command-find-git-ps1 (f)
-  "Return F if F exists and it contains function \"__git_ps1\"."
+  "Return F if F exists and it contain function \"__git_ps1\"."
   (and (file-readable-p f)
        (with-temp-buffer
          (insert ". " f "; "
@@ -89,7 +96,8 @@ This value means nothing when `resize-mini-window' is nil.")
       (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")
       ))
 
-(defun git-command-ps1 (str)
+(defun git-command-ps1 (fmt)
+  "Generate git ps1 string from FMT."
   (let ((gcmpl (or git-command-prompt-file))
         (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE="
                                         git-command-ps1-showdirtystate)
@@ -106,7 +114,7 @@ This value means nothing when `resize-mini-window' is nil.")
         (with-temp-buffer
           (insert ". " gcmpl
                   "; __git_ps1 "
-                  (shell-quote-argument str)
+                  (shell-quote-argument fmt)
                   ";")
           (shell-command-on-region (point-min)
                                    (point-max)
@@ -117,32 +125,50 @@ This value means nothing when `resize-mini-window' is nil.")
                                           (point-max)))
       "")))
 
+(defun git--command-get-major-mode (cmd)
+  "Return apropriate major mode for CMD by `git-command-major-mode-alist'."
+  (cdr (assoc (car (split-string cmd))
+              git-command-major-mode-alist)))
+
 (defun git-command (cmd)
-  "Shell like git command interface."
+  "Shell like git command interface.  CMD is the command to run."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
                                                  (abbreviate-file-name
                                                   default-directory)
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
                                          'git-command-history)))
-  (git-command-term-shell-command (concat "git "
-                                          git-command-default-options
-                                          " "
-                                          cmd)
-                                  (concat "*"
-                                          "git "
-                                          (car (split-string cmd
-                                                             " "))
-                                          "*")))
+  (let ((bname (concat "*"
+                       "git "
+                       (car (split-string cmd
+                                          " "))
+                       "*"))
+        (majormode (git--command-get-major-mode cmd)))
+    (if majormode
+        (progn
+          (and (get-buffer bname)
+               (kill-buffer bname))
+          (display-buffer (get-buffer-create bname))
+          (with-current-buffer bname
+            (erase-buffer)
+            (shell-command (concat "git "
+                                   cmd)
+                           t)
+            (funcall majormode)))
+      (git-command-term-shell-command (concat "git "
+                                              git-command-default-options
+                                              " "
+                                              cmd)
+                                      bname))))
 
 (eval-when-compile
   (require 'term nil t))
 (defvar term-shell-command-history nil
-  "History for term-shell-command")
+  "History for term-shell-command.")
 (defun git-command-term-shell-command (command &optional buffer-or-name)
   "Run COMMAND in terminal emulator.
-If buffer-or-name is given, use this buffer. In this case, old process in the
-buffer is destroyed. Otherwise, new buffer is generated automatically from
+If BUFFER-OR-NAME is given, use this buffer.  In this case, old process in the
+buffer is destroyed.  Otherwise, new buffer is generated automatically from
 COMMAND."
   (interactive (list (read-shell-command "Run program: "
                                          nil
@@ -192,4 +218,4 @@ COMMAND."
 
 (provide 'git-command)
 
-;;; git-command.el ends here.
+;;; git-command.el ends here
