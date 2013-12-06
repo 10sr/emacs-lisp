@@ -59,7 +59,8 @@ changing.")
     (frame-parameter nil 'name)
     "]"
     )
-  "List of elements for terminal title.")
+  "List of elements for terminal title. Each element must return string when
+evaluated.")
 
 (defun terminal-title-set-tmux-window-name (&rest args)
   "Set tmux window name."
@@ -70,7 +71,8 @@ changing.")
                                     `(,@args "\033\\")))))
 
 (defvar terminal-title-tmux-window-name-format nil
-  "List of elements for tmux window name.")
+  "List of elements for tmux window name. Each element must return string when
+evaluated.")
 
 (define-minor-mode terminal-title-mode
   "Set terminal title."
@@ -91,14 +93,16 @@ changing.")
 `terminal-title-tmux-window-name-mode' are enabled respectively.
 ARGS are ignored."
   (interactive)
-  (when terminal-title-mode
-    (apply 'terminal-title-set
-           (mapcar 'eval
-                 terminal-title-format)))
-  (when terminal-title-tmux-window-name-mode
-    (apply 'terminal-title-set-tmux-window-name
-           (mapcar 'eval
-                   terminal-title-tmux-window-name-format))))
+  (and terminal-title-mode
+       terminal-title-format
+       (apply 'terminal-title-set
+              (mapcar 'eval
+                      terminal-title-format)))
+  (and terminal-title-tmux-window-name-mode
+       terminal-title-tmux-window-name-format
+       (apply 'terminal-title-set-tmux-window-name
+              (mapcar 'eval
+                      terminal-title-tmux-window-name-format))))
 
 (add-hook 'buffer-file-changed-functions
           'terminal-title-update)
