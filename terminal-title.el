@@ -24,59 +24,87 @@ changing.")
   ;;             (message "dir changed %s to %s !" pdir cdir)))
   )
 
-(defvar set-terminal-title-term-regexp "^\\(rxvt\\|xterm\\|aterm$\\|screen\\)"
+(defvar terminal-title-term-regexp "^\\(rxvt\\|xterm\\|aterm$\\|screen\\)"
   "Rexexp for `set-terminal-title'.")
 
-(defun set-terminal-title (&rest args)
-  ""
+(defun terminal-title-set (&rest args)
+  "Set terminal title."
   (interactive "sString to set as title: ")
   (let ((tty (frame-parameter nil
                               'tty-type)))
     (when (and tty
-               (string-match set-terminal-title-term-regexp
+               (string-match terminal-title-term-regexp
                              tty))
       (send-string-to-terminal (apply 'concat
                                       "\033]0;"
                                       `(,@args "\007"))))))
 
-(defun set-screen-name(&rest args)
-  ""
+(defvar terminal-title-format
+  '(
+    "["
+    user-login-name
+    "@"
+    system-name
+    ":"
+    (abbreviate-file-name (or buffer-file-name
+                              default-directory))
+    "]["
+    invocation-name
+    " "
+    emacs-version
+    " "
+    (symbol-name system-type)
+    "]["
+    "FRAME:"
+    (frame-parameter nil 'name)
+    "]"
+    )
+  "List of elements for terminal title.")
+
+(defun terminal-title-set-tmux-window-name (&rest args)
+  "Set tmux window name."
   (interactive "sString to set as title: ")
   (when (getenv "TMUX")
     (send-string-to-terminal (apply 'concat
                                     "\033k"
                                     `(,@args "\033\\")))))
 
-(defun my-set-terminal-title ()
-  ""
-  (set-terminal-title "["
-                      user-login-name
-                      "@"
-                      system-name
-                      ":"
-                      (abbreviate-file-name (or buffer-file-name
-                                                default-directory))
-                      "]["
-                      invocation-name
-                      " "
-                      emacs-version
-                      " "
-                      (symbol-name system-type)
-                      "]["
-                      "FRAME:"
-                      (frame-parameter nil 'name)
-                      "]"
-                      )
-  (set-screen-name "em:"
-                   (file-name-nondirectory
-                    (directory-file-name default-directory))
-                   "/"))
+(defvar terminal-title-tmux-window-name-format nil
+  "List of elements for tmux window name.")
+
+(define-minor-mode terminal-title-mode
+  "Set terminal title."
+  :init-value nil
+  :global t
+  :lighter "")
+
+(define-minor-mode terminal-title-tmux-window-name-mode
+  "Set tmux window name."
+  :init-value nil
+  :global t
+  :lighter "")
+
+(defun terminal-title-update (&rest args)
+  "Update terminal titles `terminal-title-set' and
+`terminal-title-set-tmux-window-name' using `terminal-title-format' and
+`terminal-title-tmux-window-name-format' when `terminal-title-mode' and
+`terminal-title-tmux-window-name-mode' are enabled respectively.
+ARGS are ignored."
+  (interactive)
+  (when terminal-title-mode
+    (apply 'terminal-title-set
+           (mapcar 'eval
+                 terminal-title-format)))
+  (when terminal-title-tmux-window-name-mode
+    (apply 'terminal-title-set-tmux-window-name
+           (mapcar 'eval
+                   terminal-title-tmux-window-name-format))))
 
 (add-hook 'buffer-file-changed-functions
-          (lambda (p c)
-            (my-set-terminal-title)))
+          'terminal-title-update)
 
 (add-hook 'suspend-resume-hook
-          'my-set-terminal-title)
+          'terminal-title-update)
 
 (provide 'terminal-title)
+;;; terminal-title.el ends here
