@@ -76,14 +76,15 @@
   "Save registered file names and major-modes into file
 `remember-major-modes-file'."
   (with-current-buffer (find-file-noselect remember-major-modes-file)
-    (erase-buffer)
-    (insert "(setq remember-major-modes-modes-alist\n")
-    (insert "(quote\n")
-    (print remember-major-modes-modes-alist (current-buffer))
-    (insert ")\n")
-    (insert ")\n")
-    (save-buffer)
-    (kill-buffer)))
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (insert "(setq remember-major-modes-modes-alist\n")
+      (insert "(quote\n")
+      (print remember-major-modes-modes-alist (current-buffer))
+      (insert ")\n")
+      (insert ")\n")
+      (save-buffer)
+      (kill-buffer))))
 
 (defun remember-major-modes-remember (&optional mode filename)
   "Remember current filename and major-mode."
