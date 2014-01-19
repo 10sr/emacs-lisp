@@ -58,7 +58,7 @@ This value should be a key of `ilookup-alist'.")
                (shell-command-to-string (format "sdcv -n '%s'"
                                                 word))))
     )
-  "Alist of ilookup functions.
+  "Alist of ilookup dictionary functions.
 Each element should be in the form of (NAME . FUNCTION).
 FUNCTION must accept one argument as word to search and return the string of
 result for that word.")
@@ -166,6 +166,17 @@ Return nil if current position is not on prompt line."
        (buffer-substring-no-properties (ilookup-bol)
                                        (point-at-eol))))
 
+(defun ilookup--get-buffer-create ()
+  "Create ilookup buffer if not exists yet and return that buffer."
+  ;; TODO: implement me!
+  nil)
+
+(defun ilookup--parse-input (input)
+  "Parse input.
+INPUT must be \"word\" or \"dict:word\"."
+  ;; TODO: implement me!
+  nil)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Major-mode and interactive command for that
@@ -239,6 +250,17 @@ Freeze current input and show next prompt."
                 'ilookup--timer-remove)
       )
     (pop-to-buffer ilookup--buffer)))
+
+(defun ilookup-open-word (word &optional dict)
+  "Open ilookup buffer with WORD input.
+Optional argument DICT specified dict name defined in `ilookup-alist'."
+  ;; TODO: implement me!
+  nil)
+
+(defun ilookup-open-at-point ()
+  "Open ilookup buffer with word at point input."
+  ;; TODO: impelment me!
+  )
 
 (provide 'ilookup)
 
