@@ -50,9 +50,9 @@
 
 (defvar ilookup-default "sdcv"
   "Default command for ilookup.
-This value should be a key of `ilookup-alist'.")
+This value should be a key of `ilookup-dict-alist'.")
 
-(defvar ilookup-alist
+(defvar ilookup-dict-alist
   '(
     ("sdcv" . (lambda (word)
                (shell-command-to-string (format "sdcv -n '%s'"
@@ -130,13 +130,13 @@ This function insert newline if required."
                 ;; colon sepatated list of input
                 (inputl (split-string input
                                       ":"))
-                ;; funcname for `ilookup-alist'
+                ;; funcname for `ilookup-dict-alist'
                 (fname (if (eq (length inputl)
                                2)
                            (car inputl)
                          ilookup-default))
                 (func (cdr (assoc fname
-                                  ilookup-alist)))
+                                  ilookup-dict-alist)))
                 (word (if (eq (length inputl)
                               2)
                           (nth 1
@@ -253,7 +253,7 @@ Freeze current input and show next prompt."
 
 (defun ilookup-open-word (word &optional dict)
   "Open ilookup buffer with WORD input.
-Optional argument DICT specified dict name defined in `ilookup-alist'."
+Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   ;; TODO: implement me!
   nil)
 
