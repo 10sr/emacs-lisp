@@ -152,7 +152,11 @@ Any previous output will be removed."
                          (format "No func found for `%s'"
                                  (or (nth 1 inputl)
                                      ilookup-default)))
-                     "\n"))))))
+                     "\n")
+             (let ((p (point)))
+               (goto-char (point-max))
+               (goto-char p))
+             )))))
 
 (defun ilookup--get-result (word &optional dict)
   "Return result string for WORD with DICT.
@@ -282,6 +286,7 @@ Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   (with-current-buffer (pop-to-buffer (ilookup--get-buffer-create))
     (when (ilookup--input-given-p)
       (ilookup--emit-next-prompt))
+    (ilookup-goto-prompt)
     (when dict
       (insert dict
               ":"))
