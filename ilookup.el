@@ -111,7 +111,6 @@ result for that word.")
   "Parse input.
 INPUT must be \"word\" or \"dict:word\".
 Return list of (word dict)"
-  ;; TODO: implement me!
   (let ((l (split-string input
                          ":")))
     (if (eq 2
