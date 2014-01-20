@@ -68,6 +68,7 @@ result for that word.")
   "Point of beginning of current prompt.  Non-nil only in ilookup buffer.")
 (make-variable-buffer-local 'ilookup--current-prompt-point)
 
+;; do not use this var to get ilookup buffer: use `ilookup--get-buffer-create'
 (defvar ilookup--buffer nil
   "Pointer to ilookup buffer.")
 
@@ -89,14 +90,12 @@ result for that word.")
 
 (defun ilookup--timer-add ()
   "Add idle timer for ilookup."
-  (and (eq ilookup--buffer
-           (current-buffer))
-       ;; do not duplicate timer
-       (not ilookup--timer)
-       (setq ilookup--timer
-             (run-with-idle-timer ilookup-interval
-                                  t
-                                  'ilookup--print-result-from-input))))
+  ;; do not duplicate timer
+  (unless ilookup--timer
+    (setq ilookup--timer
+          (run-with-idle-timer ilookup-interval
+                               t
+                               'ilookup--print-result-from-input))))
 
 (defun ilookup--timer-remove ()
   "Remove idle timer for ilookup."
@@ -164,6 +163,13 @@ Return nil if no func found for DICT."
                'ignore)
            word))
 
+(defun ilookup--input-given-p ()
+  "Return non-nil if input is given."
+  (let ((input (ilookup--get-input)))
+    (and input
+         (< 0
+            (length input)))))
+
 (defun ilookup--get-input ()
   "Get current input for ilookup buffer.
 Return nil if current buffer is not ilookup buffer."
@@ -226,14 +232,16 @@ prompt.  Point is set to next to the prompt."
   "Enter function for `ilookup-mode'.
 Freeze current input and show next prompt."
   (interactive)
-  (let ((pword (and
-                ;; do not get if currently on prompt
-                (not (ilookup--on-prompt-p))
-                (thing-at-point 'word))))
-    ;; print result is done only when currently on prompt
-    (ilookup--emit-next-prompt)
-    (and pword
-         (insert pword))))
+  (if (ilookup--on-prompt-p)
+      ;; if currently on prompt and input is given
+      (ilookup--emit-next-prompt)
+    (let ((pword (thing-at-point 'word)))
+      (when (ilookup--input-given-p)
+          ;; if input is already given
+        (ilookup--emit-next-prompt))
+      (ilookup-goto-prompt)
+      (and pword
+           (insert pword)))))
 
 (defun ilookup-kill-input ()
   "Delete `ilookup-bol' to current point."
@@ -246,6 +254,12 @@ Freeze current input and show next prompt."
   (interactive)
   (goto-char (ilookup-bol)))
 
+(defun ilookup-goto-prompt ()
+  "Goto end of prompt line."
+  (interactive)
+  (when ilookup--current-prompt-point
+    (goto-char ilookup--current-prompt-point)
+    (end-of-line)))
 
 (defun ilookup-bol ()
   "Return point to bol ignoring prompt."
@@ -265,11 +279,18 @@ Freeze current input and show next prompt."
   "Open ilookup buffer with WORD input.
 Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   ;; TODO: implement me!
-  nil)
+  (with-current-buffer (pop-to-buffer (ilookup--get-buffer-create))
+    (when (ilookup--input-given-p)
+      (ilookup--emit-next-prompt))
+    (when dict
+      (insert dict
+              ":"))
+    (insert word)))
 
 (defun ilookup-open-at-point ()
   "Open ilookup buffer with word at point input."
-  (ilookup-open-word (thing-at-point 'word)))
+  (interactive)
+  (ilookup-open-word (substring-no-properties (thing-at-point 'word))))
 
 (provide 'ilookup)
 
