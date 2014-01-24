@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/dired-list-all-mode.el
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ()
 ;; Keywords: dired
 
@@ -33,9 +33,10 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
-;; Add buffer local minor mode for dired to toggle whether list dot files.
+;; dired-list-all-mode is a buffer local minor mode for dired to toggle whether
+;; list dot files.
 
 ;; For example add to your dot.emacs as below:
 ;; (when (require 'dired-list-all-mode nil t)
@@ -47,13 +48,17 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'dired nil t))
+
 (defvar dired-list-all-switch "-A"
   "Switch for listing dot files.
 Should be \"-a\" or \"-A\". Additional switch can be included.")
 
 (define-minor-mode dired-list-all-mode
   "Toggle whether list dot files in dired.
-When using this mode the value of `dired-listing-switches' should not contain \"-a\" or \"-A\" option."
+When using this mode the value of `dired-listing-switches' should not contain
+\"-a\" or \"-A\" option."
   :init-value nil
   :global nil
   :lighter " ALL"
@@ -62,7 +67,7 @@ When using this mode the value of `dired-listing-switches' should not contain \"
     (revert-buffer)))
 
 (defun dired-list-all-set ()
-  ""
+  "Update `dired-actual-switches'."
   (if dired-list-all-mode
       (or (string-match-p dired-list-all-switch
                           dired-actual-switches)
@@ -81,4 +86,4 @@ When using this mode the value of `dired-listing-switches' should not contain \"
 
 (provide 'dired-list-all-mode)
 
-;;; dired-list-all-mode.el ends here.
+;;; dired-list-all-mode.el ends here
