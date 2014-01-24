@@ -224,6 +224,7 @@ prompt.  Point is set to next to the prompt."
     (define-key map (kbd "C-m") 'ilookup-enter)
     (define-key map (kbd "C-u") 'ilookup-kill-input)
     (define-key map (kbd "C-a") 'ilookup-goto-bol)
+    (define-key map (kbd "DEL") 'ilookup-delete-backward-char)
     map))
 
 (define-derived-mode ilookup-mode fundamental-mode
@@ -273,6 +274,15 @@ Freeze current input and show next prompt."
                         (point-at-eol)
                         t)
         (point))))
+
+(defun ilookup-delete-backward-char (n)
+  "Delete the previous N characters if it is not a prompt."
+  (interactive "p")
+  (when (< (ilookup-bol)
+           (point))
+    (backward-delete-char 1)
+    (when (< 1 n)
+      (ilookup-delete-backward-char (1- n)))))
 
 (defun ilookup-open ()
   "Open ilookup buffer."
