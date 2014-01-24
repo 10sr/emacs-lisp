@@ -31,3 +31,5 @@
                'smart-revert))
 
 (provide 'smart-revert)
+
+;;; smart-revert.el ends here

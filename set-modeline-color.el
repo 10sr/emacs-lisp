@@ -33,7 +33,7 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Define and change modeline color according to current buffer state: readonly,
 ;; insert or overwrite.
@@ -87,3 +87,5 @@ STATE should be `insert', `readonly', or `overwrite'.")
 (add-hook 'after-init-hook 'set-modeline-color-according-to-write-mode)
 
 (provide 'set-modeline-color)
+
+;;; set-modeline-color.el ends here

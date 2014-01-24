@@ -33,7 +33,7 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Use osx pasteboard for yank and paste.
 
@@ -102,4 +102,4 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
 
 (provide 'pasteboard)
 
-;;; pasteboard.el ends here.
+;;; pasteboard.el ends here

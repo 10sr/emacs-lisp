@@ -33,7 +33,7 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Visit all files with view-mode enabled.
 
@@ -53,7 +53,7 @@
   )
 
 (defun read-only-only-set ()
-  "enable `view-mode' if `read-only-only-mode' is non-nil." 
+  "Enable `view-mode' if `read-only-only-mode' is non-nil."
   (and buffer-file-name
        read-only-only-mode
        (view-mode 1)))
@@ -63,4 +63,4 @@
 
 (provide 'read-only-only-mode)
 
-;;; read-only-only-mode.el ends here.
+;;; read-only-only-mode.el ends here

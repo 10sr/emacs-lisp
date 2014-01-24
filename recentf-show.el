@@ -110,3 +110,5 @@ use for the buffer. It defaults to \"*recetf-show*\"."
                  ".")))))
 
 (provide 'recentf-show)
+
+;; recentf-show.el ends here

@@ -33,7 +33,7 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Remember major-modes for files.
 ;; Usually major-modes for files are detected automatically using the value of
@@ -132,4 +132,4 @@
 
 (provide 'remember-major-modes-mode)
 
-;;; remember-major-modes-mode.el ends here.
+;;; remember-major-modes-mode.el ends here

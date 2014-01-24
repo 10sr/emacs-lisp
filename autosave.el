@@ -33,7 +33,7 @@
 
 ;; For more information, please refer to <http://unlicense.org/>
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Save buffers automatically when emacs is idle for spedified seconds.
 
