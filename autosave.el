@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/autosave.el
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ()
 ;; Keywords: utility
 
@@ -35,7 +35,7 @@
 
 ;;; Commentary:
 
-;; Save buffers automatically when emacs is idle for spedified seconds.
+;; Save buffers automatically when Emacs is idle for spedified seconds.
 
 ;; Idle timer for autosave can be set by sexps like:
 ;; (and (require 'autosave nil t)
@@ -50,60 +50,47 @@
 * the filename of the buffer does not match with EXCLUDE
 * FUNCTION return non-nil
 
-INCLUDE and EXCLUDE should be regexp. FUNCTION is called with no argument and
+INCLUDE and EXCLUDE should be regexp.  FUNCTION is called with no argument and
 the buffer to save being set as current buffer."
   (mapc (lambda (buf)
           (with-current-buffer buf
-            (and (autosave-file-test-regexp include exclude)
+            (and (autosave-file-test-regexp buffer-file-name include exclude)
                  (funcall function)
                  (save-buffer))))
         (buffer-list)))
 
-(defun autosave-file-test-regexp (include exclude)
-  "Return non-nil if the filename currently visiting is matched with INCLUDE
-and is not matched with EXCLUDE."
-  (and buffer-file-name
+(defun autosave-file-test-regexp (filename include exclude)
+  "Return non-nil if FILENAME match with INCLUDE and not with EXCLUDE."
+  (and filename
        (string-match include
-                     buffer-file-name)
+                     filename)
        (not (string-match exclude
-                          buffer-file-name))))
-
-(defun autosave-test-default ()
-  "Return non-nil if all of functions in `autosave-test-default-functions'
-return non-nil, otherwise return nil.
-
-This functions is used by `autosave-set' if the fourth arg of `autosave-set'
-is set to be nil."
-  (run-hook-with-args-until-failure 'autosave-test-default-functions))
-
-(defvar autosave-test-default-functions nil
-  "A list of functions called by `autosave-test-default'.
-Each function is called with no argument. Current buffer is set to the buffer
-to save while these functions are called.
-You can use `add-hook' and `remove-hook' to update this list.")
+                          filename))))
 
 (defvar autosave-timer-list nil
-  "A list of autosave timer objects. When new timer is set by `autosave-set',
-the timer object is added to the top of this list.")
+  "A list of autosave timer objects.
+When new timer is set by `autosave-set',the timer object is added to the top
+of this list.")
 
 (defun autosave-set (secs &optional include exclude function)
-  "Register timer so that buffers will be saved automatically each time when
-Emacs is idle for SECS. Autosave is done by calling `autosave-save-buffers'.
+  "Register timer so that buffers will be saved automatically.
+This will be done each time when Emacs is idle for SECS.  Autosave is done by
+ calling `autosave-save-buffers'.
 
 INCLUDE and EXCLUDE should be regexp to match with the filename of buffer to
-include and exclude respectively. These args can be nil, in that case all
+include and exclude respectively.  These args can be nil, in that case all
 files are included or no files are excluded.
 
-Fourth arg FUNCTION is function to test if the buffer should be saved. This
+Fourth arg FUNCTION is function to test if the buffer should be saved.  This
 function is called with no argument and the buffer to save being set as
-current buffer. If this function returns non-nil, the buffer is saved.
+current buffer.  If this function returns non-nil, the buffer is saved.
 If this arg is nil, the function `autosave-test-default' is used by default.
 
 If the timer with exactly same arg as this has already set, timer is not
 created newly.
 
 This function returns the created timer object, or nil if timer is not created.
-This timer object is also added to `autosave-timer-list'. This timer can be
+This timer object is also added to `autosave-timer-list'.  This timer can be
 disabled by using `autosave-remove'."
   (interactive "nSeconds until autosaving: ")
   (let ((tm (run-with-idle-timer secs
@@ -117,6 +104,7 @@ disabled by using `autosave-remove'."
                                      'autosave-test-default))))
     (if (member tm
                 autosave-timer-list)
+        ;; if same timer already set cancel it immediately
         (progn (cancel-timer tm)
                (message "Same timer already set (%S)."
                         tm)
@@ -134,6 +122,25 @@ disabled by using `autosave-remove'."
         (delq timer
               autosave-timer-list))
   (cancel-timer timer))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; helper functions for default settings
+
+(defun autosave-test-default ()
+  "Default function for testing if conducting auto save for specified buffer.
+Return non-nil if all of functions in `autosave-test-default-functions'
+return non-nil, otherwise return nil.
+
+This functions is used by `autosave-set' if the fourth arg of `autosave-set'
+is set to be nil."
+  (run-hook-with-args-until-failure 'autosave-test-default-functions))
+
+(defvar autosave-test-default-functions nil
+  "A list of functions called by `autosave-test-default'.
+Each function is called with no argument.  Current buffer is set to the buffer
+to save while these functions are called.
+You can use `add-hook' and `remove-hook' to update this list.")
 
 (defun autosave-buffer-file-name ()
   "Return nil if current buffer is not visiting any file."
