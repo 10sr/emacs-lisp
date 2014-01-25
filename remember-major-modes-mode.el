@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ()
 ;; Keywords: major-mode
 
@@ -35,17 +35,23 @@
 
 ;;; Commentary:
 
-;; Remember major-modes for files.
+;; `remember-major-modes-mode' is a global minor mode to remember major-modes
+;; for files.
+
 ;; Usually major-modes for files are detected automatically using the value of
-;; `auto-mode-alist' or shebang. However sometimes these detection do not work
+;; `auto-mode-alist' or shebang.  However sometimes these detection do not work
 ;; and yet updating `auto-mode-alist' is too match.
-;; Interactive function `remember-major-modes-remember' register current buffer
+;; Interactive function `remember-major-modes-remember' remember current buffer
 ;; filename and major-mode so that the mode will be enabled next time the file
 ;; opened.
 
 ;; To use, add to your dot.emacs as below:
 ;; (when (require 'remember-major-modes-mode nil t)
 ;;    (remember-major-modes-mode 1))
+
+;; You can use M-x remember-major-modes-remember to remember the pair of current
+;; file and major-mdoe and M-x remember-major-modes-forget to forget the
+;; major-mode for current visiting file.
 
 ;;; Code:
 
@@ -73,8 +79,8 @@
        (load-file remember-major-modes-file)))
 
 (defun remember-major-modes-save ()
-  "Save registered file names and major-modes into file
-`remember-major-modes-file'."
+  "Save remembered pairs of filenames and major-modes.
+This pair will be written into the file `remember-major-modes-file'."
   (with-current-buffer (find-file-noselect remember-major-modes-file)
     (let ((inhibit-read-only t))
       (erase-buffer)
@@ -87,7 +93,8 @@
       (kill-buffer))))
 
 (defun remember-major-modes-remember (&optional mode filename)
-  "Remember current filename and major-mode."
+  "Remember the pair of MODE and FILENAME.
+If these arguments are omitted current ones are used."
   (interactive)
   (if remember-major-modes-mode
       (let ((f (or filename
@@ -104,7 +111,7 @@
     (message "remember-major-modes-mode not enabled.")))
 
 (defun remember-major-modes-forget (&optional filename)
-  "Forget major-modes for current file."
+  "Forget major-modes for FILENAME."
   (let ((elem (assoc (or filename
                          buffer-file-name)
                      remember-major-modes-modes-alist)))
