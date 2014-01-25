@@ -55,6 +55,8 @@
 
 ;;; Code:
 
+;; TODO: use hash-table: make-hash-tabke, gethash, puthash
+
 (define-minor-mode remember-major-modes-mode
   "Remember major mode for specific file."
   :init-value nil
@@ -76,6 +78,7 @@
 (defun remember-major-modes-load ()
   "Load file `remember-major-modes-file'."
   (and (file-readable-p remember-major-modes-file)
+       ;; TODO: use read instead of load-file
        (load-file remember-major-modes-file)))
 
 (defun remember-major-modes-save ()
