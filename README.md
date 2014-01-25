@@ -1,5 +1,9 @@
 # emacs lisp
 
+## autosave.el
+
+Autosave buffers.
+
 ## pack.el
 
 Pack or unpack files.
@@ -39,3 +43,7 @@ Add buffer local minor mode for dired to toggle whether list dot files.
 Library version of <http://www.bookshelf.jp/soft/meadow_30.html#SEC419>.
 
 Automatically save and restore window size and position.
+
+## ilookup.el
+
+Incrememtal dictionary lookup.
