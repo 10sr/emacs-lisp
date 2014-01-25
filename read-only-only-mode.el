@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ()
 ;; Keywords: utility
 
@@ -35,7 +35,8 @@
 
 ;;; Commentary:
 
-;; Visit all files with view-mode enabled.
+;; `read-only-only-mode' is a global minor mode to Visit all files with
+;; view-mode enabled.
 
 ;;; Code:
 
@@ -53,7 +54,7 @@
   )
 
 (defun read-only-only-set ()
-  "Enable `view-mode' if `read-only-only-mode' is non-nil."
+  "Enable function `view-mode' if `read-only-only-mode' is non-nil."
   (and buffer-file-name
        read-only-only-mode
        (view-mode 1)))
