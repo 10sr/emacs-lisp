@@ -75,22 +75,26 @@
 
 (defun remember-major-modes-load ()
   "Load file `remember-major-modes-file'."
+  (interactive)
   (and (file-readable-p remember-major-modes-file)
-       (load-file remember-major-modes-file)))
+       (setq remember-major-modes-modes-alist
+             (with-temp-buffer
+               (let ((inhibit-read-only t))
+                 (insert-file-contents remember-major-modes-file)
+                 (goto-char (point-min))
+                 (read (current-buffer)))))))
 
 (defun remember-major-modes-save ()
   "Save remembered pairs of filenames and major-modes.
 This pair will be written into the file `remember-major-modes-file'."
-  (with-current-buffer (find-file-noselect remember-major-modes-file)
+  (interactive)
+  (with-temp-buffer
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (insert "(setq remember-major-modes-modes-alist\n")
-      (insert "(quote\n")
       (print remember-major-modes-modes-alist (current-buffer))
-      (insert ")\n")
-      (insert ")\n")
-      (save-buffer)
-      (kill-buffer))))
+      (write-region (point-min)
+                    (point-max)
+                    remember-major-modes-file))))
 
 (defun remember-major-modes-remember (&optional mode filename)
   "Remember the pair of MODE and FILENAME.
