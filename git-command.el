@@ -72,6 +72,10 @@ This value means nothing when `resize-mini-window' is nil.")
   "Alist of major mode for git commands.
 Each element should be like (CMD . MAJOR-MODE).")
 
+(defvar git-command-grep-command-list
+  '("grep")
+  "List of subcommands that behaves as grep commands.")
+
 (defun git-command-find-git-ps1 (f)
   "Return F if F exists and it contain function \"__git_ps1\"."
   (and (file-readable-p f)
@@ -125,10 +129,15 @@ Each element should be like (CMD . MAJOR-MODE).")
                                           (point-max)))
       "")))
 
-(defun git--command-get-major-mode (cmd)
-  "Return apropriate major mode for CMD by `git-command-major-mode-alist'."
-  (cdr (assoc (car (split-string cmd))
+(defun git--command-get-major-mode (subcmd)
+  "Return apropriate major mode for SUBCMD by `git-command-major-mode-alist'."
+  (cdr (assoc subcmd
               git-command-major-mode-alist)))
+
+(defun git--command-grep-command-p (subcmd)
+  "Return non-nil if SUBCMD is a grep command."
+  (member subcmd
+          git-command-grep-command-list))
 
 (eval-when-compile
   (require 'ansi-color nil t))
@@ -141,41 +150,48 @@ Each element should be like (CMD . MAJOR-MODE).")
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
                                          'git-command-history)))
-  (let ((bname (concat "*"
-                       "git "
-                       (car (split-string cmd
-                                          " "))
-                       "*"))
-        (majormode (git--command-get-major-mode cmd)))
-    (if majormode
-        (progn
-          (and (get-buffer bname)
-               (kill-buffer bname))
-          (display-buffer (get-buffer-create bname))
-          (with-current-buffer bname
-            (let ((inhibit-read-only t))
-              (erase-buffer)
-              (if (featurep 'ansi-color)
-                  (progn
-                    (shell-command (concat "git -c color.ui=always "
-                                           git-command-default-options
-                                           " "
-                                           cmd)
-                                   t)
-                    (ansi-color-apply-on-region (point-min)
-                                                (point-max)))
-                (shell-command (concat "git "
-                                       git-command-default-options
-                                       " "
-                                       cmd)
-                               t))
-              (funcall majormode))
-            (view-mode)))
-      (git-command-term-shell-command (concat "git "
-                                              git-command-default-options
-                                              " "
-                                              cmd)
-                                      bname))))
+  (let* ((subcmd (car (split-string cmd)))
+         (bname (concat "*"
+                        "git "
+                        subcmd
+                        "*"))
+         (majormode (git--command-get-major-mode subcmd)))
+    (if (git--command-grep-command-p subcmd)
+        (compilation-start (concat "git --no-pager -c color.grep=never "
+                                   cmd)
+                           'grep-mode)
+      ;; not grep command
+      (if majormode
+          (progn
+            (and (get-buffer bname)
+                 (kill-buffer bname))
+            (display-buffer (get-buffer-create bname))
+            (with-current-buffer bname
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                (if (featurep 'ansi-color)
+                    (progn
+                      (shell-command (concat "git -c color.ui=always "
+                                             git-command-default-options
+                                             " "
+                                             cmd)
+                                     t)
+                      (ansi-color-apply-on-region (point-min)
+                                                  (point-max)))
+                  ;; ansi-color is not available
+                  (shell-command (concat "git "
+                                         git-command-default-options
+                                         " "
+                                         cmd)
+                                 t))
+                (funcall majormode))
+              (view-mode)))
+        ;; no apropriate major-mode found
+        (git-command-term-shell-command (concat "git "
+                                                git-command-default-options
+                                                " "
+                                                cmd)
+                                        bname)))))
 
 (eval-when-compile
   (require 'term nil t))
