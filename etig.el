@@ -59,6 +59,11 @@ etig is invoked.")
 ;; apropriate buffer.")
 ;; (make-variable-buffer-local 'etig--create-buffer-function)
 
+(defvar etig--next-create-buffer-function 'ignore
+  "Function to create a buffer for next item of current buffer.
+It accept two argument, parent buffer and number of movement.")
+(make-variable-buffer-local 'etig--next-create-buffer-function)
+
 
 
 
@@ -138,8 +143,8 @@ CMDS should be a list of args for git."
   (let ((map (make-keymap)))
     (suppress-keymap map)
     (define-key map (kbd "C-m") 'etig-enter-key)
-    (define-key map (kbd "C-n") 'etig-enter-next)
-    (define-key map (kbd "C-p") 'etig-enter-previous)
+    (define-key map (kbd "C-n") 'etig-open-next-item)
+    (define-key map (kbd "C-p") 'etig-open-previous-item)
     (define-key map (kbd "C-i") 'etig-other-window)
     (define-key map "j" 'etig-next-line)
     (define-key map "k" 'etig-previous-line)
@@ -161,8 +166,8 @@ a copy of this var.")
 
 (defvar etig-diff-mode-map
   (let ((map (copy-keymap etig--base-map)))
-    (define-key map (kbd "C-n") etig-diff-open-next)
-    (define-key map (kbd "C-p") etig-diff-open-previous)
+    ;; (define-key map (kbd "C-n") 'etig-diff-open-next)
+    ;; (define-key map (kbd "C-p") 'etig-diff-open-previous)
     map))
 
 (define-derived-mode etig-diff-mode diff-mode
@@ -173,18 +178,19 @@ a copy of this var.")
 
 (defun etig-diff (sha1)
   "Open etig-diff buffer of commit of SHA1."
-  (let ((buf (get-buffer-create (format "*etig-diff<%s>*"
-                                        sha1))))
-    (with-current-buffer buf
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (etig--command-str (concat "show " sha1)
-                           buf nil 'etig-diff-mode))
-      (goto-char (point-min)))
-    (message "etig-diff: %s" sha1)
-    buf))
+  (save-window-excursion
+    (let ((buf (get-buffer-create (format "*etig-diff<%s>*"
+                                          sha1))))
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (etig--command-str (concat "show " sha1)
+                             buf nil 'etig-diff-mode))
+        (goto-char (point-min)))
+      (message "etig-diff: %s" sha1)
+      buf)))
 
-(defin etig-diff-open-next (n)
+(defun etig-diff-open-next (n)
   "Open N next item."
   (interactive "p")
   (let ((win (get-buffer-window (current-buffer)))
@@ -228,30 +234,69 @@ a copy of this var.")
 (defun etig-main (&optional dir)
   "Create and return new etig main buffer."
   (interactive)
-  (let ((buf (generate-new-buffer "*etig-main*")))
-    (with-current-buffer buf
-      (erase-buffer)
-      (and dir
-           (cd dir))
-      (etig--command-str etig-main-command buf t 'etig-main-mode)
-      (goto-char (point-min)))
-    buf))
+  (save-window-excursion
+    (let ((buf (generate-new-buffer "*etig-main*")))
+      (with-current-buffer buf
+        (erase-buffer)
+        (and dir
+             (cd dir))
+        (etig--command-str etig-main-command buf t 'etig-main-mode)
+        (goto-char (point-min)))
+      buf)))
 
 (defun etig-main-open-current ()
   "Open commit of current line."
   (interactive)
-  (let ((sha1 (etig--main-extract-sha1
-               (buffer-substring-no-properties (point-at-bol)
-                                               (point-at-eol)))))
+  (let ((sha1 (etig--main-extract-current-sha1)))
     (if sha1
-        (let ((parent (current-buffer))
-              (buf (etig-diff sha1)))
-          (with-current-buffer buf
-            (setq etig--parent-buffer
-                  parent))
-          (pop-to-buffer buf))
+        (let ((buf (etig--main-create-diff-buffer sha1)))
+          (when buf
+            (etig--push-window-configuration)
+            (pop-to-buffer buf)))
       (message "No commit found on this line")
       nil)))
+
+(defun etig--main-create-diff-buffer (sha1)
+  (let ((parent (current-buffer))
+        (buf (etig-diff sha1)))
+    (when buf
+      (with-current-buffer buf
+        (setq etig--parent-buffer
+              parent)
+        (setq etig--next-create-buffer-function
+              'etig--main-next-create-diff-buffer))
+      buf)))
+
+;; TODO: highlight current line
+(defun etig--main-next-create-diff-buffer (parent n)
+  (with-current-buffer parent
+    (let ((sha1 (etig--main-extract-current-sha1)))
+      (if (eq n 0)
+          (if sha1
+              (etig--main-create-diff-buffer sha1)
+            ;; wont happen because n will not be decremented when sha1 is nil
+            (etig--main-next-create-diff-buffer parent
+                                                0))
+        ;; n is not 0
+        (progn
+          (if (< 0 n)
+              (forward-line 1)
+            (forward-line -1))
+          (if sha1
+              (if (< 0 n)
+                  ;; n is positive
+                  (etig--main-next-create-diff-buffer parent
+                                                      (- n 1))
+                ;; n is negative
+                (etig--main-next-create-diff-buffer parent
+                                                    (+ n 1)))
+            (etig--main-next-create-diff-buffer parent
+                                                n)))))))
+
+(defun etig--main-extract-current-sha1 ()
+  "Extract sha1 of current line."
+  (etig--main-extract-sha1 (buffer-substring-no-properties (point-at-bol)
+                                                           (point-at-eol))))
 
 (defun etig--main-extract-sha1 (line)
   (let ((str
@@ -275,23 +320,23 @@ a copy of this var.")
   (interactive)
   (other-window 1))
 
-(defun etig-enter-next ()
+(defun etig-open-next-item (n)
   "Enter next item."
-  (interactive)
+  (interactive "p")
+  (and etig--next-create-buffer-function
+       etig--parent-buffer
+       (let ((buf (funcall etig--next-create-buffer-function
+                           etig--parent-buffer
+                           n))
+             (win (get-buffer-window (current-buffer))))
+         (when buf
+           (set-window-buffer win
+                              buf)))))
 
-(defun etig-enter-previous ()
+(defun etig-open-previous-item (n)
   "Enter previous item."
-  (interactive)
-  (let ((win (get-buffer-window (current-buffer)))
-        (parent etig--parent-buffer))
-    (if parent
-        (let ((buf (with-current-buffer parent
-                     (forward-line -1)
-                     (etig--create-buffer parent))))
-          (when buf
-            (set-window-buffer win buf)))
-      (forward-line -1)
-      (message "No parent buffer."))))
+  (interactive "p")
+  (etig-open-next-item (- n)))
 
 (defalias 'etig-next-line 'next-line)
 (defalias 'etig-previous-line 'previous-line)
