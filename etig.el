@@ -39,7 +39,7 @@
 
 ;;; Code:
 
-;; variables
+;; internal variables
 
 (defvar etig--ansi-color-library
   (locate-library "ansi-color")
@@ -53,11 +53,14 @@ etig is invoked.")
   "etig parent buffer.")
 (make-variable-buffer-local 'etig--parent-buffer)
 
-(defvar etig--create-buffer-function nil
-  "Function to create new buffer from current line.
-This function accept no args and return newly created buffer or nil of no
-apropriate buffer.")
-(make-variable-buffer-local 'etig--create-buffer-function)
+;; (defvar etig--create-buffer-function nil
+;;   "Function to create new buffer from current line.
+;; This function accept no args and return newly created buffer or nil of no
+;; apropriate buffer.")
+;; (make-variable-buffer-local 'etig--create-buffer-function)
+
+
+
 
 ;; utilities
 
@@ -117,12 +120,27 @@ CMDS should be a list of args for git."
   (and (executable-find "git")
        (eq 0 (call-process "git" nil nil nil "rev-parse" "--git-dir"))))
 
+;; (defun etig--create-buffer (&optional parent)
+;;   "Create etig buffer according to current mode. Return that buffer."
+;;   (save-excursion
+;;     (if etig--create-buffer-function
+;;         (let ((buf (funcall etig--create-buffer-function)))
+;;           (when buf
+;;             (with-current-buffer buf
+;;               (goto-char (point-min))
+;;               (and parent
+;;                    (setq etig--parent-buffer parent)))
+;;             buf))
+;;       (message "I dont know how to create new buffer")
+;;       nil)))
+
 (defvar etig--base-map
   (let ((map (make-keymap)))
     (suppress-keymap map)
-    (define-key map (kbd "C-m") 'etig-enter)
+    (define-key map (kbd "C-m") 'etig-enter-key)
     (define-key map (kbd "C-n") 'etig-enter-next)
     (define-key map (kbd "C-p") 'etig-enter-previous)
+    (define-key map (kbd "C-i") 'etig-other-window)
     (define-key map "j" 'etig-next-line)
     (define-key map "k" 'etig-previous-line)
     (define-key map "q" 'etig-quit-buffer)
@@ -131,26 +149,59 @@ CMDS should be a list of args for git."
 a copy of this var.")
 
 
+
+;; modes
+
+;; etig-xxx will create and return etig xxx buffer *without* changing window
+;; configuration
+
 ;;; views
 
 ;; diff view buffer
 
 (defvar etig-diff-mode-map
-  (copy-keymap etig--base-map))
+  (let ((map (copy-keymap etig--base-map)))
+    (define-key map (kbd "C-n") etig-diff-open-next)
+    (define-key map (kbd "C-p") etig-diff-open-previous)
+    map))
 
 (define-derived-mode etig-diff-mode diff-mode
   "etig-diff"
   "diff-mode for etig."
-  (view-mode t))
+  (setq buffer-read-only t))
 
 
 (defun etig-diff (sha1)
   "Open etig-diff buffer of commit of SHA1."
-  (let ((buf (generate-new-buffer "*etig-diff*")))
-    (etig--command-str (concat "show " sha1)
-                       buf nil 'etig-diff-mode)
+  (let ((buf (get-buffer-create (format "*etig-diff<%s>*"
+                                        sha1))))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (etig--command-str (concat "show " sha1)
+                           buf nil 'etig-diff-mode))
+      (goto-char (point-min)))
     (message "etig-diff: %s" sha1)
     buf))
+
+(defin etig-diff-open-next (n)
+  "Open N next item."
+  (interactive "p")
+  (let ((win (get-buffer-window (current-buffer)))
+        (parent etig--parent-buffer))
+    (if parent
+        (let ((buf (with-current-buffer parent
+                     (forward-line 1)
+                     (etig--create-buffer parent))))
+          (when buf
+            (set-window-buffer win buf)))
+      (forward-line 1)
+      (message "No parent buffer."))))
+
+
+
+
+
 
 ;; main buffer
 
@@ -162,37 +213,43 @@ a copy of this var.")
   (concat "log --graph --date-order -C -M --all --date=iso "
           "--pretty=tformat:'%C(green)%h%C(reset) %C(white)%ad%C(reset) %C(red)%an%C(reset)%C(yellow)%d%C(reset) %C(white bold)%s%C(reset)'"
           )
-  "git command used to open log")
+  "git command used to open main")
 
 (defvar etig-main-mode-map
-  (copy-keymap etig--base-map))
+  (let ((map (copy-keymap etig--base-map)))
+    (define-key map (kbd "C-m") 'etig-main-open-current)
+    map))
 
 (define-derived-mode etig-main-mode text-mode
   "etig-main"
   "main mode for etig."
-  (setq etig--create-buffer-function 'etig--main-create-buffer-function))
+  (setq buffer-read-only t))
 
 (defun etig-main (&optional dir)
-  "Invole etig."
+  "Create and return new etig main buffer."
   (interactive)
-  (etig--push-window-configuration)
-  (let ((buf (get-buffer-create "*etig-main*")))
+  (let ((buf (generate-new-buffer "*etig-main*")))
     (with-current-buffer buf
       (erase-buffer)
       (and dir
            (cd dir))
-      (etig--command-str etig-main-command buf t 'etig-main-mode))
-    (delete-other-windows)
-    (switch-to-buffer buf)
-    (goto-char (point-min))))
+      (etig--command-str etig-main-command buf t 'etig-main-mode)
+      (goto-char (point-min)))
+    buf))
 
-(defun etig--main-create-buffer-function ()
-  "Open commit of current line. Return buffer."
+(defun etig-main-open-current ()
+  "Open commit of current line."
+  (interactive)
   (let ((sha1 (etig--main-extract-sha1
                (buffer-substring-no-properties (point-at-bol)
                                                (point-at-eol)))))
     (if sha1
-        (etig-diff sha1)
+        (let ((parent (current-buffer))
+              (buf (etig-diff sha1)))
+          (with-current-buffer buf
+            (setq etig--parent-buffer
+                  parent))
+          (pop-to-buffer buf))
       (message "No commit found on this line")
       nil)))
 
@@ -209,45 +266,18 @@ a copy of this var.")
              match)))))
 
 
+
+
 ;; interactive command for etig modes
 
-(defun etig-enter ()
-  "Function for enter key."
+(defun etig-other-window ()
+  "Focus to other etig window."
   (interactive)
-  (let ((parent (current-buffer))
-        (buf (etig--create-buffer)))
-    (when buf
-      (etig--push-window-configuration)
-      (pop-to-buffer buf)               ; switch buffer
-      (setq etig--parent-buffer parent))))
-
-(defun etig--create-buffer (&optional parent)
-  "Create etig buffer according to current mode. Return that buffer."
-  (save-excursion
-    (if etig--create-buffer-function
-        (let ((buf (funcall etig--create-buffer-function)))
-          (when buf
-            (with-current-buffer buf
-              (goto-char (point-min))
-              (and parent
-                   (setq etig--parent-buffer parent)))
-            buf))
-      (message "I dont know how to create new buffer")
-      nil)))
+  (other-window 1))
 
 (defun etig-enter-next ()
   "Enter next item."
   (interactive)
-  (let ((win (get-buffer-window (current-buffer)))
-        (parent etig--parent-buffer))
-    (if parent
-        (let ((buf (with-current-buffer parent
-                     (forward-line 1)
-                     (etig--create-buffer parent))))
-          (when buf
-            (set-window-buffer win buf)))
-      (forward-line 1)
-      (message "No parent buffer."))))
 
 (defun etig-enter-previous ()
   "Enter previous item."
@@ -270,6 +300,17 @@ a copy of this var.")
   "etig quit"
   (interactive)
   (etig--pop-window-configuration))
+
+
+;; open etig buffer
+
+(defun etig-open (&optional dir)
+  "Invole etig."
+  (interactive)
+  (etig--push-window-configuration)
+  (switch-to-buffer (etig-main dir))
+  (delete-other-windows))
+
 
 (provide 'etig)
 
