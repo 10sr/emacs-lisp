@@ -173,7 +173,7 @@ a copy of this var.")
 (define-derived-mode etig-diff-mode diff-mode
   "etig-diff"
   "diff-mode for etig."
-  ;; (setq buffer-read-only t)
+  (setq buffer-read-only t)
   )
 
 
