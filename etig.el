@@ -146,6 +146,8 @@ CMDS should be a list of args for git."
     (define-key map (kbd "C-n") 'etig-open-next-item)
     (define-key map (kbd "C-p") 'etig-open-previous-item)
     (define-key map (kbd "C-i") 'etig-other-window)
+    (define-key map (kbd "C-u") 'etig-other-window)
+    (define-key map (kbd "C-d") 'etig-other-window)
     (define-key map "j" 'etig-next-line)
     (define-key map "k" 'etig-previous-line)
     (define-key map "q" 'etig-quit-buffer)
@@ -173,7 +175,9 @@ a copy of this var.")
 (define-derived-mode etig-diff-mode diff-mode
   "etig-diff"
   "diff-mode for etig."
-  (setq buffer-read-only t)
+  ;; setting buffer-read-only defines some keybindings (even when view-read-only
+  ;; is nil)
+  ;; (setq buffer-read-only t)
   )
 
 
@@ -324,15 +328,16 @@ a copy of this var.")
 (defun etig-open-next-item (n)
   "Enter next item."
   (interactive "p")
-  (and etig--next-create-buffer-function
-       etig--parent-buffer
-       (let ((buf (funcall etig--next-create-buffer-function
-                           etig--parent-buffer
-                           n))
-             (win (get-buffer-window (current-buffer))))
-         (when buf
-           (set-window-buffer win
-                              buf)))))
+  (if (and etig--next-create-buffer-function
+           etig--parent-buffer)
+      (let ((buf (funcall etig--next-create-buffer-function
+                          etig--parent-buffer
+                          n))
+            (win (get-buffer-window (current-buffer))))
+        (when buf
+          (set-window-buffer win
+                             buf)))
+    (forward-line n)))
 
 (defun etig-open-previous-item (n)
   "Enter previous item."
