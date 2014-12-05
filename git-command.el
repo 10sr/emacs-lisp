@@ -150,6 +150,12 @@ The function should get two argument: command itself and options in string.")
   (cdr (assoc (car (split-string cmd))
               git-command-major-mode-alist)))
 
+(defun git-command-parse-commandline (str)
+  "Parse commandline string STR into a list like (OPTIONS COMMAND ARGUMENT)."
+  (git-command-part-commands-with-subcommand
+   (git-command-shell-split-string
+    str)))
+
 (defun git-command-shell-split-string (str)
   "Split string STR into strings by shell."
   (let ((emacs-bin (concat invocation-directory
