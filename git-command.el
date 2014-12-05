@@ -65,12 +65,22 @@ This value means nothing when `resize-mini-window' is nil.")
 (defvar git-command-history nil
   "History list for `git-command'.")
 
+;; TODO: remove
 (defvar git-command-major-mode-alist
   '(
     ("diff" . diff-mode)
     )
   "Alist of major mode for git commands.
 Each element should be like (CMD . MAJOR-MODE).")
+
+(defvar git-command-view-command-list
+  '("log")
+  "List of commands that will only output something for read.")
+
+(defvar git-command-aliases-alist
+  '()
+  "Alist of cons of command and function to run.
+The function should get one argument: command in string to execute.")
 
 (defun git-command-find-git-ps1 (f)
   "Return F if F exists and it contain function \"__git_ps1\"."
@@ -97,7 +107,7 @@ Each element should be like (CMD . MAJOR-MODE).")
       ))
 
 (defun git-command-ps1 (fmt)
-  "Generate git ps1 string from FMT."
+  "Generate git ps1 string from FMT and return that string."
   (let ((gcmpl (or git-command-prompt-file))
         (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE="
                                         git-command-ps1-showdirtystate)
@@ -125,6 +135,7 @@ Each element should be like (CMD . MAJOR-MODE).")
                                           (point-max)))
       "")))
 
+;; TODO: remove
 (defun git--command-get-major-mode (cmd)
   "Return apropriate major mode for CMD by `git-command-major-mode-alist'."
   (cdr (assoc (car (split-string cmd))
