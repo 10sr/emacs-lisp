@@ -151,12 +151,14 @@ The function should get two argument: command itself and options in string.")
               git-command-major-mode-alist)))
 
 (defun git-command-shell-split-string (str)
-  "Split string into strings by shell."
+  "Split string STR into strings by shell."
   (let ((emacs-bin (concat invocation-directory
                            invocation-name)))
     (cdr (read (shell-command-to-string (concat emacs-bin
-                                                " -Q --batch --eval '(progn (setq vc-handled-backends nil)(prin1 command-line-args-left))' -- "
-                                                str))))))
+                                                " -Q --batch --eval '(prin1 command-line-args-left)' -- "
+                                                str
+                                                " 2>/dev/null"))))))
+
 
 ;; use commands
 (eval-when-compile
