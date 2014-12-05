@@ -163,10 +163,26 @@ The function should get two argument: command itself and options in string.")
   "Partition list L into (OPTIONS COMMAND ARGUMENTS) and return it.
 Only COMMAND is string, others are lists.
 OPTIONS is distinguished by if they start with hyphens.
-\"-c\" option is a special case which take one parameter."
-  (let ((i (git-command-find-subcommand '("-a" "-fc" "-3"))))
-    (if (eq i
-            -1))))
+\"-c\" option is a special case which takes one parameter."
+  (let ((i (git-command-find-subcommand l)))
+    ;; make list that contains from 0th to ith element
+    (list
+     ;; OPTIONS
+     (if (eq 0
+             i)
+         nil
+       (let ((ol (copy-sequence l)))
+         (setcdr (nthcdr (- i 1)
+                         ol)
+                 nil)
+         ol))
+     ;; COMMAND
+     (nth i
+          l)
+     ;; ARGUMENTS
+     (nthcdr (1+ i)
+             l)
+     )))
 
 (defun git-command-find-subcommand (l &optional index)
   "Find subcommand from list L and return the index number.
