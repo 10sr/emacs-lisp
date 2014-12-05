@@ -78,9 +78,18 @@ Each element should be like (CMD . MAJOR-MODE).")
   "List of commands that will only output something for read.")
 
 (defvar git-command-aliases-alist
-  '()
+  '("diff" . (lambda (cmd option)
+               (let ((buf (get-buffer-create "*git diff*")))
+                 (with-current-buffer buf
+                   (shell-command (concat "git -c color.diff=never "
+                                          git-command-default-options
+                                          " diff "
+                                          option)
+                                  t)))))
   "Alist of cons of command and function to run.
-The function should get one argument: command in string to execute.")
+The function should get two argument: command itself and options in string.")
+
+;; utility
 
 (defun git-command-find-git-ps1 (f)
   "Return F if F exists and it contain function \"__git_ps1\"."
@@ -141,6 +150,15 @@ The function should get one argument: command in string to execute.")
   (cdr (assoc (car (split-string cmd))
               git-command-major-mode-alist)))
 
+(defun git-command-shell-split-string (str)
+  "Split string into strings by shell."
+  (let ((emacs-bin (concat invocation-directory
+                           invocation-name)))
+    (cdr (read (shell-command-to-string (concat emacs-bin
+                                                " -Q --batch --eval '(progn (setq vc-handled-backends nil)(prin1 command-line-args-left))' -- "
+                                                str))))))
+
+;; use commands
 (eval-when-compile
   (require 'ansi-color nil t))
 
