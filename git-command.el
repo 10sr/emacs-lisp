@@ -51,16 +51,16 @@
 This value means nothing when `resize-mini-window' is nil.")
 
 (defvar git-command-ps1-showdirtystate "t"
-  "Set the value of GIT_PS1_SHOWDIRTYSTATE to this when running __git_ps1.")
+  "Value of  GIT_PS1_SHOWDIRTYSTATE when running __git_ps1.")
 
 (defvar git-command-ps1-showstashstate ""
-  "Set the value of GIT_PS1_SHOWSTASHSTATE to this when running __git_ps1.")
+  "Value of GIT_PS1_SHOWSTASHSTATE when running __git_ps1.")
 
 (defvar git-command-ps1-showuntrackedfiles ""
-  "Set the value of GIT_PS1_SHOWUNTRACKEDFILES to this when running __git_ps1.")
+  "Value of GIT_PS1_SHOWUNTRACKEDFILES when running __git_ps1.")
 
 (defvar git-command-ps1-showupstream "auto"
-  "Set the value of GIT_PS1_SHOWUPSTREAM to this when running __git_ps1.")
+  "Value of GIT_PS1_SHOWUPSTREAM when running __git_ps1.")
 
 (defvar git-command-history nil
   "History list for `git-command'.")
