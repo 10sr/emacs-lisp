@@ -163,13 +163,16 @@ The function should get two argument: command itself and options in string.")
   "Partition list L into (OPTIONS COMMAND ARGUMENTS) and return it.
 Only COMMAND is string, others are lists.
 OPTIONS is distinguished by if they start with hyphens.
-\"-c\" option is a special case which take one parameter.")
+\"-c\" option is a special case which take one parameter."
+  (let ((i (git-command-find-subcommand '("-a" "-fc" "-3"))))
+    (if (eq i
+            -1))))
 
 (defun git-command-find-subcommand (l &optional index)
   "Find subcommand from list L and return the index number.
 Options that lead subcommand are distinguished by if they start with hyphens.
 \"-c\" option is a special case which take one parameter.
-If no subcommand was found, returns -1.
+If no subcommand was found, returns the length of L.
 
 INDEX is the original index of car of L.
 The value nil means that it is 0."
@@ -179,21 +182,30 @@ The value nil means that it is 0."
         (i (or index
                0)))
     (if l
+
+        ;; l is not empty
         (if (member first
                     options-w-param)
             ;; if first is the command that requires a parameter, skip the parameter
-            (git-command-find-subcommand (cdr rest)
-                                         (+ 2 i))
-          (if
-              (eq ?-
+            (if rest
+                (git-command-find-subcommand (cdr rest)
+                                             (+ 2 i))
+              ;; Only -c is given: this is undesirable situation, but anyway returns the length of original L
+              (1+ i)
+              )
+
+          (if (eq ?-
                   (aref first
                         0))
-              ;; the first letter of first element of l is '-'
+              ;; the first element is not in optinos-w-params but
+              ;; the first letter of first element of L is '-'
               (git-command-find-subcommand rest
                                            (1+ i))
             i))
-      ;; if l is empty returns -1
-      -1)))
+
+      ;; if L is empty returns the original length of L
+      i)))
+
 
 ;; use commands
 (eval-when-compile
