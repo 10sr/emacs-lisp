@@ -159,6 +159,41 @@ The function should get two argument: command itself and options in string.")
                                                 str
                                                 " 2>/dev/null"))))))
 
+(defun git-command-part-commands-with-subcommand (l)
+  "Partition list L into (OPTIONS COMMAND ARGUMENTS) and return it.
+Only COMMAND is string, others are lists.
+OPTIONS is distinguished by if they start with hyphens.
+\"-c\" option is a special case which take one parameter.")
+
+(defun git-command-find-subcommand (l &optional index)
+  "Find subcommand from list L and return the index number.
+Options that lead subcommand are distinguished by if they start with hyphens.
+\"-c\" option is a special case which take one parameter.
+If no subcommand was found, returns -1.
+
+INDEX is the original index of car of L.
+The value nil means that it is 0."
+  (let ((options-w-param '("-c"))
+        (first (car l))
+        (rest (cdr l))
+        (i (or index
+               0)))
+    (if l
+        (if (member first
+                    options-w-param)
+            ;; if first is the command that requires a parameter, skip the parameter
+            (git-command-find-subcommand (cdr rest)
+                                         (+ 2 i))
+          (if
+              (eq ?-
+                  (aref first
+                        0))
+              ;; the first letter of first element of l is '-'
+              (git-command-find-subcommand rest
+                                           (1+ i))
+            i))
+      ;; if l is empty returns -1
+      -1)))
 
 ;; use commands
 (eval-when-compile
