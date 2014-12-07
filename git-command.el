@@ -73,7 +73,7 @@ This value means nothing when `resize-mini-window' is nil.")
   "List of commands that will only output something for read.")
 
 (defvar git-command-aliases-alist
-  '("diff" . (lambda (options cmd args)
+  '(("diff" . (lambda (options cmd args)
                (let ((buf (get-buffer-create "*git diff*")))
                  (with-current-buffer buf
                    (erase-buffer)
@@ -84,7 +84,7 @@ This value means nothing when `resize-mini-window' is nil.")
                                            args))
                                   t)
                    (diff-mode))
-                 (display-buffer buf))))
+                 (display-buffer buf)))))
   "Alist of cons of command and function to run.
 The function should get three argument: see `git-command-exec'.")
 
@@ -163,7 +163,7 @@ About these arguments see document of `git-command-parse-commandline'."
                                           (point-max)))
       "")))
 
-(defun git--command-get-alias-function (cmd)
+(defun git-command-get-alias-function (cmd)
   "Return alias function for CMD if available in `git-command-alias-alist'."
   (cdr (assoc cmd
               git-command-aliases-alist)))
@@ -311,11 +311,13 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                                  t))
                 (fundamental-mode)
                 (view-mode))))
-        (git-command-term-shell-command (concat "git "
-                                                git-command-default-options
-                                                " "
-                                                cmd)
-                                        bname)))))
+        (git-command-term-shell-command
+         (concat "git "
+                 (git-command-construct-commandline
+                  options
+                  command
+                  args))
+         bname)))))
 
 (eval-when-compile
   (require 'term nil t))
