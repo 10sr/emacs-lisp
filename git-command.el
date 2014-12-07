@@ -41,6 +41,9 @@
 
 ;;; Code:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Variables
+
 (defvar git-command-default-options
   ""
   "Options always passed to git.")
@@ -65,31 +68,25 @@ This value means nothing when `resize-mini-window' is nil.")
 (defvar git-command-history nil
   "History list for `git-command'.")
 
-;; TODO: remove
-(defvar git-command-major-mode-alist
-  '(
-    ("diff" . diff-mode)
-    )
-  "Alist of major mode for git commands.
-Each element should be like (CMD . MAJOR-MODE).")
-
 (defvar git-command-view-command-list
-  '("log")
+  '("log" "show")
   "List of commands that will only output something for read.")
 
 (defvar git-command-aliases-alist
-  '("diff" . (lambda (cmd option)
+  '("diff" . (lambda (options cmd args)
                (let ((buf (get-buffer-create "*git diff*")))
                  (with-current-buffer buf
-                   (shell-command (concat "git -c color.diff=never "
-                                          git-command-default-options
-                                          " diff "
-                                          option)
-                                  t)))))
+                   (erase-buffer)
+                   (shell-command (concat "git "
+                                          (git-command-construct-commandline
+                                           `(,@options "-c" "color.diff=never")
+                                           "diff"
+                                           args))
+                                  t)
+                   (diff-mode))
+                 (display-buffer buf))))
   "Alist of cons of command and function to run.
-The function should get two argument: command itself and options in string.")
-
-;; utility
+The function should get three argument: see `git-command-exec'.")
 
 (defun git-command-find-git-ps1 (f)
   "Return F if F exists and it contain function \"__git_ps1\"."
@@ -114,6 +111,28 @@ The function should get two argument: command itself and options in string.")
        "/opt/local/share/git-core/git-prompt.sh")
       (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")
       ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; utility
+
+(defun git-command-construct-commandline (options command args)
+  "Construct one commandline string from OPTIONS COMMAND and ARGS.
+TODO: how to do about `git-command-default-options'?
+The string returned does not start with \"git\" so this should be concat-ed.
+
+About these arguments see document of `git-command-parse-commandline'."
+  (concat git-command-default-options
+          " "
+          (mapconcat 'shell-quote-argument
+                     options
+                     " ")
+          " "
+          command
+          " "
+          (mapconcat 'shell-quote-argument
+                     args
+                     " ")))
 
 (defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
@@ -144,12 +163,12 @@ The function should get two argument: command itself and options in string.")
                                           (point-max)))
       "")))
 
-;; TODO: remove
-(defun git--command-get-major-mode (cmd)
-  "Return apropriate major mode for CMD by `git-command-major-mode-alist'."
-  (cdr (assoc (car (split-string cmd))
-              git-command-major-mode-alist)))
+(defun git--command-get-alias-function (cmd)
+  "Return alias function for CMD if available in `git-command-alias-alist'."
+  (cdr (assoc cmd
+              git-command-aliases-alist)))
 
+;; commandline parsing
 (defun git-command-parse-commandline (str)
   "Parse commandline string STR into a list like (OPTIONS COMMAND ARGUMENT)."
   (git-command-part-commands-with-subcommand
@@ -166,7 +185,7 @@ The function should get two argument: command itself and options in string.")
                                                 " 2>/dev/null"))))))
 
 (defun git-command-part-commands-with-subcommand (l)
-  "Partition list L into (OPTIONS COMMAND ARGUMENTS) and return it.
+  "Partition git args list L into (OPTIONS COMMAND ARGUMENTS) and return it.
 Only COMMAND is string, others are lists.
 OPTIONS is distinguished by if they start with hyphens.
 \"-c\" option is a special case which takes one parameter."
@@ -183,8 +202,9 @@ OPTIONS is distinguished by if they start with hyphens.
                  nil)
          ol))
      ;; COMMAND
-     (nth i
-          l)
+     (or (nth i
+              l)
+         "")
      ;; ARGUMENTS
      (nthcdr (1+ i)
              l)
@@ -229,53 +249,73 @@ The value nil means that it is 0."
       i)))
 
 
-;; use commands
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; user commands
+
 (eval-when-compile
   (require 'ansi-color nil t))
 
 (defun git-command (cmd)
-  "Shell like git command interface.  CMD is the command to run."
+  "Shell like git command interface.  CMD is the commandline strings to run."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
                                                  (abbreviate-file-name
                                                   default-directory)
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
                                          'git-command-history)))
+  (apply 'git-command-exec (git-command-parse-commandline cmd)))
+
+(defun git-command-exec (options command args)
+  "Execute git.
+
+This function accept three arguments.  OPTIONS is a list of options that will be
+passed to git itself.  Tipically they are appeared before the git subcommand.
+COMMAND is a string of git subcommand.  ARGS is a list of arguments for git
+subcommand.
+
+These arguments are tipically constructed with `git-command-parse-commandline'."
   (let ((bname (concat "*"
                        "git "
-                       (car (split-string cmd
-                                          " "))
+                       command
                        "*"))
-        (majormode (git--command-get-major-mode cmd)))
-    (if majormode
-        (progn
-          (and (get-buffer bname)
-               (kill-buffer bname))
-          (display-buffer (get-buffer-create bname))
-          (with-current-buffer bname
-            (let ((inhibit-read-only t))
-              (erase-buffer)
-              (if (featurep 'ansi-color)
-                  (progn
-                    (shell-command (concat "git -c color.ui=always "
-                                           git-command-default-options
-                                           " "
-                                           cmd)
-                                   t)
-                    (ansi-color-apply-on-region (point-min)
-                                                (point-max)))
-                (shell-command (concat "git "
-                                       git-command-default-options
-                                       " "
-                                       cmd)
-                               t))
-              (funcall majormode))
-            (view-mode)))
-      (git-command-term-shell-command (concat "git "
-                                              git-command-default-options
-                                              " "
-                                              cmd)
-                                      bname))))
+        (alias (git-command-get-alias-function command)))
+    (if alias
+        ;; if alias is defined in git-command-get-alias-function
+        (funcall alias
+                 options command args)
+      (if (member command
+                  git-command-view-command-list)
+          ;; if this command is a view command
+          (progn
+            (and (get-buffer bname)
+                 (kill-buffer bname))
+            (display-buffer (get-buffer-create bname))
+            (with-current-buffer bname
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                (if (fboundp 'ansi-color-apply-on-region)
+                    (progn
+                      (shell-command (concat "git "
+                                             (git-command-construct-commandline
+                                              `(,@options "-c" "color.ui=always")
+                                              "diff"
+                                              args))
+                                     t)
+                      (ansi-color-apply-on-region (point-min)
+                                                  (point-max)))
+                  (shell-command (concat "git "
+                                         (git-command-construct-commandline
+                                          `(,@options "-c" "color.ui=never")
+                                          "diff"
+                                          args))
+                                 t))
+                (fundamental-mode)
+                (view-mode))))
+        (git-command-term-shell-command (concat "git "
+                                                git-command-default-options
+                                                " "
+                                                cmd)
+                                        bname)))))
 
 (eval-when-compile
   (require 'term nil t))
