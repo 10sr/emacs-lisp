@@ -53,6 +53,7 @@
   "Maximum height for resizing mini-window when showing result.
 This value means nothing when `resize-mini-window' is nil.")
 
+;; variables for __git_ps1
 (defvar git-command-ps1-showdirtystate "t"
   "Value of  GIT_PS1_SHOWDIRTYSTATE when running __git_ps1.")
 
@@ -65,8 +66,10 @@ This value means nothing when `resize-mini-window' is nil.")
 (defvar git-command-ps1-showupstream "auto"
   "Value of GIT_PS1_SHOWUPSTREAM when running __git_ps1.")
 
+
 (defvar git-command-history nil
   "History list for `git-command'.")
+
 
 (defvar git-command-view-command-list
   '("log" "show")
@@ -111,6 +114,13 @@ The function should get three argument: see `git-command-exec'.")
        "/opt/local/share/git-core/git-prompt.sh")
       (git-command-find-git-ps1 "/opt/local/etc/bash_completion.d/git")
       ))
+
+
+(defvar git-command-use-emacsclient
+  nil
+  "If non-nil use emacsclient for editor of git.
+In this case, `server-start' will be called at the first call of `git-command'
+if Emacs server is not running.")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,26 +274,11 @@ The value nil is equivalent to 0."
 
 ;; emacs client
 
-(eval-when-compile (require 'server))
-
-(defmacro git-command-with-server-running (&rest body)
-  "Execute the forms in BODY with emacs server runnning.
-
-Server will be terminated after executing if originally server is not running."
-  `(let ((running-p server-mode))
-     (if running-p
-         (progn ,@body)
-       ;; server is not running
-       (let ((server-name ,(concat "gitcommand.emacs"
-                                   (number-to-string (emacs-pid))))
-             (server-use-tcp nil))
-         (server-start)
-         ,@body
-         ;;(server-force-delete)
-         ))))
+(eval-when-compile
+  (require 'server nil t))
 
 (defun git-command--construct-emacsclient-command ()
-  "Construct and return command in a string to connect to current emacs server."
+  "Construct and return command in a string to connect to current Emacs server."
   (if server-use-tcp
       (format "%s -f \"%s/%s\""
               "emacsclient"
@@ -357,18 +352,23 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                                  t))
                 (fundamental-mode)
                 (view-mode))))
-        (git-command-with-server-running
-         (let ((process-environment
-                `(,(concat "GIT_EDITOR="
-                           (git-command--construct-emacsclient-command))
-                  ,@process-environment)))
-           (git-command-term-shell-command
-            (concat "git "
-                    (git-command-construct-commandline
-                     options
-                     command
-                     args))
-            bname)))))))
+        ;; if this command is not a view command
+        (and git-command-use-emacsclient
+             (not server-mode)
+             (server-start))
+        (let ((process-environment
+               (if git-command-use-emacsclient
+                   `(,(concat "GIT_EDITOR="
+                              (git-command--construct-emacsclient-command))
+                     ,@process-environment)
+                 process-environment)))
+          (git-command-term-shell-command
+           (concat "git "
+                   (git-command-construct-commandline
+                    options
+                    command
+                    args))
+           bname))))))
 
 (eval-when-compile
   (require 'term nil t))
