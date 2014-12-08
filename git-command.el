@@ -264,6 +264,8 @@ The value nil means that it is 0."
 
 ;; emacs client
 
+(eval-when-compile (require 'server))
+
 (defmacro git-command-with-server-running (&rest body)
   "Execute the forms in BODY with emacs server runnning.
 
@@ -277,8 +279,20 @@ Server will be terminated after executing if originally server is not running."
              (server-use-tcp nil))
          (server-start)
          ,@body
-         (server-force-delete)))))
+         (server-force-delete)
+         ))))
 
+(defun git-command--construct-emacsclient-command ()
+  "Construct and return command in a string to connect to current emacs server."
+  (if server-use-tcp
+      (format "%s -f \"%s/%s\""
+              "emacsclient"
+              (expand-file-name server-auth-dir)
+              server-name)
+    (format "%s -s \"%s/%s\""
+            "emacsclient"
+            server-socket-dir
+            server-name)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -330,7 +344,7 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                       (shell-command (concat "git "
                                              (git-command-construct-commandline
                                               `(,@options "-c" "color.ui=always")
-                                              "diff"
+                                              command
                                               args))
                                      t)
                       (ansi-color-apply-on-region (point-min)
@@ -338,18 +352,23 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                   (shell-command (concat "git "
                                          (git-command-construct-commandline
                                           `(,@options "-c" "color.ui=never")
-                                          "diff"
+                                          command
                                           args))
                                  t))
                 (fundamental-mode)
                 (view-mode))))
-        (git-command-term-shell-command
-         (concat "git "
-                 (git-command-construct-commandline
-                  options
-                  command
-                  args))
-         bname)))))
+        (git-command-with-server-running
+         (let ((process-environment
+                `(,(concat "GIT_EDITOR="
+                           (git-command--construct-emacsclient-command))
+                  ,@process-environment)))
+           (git-command-term-shell-command
+            (concat "git "
+                    (git-command-construct-commandline
+                     options
+                     command
+                     args))
+            bname)))))))
 
 (eval-when-compile
   (require 'term nil t))
