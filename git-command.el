@@ -147,7 +147,7 @@ About these arguments see document of `git-command-parse-commandline'."
                (buffer-substring-no-properties (point-at-bol)
                                                (point-at-eol))))))
 
-  (defun git-command-ps1 (fmt)
+(defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
   (let ((gcmpl (or git-command-prompt-file))
         (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE="
@@ -279,7 +279,7 @@ Server will be terminated after executing if originally server is not running."
              (server-use-tcp nil))
          (server-start)
          ,@body
-         (server-force-delete)
+         ;;(server-force-delete)
          ))))
 
 (defun git-command--construct-emacsclient-command ()
