@@ -368,6 +368,7 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                     options
                     command
                     args))
+           ;; TODO: use same bname for this case?
            bname))))))
 
 (eval-when-compile
