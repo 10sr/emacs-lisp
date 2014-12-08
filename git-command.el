@@ -315,11 +315,7 @@ COMMAND is a string of git subcommand.  ARGS is a list of arguments for git
 subcommand.
 
 These arguments are tipically constructed with `git-command-parse-commandline'."
-  (let ((bname (concat "*"
-                       "git "
-                       command
-                       "*"))
-        (alias (git-command-get-alias-function command)))
+  (let ((alias (git-command-get-alias-function command)))
     (if alias
         ;; if alias is defined in git-command-get-alias-function
         (funcall alias
@@ -327,7 +323,10 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
       (if (member command
                   git-command-view-command-list)
           ;; if this command is a view command
-          (progn
+          (let ((bname (concat "*"
+                       "git "
+                       command
+                       "*")))
             (and (get-buffer bname)
                  (kill-buffer bname))
             (display-buffer (get-buffer-create bname))
@@ -369,7 +368,7 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                     command
                     args))
            ;; TODO: use same bname for this case?
-           bname))))))
+           "*git command*"))))))
 
 (eval-when-compile
   (require 'term nil t))
