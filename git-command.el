@@ -134,7 +134,20 @@ About these arguments see document of `git-command-parse-commandline'."
                      args
                      " ")))
 
-(defun git-command-ps1 (fmt)
+(defun git-command--git-dir ()
+  "Execute \"git rev-parse --git-dir\" and return result string or nil."
+  (with-temp-buffer
+    (and (eq 0
+            (call-process "git"
+                          nil
+                          t
+                          nil
+                          "rev-parse" "--git-dir"))
+        (progn (goto-char (point-min))
+               (buffer-substring-no-properties (point-at-bol)
+                                               (point-at-eol))))))
+
+  (defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
   (let ((gcmpl (or git-command-prompt-file))
         (process-environment `(,(concat "GIT_PS1_SHOWDIRTYSTATE="
@@ -247,6 +260,25 @@ The value nil means that it is 0."
 
       ;; if L is empty returns the original length of L
       i)))
+
+
+;; emacs client
+
+(defmacro git-command-with-server-running (&rest body)
+  "Execute the forms in BODY with emacs server runnning.
+
+Server will be terminated after executing if originally server is not running."
+  `(let ((running-p server-mode))
+     (if running-p
+         (progn ,@body)
+       ;; server is not running
+       (let ((server-name ,(concat "gitcommand.emacs"
+                                   (number-to-string (emacs-pid))))
+             (server-use-tcp nil))
+         (server-start)
+         ,@body
+         (server-force-delete)))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
