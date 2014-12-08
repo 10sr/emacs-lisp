@@ -116,24 +116,6 @@ The function should get three argument: see `git-command-exec'.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utility
 
-(defun git-command-construct-commandline (options command args)
-  "Construct one commandline string from OPTIONS COMMAND and ARGS.
-TODO: how to do about `git-command-default-options'?
-The string returned does not start with \"git\" so this should be concat-ed.
-
-About these arguments see document of `git-command-parse-commandline'."
-  (concat git-command-default-options
-          " "
-          (mapconcat 'shell-quote-argument
-                     options
-                     " ")
-          " "
-          command
-          " "
-          (mapconcat 'shell-quote-argument
-                     args
-                     " ")))
-
 (defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
   (let ((gcmpl (or git-command-prompt-file))
@@ -169,6 +151,24 @@ About these arguments see document of `git-command-parse-commandline'."
               git-command-aliases-alist)))
 
 ;; commandline parsing
+(defun git-command-construct-commandline (options command args)
+  "Construct one commandline string from OPTIONS COMMAND and ARGS.
+TODO: how to do about `git-command-default-options'?
+The string returned does not start with \"git\" so this should be concat-ed.
+
+About these arguments see document of `git-command-parse-commandline'."
+  (concat git-command-default-options
+          " "
+          (mapconcat 'shell-quote-argument
+                     options
+                     " ")
+          " "
+          command
+          " "
+          (mapconcat 'shell-quote-argument
+                     args
+                     " ")))
+
 (defun git-command-parse-commandline (str)
   "Parse commandline string STR into a list like (OPTIONS COMMAND ARGUMENT)."
   (git-command-part-commands-with-subcommand
@@ -216,8 +216,8 @@ Options that lead subcommand are distinguished by if they start with hyphens.
 \"-c\" option is a special case which take one parameter.
 If no subcommand was found, returns the length of L.
 
-INDEX is the original index of car of L.
-The value nil means that it is 0."
+INDEX is always the original index of car of L.
+The value nil is equivalent to 0."
   (let ((options-w-param '("-c"))
         (first (car l))
         (rest (cdr l))
