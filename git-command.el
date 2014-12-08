@@ -364,7 +364,8 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
           (git-command-term-shell-command
            (concat "git "
                    (git-command-construct-commandline
-                    options
+                    ;; TODO: fix colorize: currently output is not colorized
+                    `(,@options "-c" "color.ui=always")
                     command
                     args))
            ;; TODO: use same bname for this case?
