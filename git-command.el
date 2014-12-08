@@ -53,6 +53,7 @@
   "Maximum height for resizing mini-window when showing result.
 This value means nothing when `resize-mini-window' is nil.")
 
+;; variables for __git_ps1
 (defvar git-command-ps1-showdirtystate "t"
   "Value of  GIT_PS1_SHOWDIRTYSTATE when running __git_ps1.")
 
@@ -65,8 +66,10 @@ This value means nothing when `resize-mini-window' is nil.")
 (defvar git-command-ps1-showupstream "auto"
   "Value of GIT_PS1_SHOWUPSTREAM when running __git_ps1.")
 
+
 (defvar git-command-history nil
   "History list for `git-command'.")
+
 
 (defvar git-command-view-command-list
   '("log" "show")
@@ -113,8 +116,28 @@ The function should get three argument: see `git-command-exec'.")
       ))
 
 
+(defvar git-command-use-emacsclient
+  nil
+  "If non-nil use emacsclient for editor of git.
+In this case, `server-start' will be called at the first call of `git-command'
+if Emacs server is not running.")
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utility
+
+(defun git-command--git-dir ()
+  "Execute \"git rev-parse --git-dir\" and return result string or nil."
+  (with-temp-buffer
+    (and (eq 0
+            (call-process "git"
+                          nil
+                          t
+                          nil
+                          "rev-parse" "--git-dir"))
+        (progn (goto-char (point-min))
+               (buffer-substring-no-properties (point-at-bol)
+                                               (point-at-eol))))))
 
 (defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
@@ -249,6 +272,24 @@ The value nil is equivalent to 0."
       i)))
 
 
+;; emacs client
+
+(eval-when-compile
+  (require 'server nil t))
+
+(defun git-command--construct-emacsclient-command ()
+  "Construct and return command in a string to connect to current Emacs server."
+  (if server-use-tcp
+      (format "%s -f \"%s/%s\""
+              "emacsclient"
+              (expand-file-name server-auth-dir)
+              server-name)
+    (format "%s -s \"%s/%s\""
+            "emacsclient"
+            server-socket-dir
+            server-name)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; user commands
 
@@ -298,7 +339,7 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                       (shell-command (concat "git "
                                              (git-command-construct-commandline
                                               `(,@options "-c" "color.ui=always")
-                                              "diff"
+                                              command
                                               args))
                                      t)
                       (ansi-color-apply-on-region (point-min)
@@ -306,18 +347,28 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                   (shell-command (concat "git "
                                          (git-command-construct-commandline
                                           `(,@options "-c" "color.ui=never")
-                                          "diff"
+                                          command
                                           args))
                                  t))
                 (fundamental-mode)
                 (view-mode))))
-        (git-command-term-shell-command
-         (concat "git "
-                 (git-command-construct-commandline
-                  options
-                  command
-                  args))
-         bname)))))
+        ;; if this command is not a view command
+        (and git-command-use-emacsclient
+             (not server-mode)
+             (server-start))
+        (let ((process-environment
+               (if git-command-use-emacsclient
+                   `(,(concat "GIT_EDITOR="
+                              (git-command--construct-emacsclient-command))
+                     ,@process-environment)
+                 process-environment)))
+          (git-command-term-shell-command
+           (concat "git "
+                   (git-command-construct-commandline
+                    options
+                    command
+                    args))
+           bname))))))
 
 (eval-when-compile
   (require 'term nil t))
