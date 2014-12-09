@@ -45,13 +45,9 @@
 ;; Variables
 
 (defvar git-command-default-options
-  ""
-  "Options always passed to git.")
+  nil
+  "List of options always passed to git.")
 
-(defvar git-command-max-mini-window-height
-  max-mini-window-height
-  "Maximum height for resizing mini-window when showing result.
-This value means nothing when `resize-mini-window' is nil.")
 
 ;; variables for __git_ps1
 (defvar git-command-ps1-showdirtystate "t"
@@ -180,17 +176,9 @@ TODO: how to do about `git-command-default-options'?
 The string returned does not start with \"git\" so this should be concat-ed.
 
 About these arguments see document of `git-command-parse-commandline'."
-  (concat git-command-default-options
-          " "
-          (mapconcat 'shell-quote-argument
-                     options
-                     " ")
-          " "
-          command
-          " "
-          (mapconcat 'shell-quote-argument
-                     args
-                     " ")))
+  (mapconcat 'shell-quote-argument
+             `(,@options ,command ,@args)
+             " "))
 
 (defun git-command-parse-commandline (str)
   "Parse commandline string STR into a list like (OPTIONS COMMAND ARGUMENT)."
@@ -337,7 +325,10 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                     (progn
                       (shell-command (concat "git "
                                              (git-command-construct-commandline
-                                              `(,@options "-c" "color.ui=always")
+                                              `(,@git-command-default-options
+                                                ,@options
+                                                "-c"
+                                                "color.ui=always")
                                               command
                                               args))
                                      t)
@@ -345,7 +336,8 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                                                   (point-max)))
                   (shell-command (concat "git "
                                          (git-command-construct-commandline
-                                          `(,@options "-c" "color.ui=never")
+                                          `(,@git-command-default-options
+                                            ,@options "-c" "color.ui=never")
                                           command
                                           args))
                                  t))
@@ -365,10 +357,10 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
            (concat "git "
                    (git-command-construct-commandline
                     ;; TODO: fix colorize: currently output is not colorized
-                    `(,@options "-c" "color.ui=always")
+                    `(,@git-command-default-options
+                      ,@options "-c" "color.ui=always")
                     command
                     args))
-           ;; TODO: use same bname for this case?
            "*git command*"))))))
 
 (eval-when-compile
