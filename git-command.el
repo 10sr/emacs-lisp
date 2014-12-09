@@ -72,7 +72,7 @@ This value means nothing when `resize-mini-window' is nil.")
 
 
 (defvar git-command-view-command-list
-  '("log" "show")
+  '("log" "show" "help")
   "List of commands that will only output something for read.")
 
 (defvar git-command-aliases-alist
