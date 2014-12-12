@@ -345,6 +345,7 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                 (view-mode))))
         ;; if this command is not a view command
         (and git-command-use-emacsclient
+             (require 'server nil t)
              (not (server-running-p))
              (server-start))
         (let ((process-environment
