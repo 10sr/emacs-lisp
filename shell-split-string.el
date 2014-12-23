@@ -41,7 +41,7 @@
 
 (defun shell-split-string (str)
   "Split string STR using shell-like syntax."
-  str)
+  (split-string str))
 
 
 (provide 'shell-split-string)

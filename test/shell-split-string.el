@@ -3,5 +3,7 @@
 
 (ert-deftest test-shell-split-string ()
   (should (equal (shell-split-string "abc")
-                 "abc"))
+                 '("abc")))
+  (should (equal (shell-split-string "abc def")
+                 '("abc" "def")))
   )
