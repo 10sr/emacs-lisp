@@ -72,18 +72,20 @@
   "List of commands that will only output something for read.")
 
 (defvar git-command-aliases-alist
-  '(("diff" . (lambda (options cmd args)
-               (let ((buf (get-buffer-create "*git diff*")))
-                 (with-current-buffer buf
-                   (erase-buffer)
-                   (shell-command (concat "git "
-                                          (git-command-construct-commandline
-                                           `(,@options "-c" "color.diff=never")
-                                           "diff"
-                                           args))
-                                  t)
-                   (diff-mode))
-                 (display-buffer buf)))))
+  '(("diff" . (lambda (options cmd args new-buffer-p)
+                (let ((buf (if new-buffer-p
+                               (generate-new-buffer "*git diff*")
+                             (get-buffer-create "*git diff*"))))
+                  (with-current-buffer buf
+                    (erase-buffer)
+                    (shell-command (concat "git "
+                                           (git-command-construct-commandline
+                                            `(,@options "-c" "color.diff=never")
+                                            "diff"
+                                            args))
+                                   t)
+                    (diff-mode))
+                  (display-buffer buf)))))
   "Alist of cons of command and function to run.
 The function should get three argument: see `git-command-exec'.")
 
@@ -126,14 +128,14 @@ if Emacs server is not running.")
   "Execute \"git rev-parse --git-dir\" and return result string or nil."
   (with-temp-buffer
     (and (eq 0
-            (call-process "git"
-                          nil
-                          t
-                          nil
-                          "rev-parse" "--git-dir"))
-        (progn (goto-char (point-min))
-               (buffer-substring-no-properties (point-at-bol)
-                                               (point-at-eol))))))
+             (call-process "git"
+                           nil
+                           t
+                           nil
+                           "rev-parse" "--git-dir"))
+         (progn (goto-char (point-min))
+                (buffer-substring-no-properties (point-at-bol)
+                                                (point-at-eol))))))
 
 (defun git-command-ps1 (fmt)
   "Generate git ps1 string from FMT and return that string."
@@ -284,17 +286,21 @@ The value nil is equivalent to 0."
 (eval-when-compile
   (require 'ansi-color nil t))
 
-(defun git-command (cmd)
-  "Shell like git command interface.  CMD is the commandline strings to run."
+(defun git-command (cmd &optional new-buffer-p)
+  "Shell like git command interface.  CMD is the commandline strings to run.
+
+If NEW-BUFFER-P is non-nil, generate new buffer for running command."
   (interactive (list (read-shell-command (format "[%s]%s $ git : "
                                                  (abbreviate-file-name
                                                   default-directory)
                                                  (git-command-ps1 "[GIT:%s]"))
                                          nil
-                                         'git-command-history)))
-  (apply 'git-command-exec (git-command-parse-commandline cmd)))
+                                         'git-command-history)
+                     current-prefix-arg))
+  (apply 'git-command-exec (append (git-command-parse-commandline cmd)
+                                   (list new-buffer-p))))
 
-(defun git-command-exec (options command args)
+(defun git-command-exec (options command args &optional new-buffer-p)
   "Execute git.
 
 This function accept three arguments.  OPTIONS is a list of options that will be
@@ -302,23 +308,28 @@ passed to git itself.  Tipically they are appeared before the git subcommand.
 COMMAND is a string of git subcommand.  ARGS is a list of arguments for git
 subcommand.
 
-These arguments are tipically constructed with `git-command-parse-commandline'."
+These arguments are tipically constructed with `git-command-parse-commandline'.
+
+Set optional argument NEW-BUFFER-P to non-nil to generate new buffer for the
+process."
   (let ((alias (git-command-get-alias-function command)))
     (if alias
         ;; if alias is defined in git-command-get-alias-function
         (funcall alias
-                 options command args)
+                 options command args new-buffer-p)
       (if (member command
                   git-command-view-command-list)
           ;; if this command is a view command
-          (let ((bname (concat "*"
-                       "git "
-                       command
-                       "*")))
-            (and (get-buffer bname)
-                 (kill-buffer bname))
-            (display-buffer (get-buffer-create bname))
-            (with-current-buffer bname
+          (let* ((bname (concat "*"
+                                "git "
+                                command
+                                "*"))
+                 (bf (if new-buffer-p (generate-new-buffer bname)
+                       (and (get-buffer bname)
+                            (kill-buffer bname))
+                       (get-buffer-create bname))))
+            (display-buffer bf)
+            (with-current-buffer bf
               (let ((inhibit-read-only t))
                 (erase-buffer)
                 (if (fboundp 'ansi-color-apply-on-region)
@@ -362,7 +373,9 @@ These arguments are tipically constructed with `git-command-parse-commandline'."
                       ,@options "-c" "color.ui=always")
                     command
                     args))
-           "*git command*"))))))
+           (if new-buffer-p
+               (generate-new-buffer "*git command*")
+             "*git command*")))))))
 
 (eval-when-compile
   (require 'term nil t))
