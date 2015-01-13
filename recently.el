@@ -39,13 +39,32 @@
 
 ;;; Code:
 
+(defvar recently-default-database-path
+  (concat user-emacs-directory
+          "recently.sqlite"))
+
 (define-minor-mode recently-mode
   "Save recently visited files."
   :global t
   :init-value nil
   :lighter ""
-  nil
+  (if recently-mode
+      (add-hook 'find-file-hook
+                'recently-register-current)
+    (remove-hook 'find-file-hook
+                 'recently-register-current))
   )
+
+(defun recently-register (filename)
+  "Push FILENAME into the recently list.")
+
+(defun recently-register-current ()
+  "Register currently visiting file into the recently list."
+  (and buffer-file-name
+       (recently-register buffer-file-name)))
+
+(defun recently-get-list ()
+  "Get recently list.")
 
 (provide 'recently)
 
