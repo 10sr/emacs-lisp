@@ -85,7 +85,19 @@
                                             args))
                                    t)
                     (diff-mode))
-                  (display-buffer buf)))))
+                  (display-buffer buf))))
+    ("grep" . (lambda (options cmd args new-buffer-p)
+                (compilation-start (concat "git "
+                                           (git-command-construct-commandline
+                                            `(,@options "--no-pager"
+                                                        "-c" "color.grep=false")
+                                            cmd
+                                            `("-nHe" ,@args)))
+                                   'grep-mode
+                                   (and new-buffer-p
+                                        (lambda (s)
+                                          (generate-new-buffer-name "*git grep*"))))
+                )))
   "Alist of cons of command and function to run.
 The function should get three argument: see `git-command-exec'.")
 
