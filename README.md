@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/10sr/emacs-lisp.svg?branch=master)](https://travis-ci.org/10sr/emacs-lisp)
+
+
+
 # Emacs lisp
 
 Some small Emacs lisp libraries.
