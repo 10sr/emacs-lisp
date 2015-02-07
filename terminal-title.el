@@ -41,35 +41,37 @@
 
 ;; todo: use format-mode-line
 
-(progn
-  (defvar buffer-file-changed-functions nil "Hook run when buffer file changed.
+(defvar buffer-file-changed-functions nil "Hook run when buffer file changed.
 Each function is called with two args, the filename before changing and after
 changing.")
-  (declare-function run-buffer-file-changed-functions "terminal-title.el")
-  (add-hook 'post-command-hook
-            'run-buffer-file-changed-functions)
-  (lexical-let (previous-file)
-    (defun run-buffer-file-changed-functions ()
-      ""
-      (unless (and previous-file
-                   (equal previous-file
-                          (expand-file-name (or buffer-file-name
-                                                default-directory))))
-        (let ((pfile previous-file)
-              (cfile (expand-file-name (or buffer-file-name
-                                           default-directory))))
-          (setq previous-file cfile)
-          (run-hook-with-args 'buffer-file-changed-functions pfile cfile)))))
-  ;; (add-hook 'buffer-file-changed-function
-  ;;           (lambda (pdir cdir)
-  ;;             (message "dir changed %s to %s !" pdir cdir)))
-  )
+
+(defvar terminal--title-previous-file
+  nil
+  "File name that was previously visited.")
+
+(add-hook 'post-command-hook
+          'run-buffer-file-changed-functions)
+
+(defun run-buffer-file-changed-functions ()
+  "Run `buffer-file-changed-functions'."
+  (unless (and terminal--title-previous-file
+               (equal terminal--title-previous-file
+                      (expand-file-name (or buffer-file-name
+                                            default-directory))))
+    (let ((pfile terminal--title-previous-file)
+          (cfile (expand-file-name (or buffer-file-name
+                                       default-directory))))
+      (setq terminal--title-previous-file cfile)
+      (run-hook-with-args 'buffer-file-changed-functions pfile cfile))))
+;; (add-hook 'buffer-file-changed-function
+;;           (lambda (pdir cdir)
+;;             (message "dir changed %s to %s !" pdir cdir)))
 
 (defvar terminal-title-term-regexp "^\\(rxvt\\|xterm\\|aterm$\\|screen\\)"
   "Rexexp for `set-terminal-title'.")
 
 (defun terminal-title-set (&rest args)
-  "Set terminal title."
+  "Set terminal title by concatinating ARGS."
   (interactive "sString to set as title: ")
   (let ((tty (frame-parameter nil
                               'tty-type)))
@@ -100,11 +102,12 @@ changing.")
     (frame-parameter nil 'name)
     "]"
     )
-  "List of elements for terminal title. Each element must return string when
-evaluated.")
+  "List of elements for terminal title.
+
+ Each element must return string when evaluated.")
 
 (defun terminal-title-set-tmux-window-name (&rest args)
-  "Set tmux window name."
+  "Set tmux window name by concatinating ARGS."
   (interactive "sString to set as title: ")
   (when (getenv "TMUX")
     (send-string-to-terminal (apply 'concat
@@ -112,8 +115,8 @@ evaluated.")
                                     `(,@args "\033\\")))))
 
 (defvar terminal-title-tmux-window-name-format nil
-  "List of elements for tmux window name. Each element must return string when
-evaluated.")
+  "List of elements for tmux window name.
+Each element must return string when evaluated.")
 
 (define-minor-mode terminal-title-mode
   "Set terminal title."
@@ -128,11 +131,11 @@ evaluated.")
   :lighter "")
 
 (defun terminal-title-update (&rest args)
-  "Update terminal titles `terminal-title-set' and
-`terminal-title-set-tmux-window-name' using `terminal-title-format' and
-`terminal-title-tmux-window-name-format' when `terminal-title-mode' and
-`terminal-title-tmux-window-name-mode' are enabled respectively.
-ARGS are ignored."
+  "Update terminal titles.  ARGS are ignored.
+
+ `terminal-title-set' and `terminal-title-set-tmux-window-name' using
+ `terminal-title-format' and `terminal-title-tmux-window-name-format' when
+`terminal-title-mode' and `terminal-title-tmux-window-name-mode' are enabled"
   (interactive)
   (and terminal-title-mode
        terminal-title-format
