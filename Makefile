@@ -5,6 +5,11 @@ elc = $(el:%.el=%.elc)
 
 all:
 
+.PHONY: all test build info clean
+
+clean:
+	$(RM) $(elc)
+
 test: build info
 
 build: $(elc)
