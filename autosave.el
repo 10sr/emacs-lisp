@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/autosave.el
-;; Version: 0.2
+;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
 
