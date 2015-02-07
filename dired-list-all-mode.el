@@ -1,7 +1,7 @@
 ;;; dired-list-all-mode.el --- Toggle listing dot files in dired
 
 ;; Author: 10sr <>
-;; URL: https://github.com/10sr/emacs-lisp/blob/master/dired-list-all-mode.el
+;; URL: https://github.com/10sr/emacs-lisp
 ;; Version: 0.2
 ;; Package-Requires: ()
 ;; Keywords: dired
