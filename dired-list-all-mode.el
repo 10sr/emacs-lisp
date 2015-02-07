@@ -2,8 +2,8 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Version: 0.2
-;; Package-Requires: ()
+;; Version: 0.1
+;; Package-Requires: ((dired "0"))
 ;; Keywords: dired
 
 ;; This file is not part of GNU Emacs.

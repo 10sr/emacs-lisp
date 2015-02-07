@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
 ;; Version: 0.1
-;; Package-Requires: (recentf)
+;; Package-Requires: ((recentf "0"))
 ;; Keywords: recentf view show
 
 ;; This file is not part of GNU Emacs.
