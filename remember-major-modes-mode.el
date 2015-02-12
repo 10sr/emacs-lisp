@@ -49,7 +49,7 @@
 ;; (when (require 'remember-major-modes-mode nil t)
 ;;    (remember-major-modes-mode 1))
 
-;; You can use M-x remember-major-modes-remember to remember the pair of current
+;; You can use M-x remember-major-modes-memorize to remember the pair of current
 ;; file and major-mdoe and M-x remember-major-modes-forget to forget the
 ;; major-mode for current visiting file.
 
@@ -98,7 +98,7 @@ This pair will be written into the file `remember-major-modes-file'."
                     (point-max)
                     remember-major-modes-file))))
 
-(defun remember-major-modes-remember (&optional mode filename)
+(defun remember-major-modes-memorize (&optional mode filename)
   "Remember the pair of MODE and FILENAME.
 If these arguments are omitted current ones are used."
   (interactive)
