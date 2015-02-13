@@ -3,7 +3,7 @@ emacs ?= emacs
 el = $(wildcard *.el)
 elc = $(el:%.el=%.elc)
 
-all:
+all: $(elc)
 
 .PHONY: all test build info clean
 
