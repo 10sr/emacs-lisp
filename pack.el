@@ -44,6 +44,7 @@
   (require 'simple))
 
 (declare-function dired-dwim-target-directory "dired-aux")
+(declare-function dired-get-marked-files "dired")
 
 (defvar 7z-program-name
   (or (executable-find "7z")

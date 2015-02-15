@@ -35,7 +35,7 @@
 
 ;;; Commentary:
 
-;; dired-list-all-mode is a buffer local minor mode for dired to toggle whether
+;; A buffer local minor mode for dired to toggle whether
 ;; list dot files.
 
 ;; For example add to your dot.emacs as below:
@@ -43,7 +43,7 @@
 ;;    (setq dired-listing-switches "-lhFG")
 ;;    (add-hook 'dired-mode-hook
 ;;              (lambda ()
-;;                (define-key dired-mode-map "a" 'dired-list-all-mode)
+;;                (local-set-key "a" 'dired-list-all-mode)
 ;;                )))
 
 ;;; Code:

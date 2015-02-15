@@ -44,8 +44,9 @@
 (defvar pasteboard-copy-program (executable-find "pbcopy")
   "Program to put text to osx pasteboard.")
 (defvar pasteboard-rtun-program (executable-find "reattach-to-user-namespace")
-  "Program reattach-to-user-namespace. It is needed when you use pasteboard
-within tmux. For details see
+  "Program reattach-to-user-namespace.
+
+It is needed when you use pasteboard within tmux.  For details see
 https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
 
 (defvar pasteboard-paste-command pasteboard-paste-program
@@ -90,9 +91,15 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
         pasteboard-copy-program))
 
 (defun pasteboard-paste ()
+  "Pasting function using pasteboard.
+
+Intended to be set to `interprogram-paste-function'."
   (shell-command-to-string pasteboard-paste-command))
 
 (defun pasteboard-cut (text &optional push)
+  "Cutting function using pasteboard.
+
+Intended to be set to `interprogram-cut-function'."
   (let ((process-connection-type nil))
     (let ((proc (start-process-shell-command pasteboard-copy-program
                                              "*Messages*"
