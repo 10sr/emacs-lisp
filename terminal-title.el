@@ -41,7 +41,8 @@
 
 ;; todo: use format-mode-line
 
-(defvar buffer-file-changed-functions nil "Hook run when buffer file changed.
+(defvar terminal-title-buffer-file-changed-functions nil
+  "Hook run when buffer file changed.
 Each function is called with two args, the filename before changing and after
 changing.")
 
@@ -50,10 +51,10 @@ changing.")
   "File name that was previously visited.")
 
 (add-hook 'post-command-hook
-          'run-buffer-file-changed-functions)
+          'terminal-title-run-buffer-file-changed-functions)
 
-(defun run-buffer-file-changed-functions ()
-  "Run `buffer-file-changed-functions'."
+(defun terminal-title-run-buffer-file-changed-functions ()
+  "Run `terminal-title-buffer-file-changed-functions'."
   (unless (and terminal--title-previous-file
                (equal terminal--title-previous-file
                       (expand-file-name (or buffer-file-name
@@ -62,7 +63,8 @@ changing.")
           (cfile (expand-file-name (or buffer-file-name
                                        default-directory))))
       (setq terminal--title-previous-file cfile)
-      (run-hook-with-args 'buffer-file-changed-functions pfile cfile))))
+      (run-hook-with-args 'terminal-title-buffer-file-changed-functions
+                          pfile cfile))))
 ;; (add-hook 'buffer-file-changed-function
 ;;           (lambda (pdir cdir)
 ;;             (message "dir changed %s to %s !" pdir cdir)))
@@ -148,7 +150,7 @@ Each element must return string when evaluated.")
               (mapcar 'eval
                       terminal-title-tmux-window-name-format))))
 
-(add-hook 'buffer-file-changed-functions
+(add-hook 'terminal-title-buffer-file-changed-functions
           'terminal-title-update)
 
 (add-hook 'suspend-resume-hook
