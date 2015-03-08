@@ -124,21 +124,40 @@ Each element must return string when evaluated.")
   "Set terminal title."
   :init-value nil
   :global t
-  :lighter "")
+  :lighter ""
+  (if terminal-title-mode
+      (progn
+        (add-hook 'terminal-title-buffer-file-changed-functions
+                  'terminal-title-update)
+        (add-hook 'suspend-resume-hook
+                  'terminal-title-update))
+    (remove-hook 'terminal-title-buffer-file-changed-functions
+                 'terminal-title-update)
+    (remove-hook 'suspend-resume-hook
+                 'terminal-title-update)))
 
 (define-minor-mode terminal-title-tmux-window-name-mode
   "Set tmux window name."
   :init-value nil
   :global t
-  :lighter "")
+  :lighter ""
+  (if terminal-title-tmux-window-name-mode
+      (progn
+        (add-hook 'terminal-title-buffer-file-changed-functions
+                  'terminal-title-tmux-window-name-update)
+        (add-hook 'suspend-resume-hook
+                  'terminal-title-tmux-window-name-update))
+    (remove-hook 'terminal-title-buffer-file-changed-functions
+                 'terminal-title-tmux-window-name-update)
+    (remove-hook 'suspend-resume-hook
+                 'terminal-title-tmux-window-name-update)))
 
 (defun terminal-title-update (&rest args)
   "Update terminal titles.  ARGS are ignored.
 
 Call `terminal-title-set' using `terminal-title-format'."
   (interactive)
-  (and terminal-title-mode
-       terminal-title-format
+  (and terminal-title-format
        (apply 'terminal-title-set
               (mapcar 'eval
                       terminal-title-format))))
@@ -148,23 +167,10 @@ Call `terminal-title-set' using `terminal-title-format'."
 
 Call `terminal-title-set-tmux-window-name' using
 `terminal-title-tmux-window-name-format'."
-  (and terminal-title-tmux-window-name-mode
-       terminal-title-tmux-window-name-format
+  (and terminal-title-tmux-window-name-format
        (apply 'terminal-title-set-tmux-window-name
               (mapcar 'eval
                       terminal-title-tmux-window-name-format))))
-
-(add-hook 'terminal-title-buffer-file-changed-functions
-          'terminal-title-update)
-
-(add-hook 'suspend-resume-hook
-          'terminal-title-update)
-
-(add-hook 'terminal-title-buffer-file-changed-functions
-          'terminal-title-tmux-window-name-update)
-
-(add-hook 'suspend-resume-hook
-          'terminal-title-tmux-window-name-update)
 
 (provide 'terminal-title)
 
