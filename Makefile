@@ -10,9 +10,9 @@ all: $(elc)
 clean:
 	$(RM) $(elc)
 
-test: build info
+test: compile info
 
-build: $(elc)
+compile: $(elc)
 
 $(elc): %.elc: %.el
 	$(emacs) -batch -Q -f batch-byte-compile $<
