@@ -7,6 +7,8 @@ before_install:
   - sudo apt-get update -qq
 install:
   - sudo apt-get install -qq $EMACS
+  - sudo apt-get install -qq markdown
 before_script:
   - $EMACS --version
-script: make test emacs=$EMACS
+script:
+  - make test gh-pages-push emacs=$EMACS git_user_name=travis git_user_email=8slashes+travis@gmail.com
