@@ -77,5 +77,5 @@ gh-pages: git-user-config
 	$(git) checkout -f -
 
 git-user-config:
-	test -n "`$(git config user.name)`" || git config user.name $(git_user_name)
-	test -n "`$(git config user.email)`" || git config user.name $(git_user_email)
+	test -n "`$(git) config user.name`" || git config user.name $(git_user_name)
+	test -n "`$(git) config user.email`" || git config user.email $(git_user_email)
