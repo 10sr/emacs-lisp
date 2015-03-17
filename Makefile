@@ -73,7 +73,7 @@ gh-pages: git-user-config
 	$(git) merge $(gh_pages_base_branch)
 	$(markdown) README.md >index.html
 	$(git) add index.html
-	$(git) commit -m 'Update index.html'
+	$(git) diff --cached --exit-code || $(git) commit -m 'Update index.html'
 	$(git) checkout -f -
 
 git-user-config:
