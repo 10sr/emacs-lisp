@@ -7,7 +7,6 @@ before_install:
   - sudo apt-get update -qq
 install:
   - sudo apt-get install -qq $EMACS
-  - sudo apt-get install -qq markdown
 before_script:
   - $EMACS --version
 script:
