@@ -40,13 +40,66 @@
 
 ;;; Code:
 
+;; Variable Definition derived from editorconfig.el `edconf-indentation-alist'
+;; http://github.com/editorconfig/editorconfig-emacs#readme
+;; Copyright (C) 2011-2015 EditorConfig Team
+;; Released under GPL
+(defvar editorconfig-extract-mode-offset-alist
+  '((awk-mode c-basic-offset)
+    (c++-mode c-basic-offset)
+    (c-mode c-basic-offset)
+    (cmake-mode cmake-tab-width)
+    (coffee-mode coffee-tab-width)
+    (cperl-mode cperl-indent-level)
+    (css-mode css-indent-offset)
+    (emacs-lisp-mode lisp-indent-offset)
+    (erlang-mode erlang-indent-level)
+    (groovy-mode c-basic-offset)
+    (haskell-mode haskell-indent-spaces
+                  haskell-indent-offset
+                  shm-indent-spaces)
+    (idl-mode c-basic-offset)
+    (java-mode c-basic-offset)
+    (js-mode js-indent-level)
+    (js2-mode js2-basic-offset)
+    (js3-mode js3-indent-level)
+    (json-mode js-indent-level)
+    (latex-mode tex-indent-basic)
+    (lisp-mode lisp-indent-offset)
+    (livescript-mode livescript-tab-width)
+    (mustache-mode mustache-basic-offset)
+    (nxml-mode nxml-child-indent)
+    (objc-mode c-basic-offset)
+    (perl-mode perl-indent-level)
+    (pike-mode c-basic-offset)
+    (puppet-mode puppet-indent-level)
+    (python-mode python-indent-offset
+                 python-indent
+                 py-indent-offset)
+    (ruby-mode ruby-indent-level)
+    (scala-mode scala-indent:step)
+    (sgml-mode sgml-basic-offset)
+    (sh-mode sh-basic-offset sh-indentation)
+    (web-mode web-mode-markup-indent-offset)
+    (yaml-mode yaml-indent-offset))
+  "Alist of modes and its candidate for indentation offset.
+
+Each element should be like (MODE . VARIABLE-CANDIDATES) .
+The indentation offset will be gotten from the first valid value
+ (varible is defined it value is not nil)."
+  )
+
+
 (defvar editorconfig-extract-properties-alist
   (setq editorconfig-extract-properties-alist
   '(
     ("indent_style" . (if indent-tabs-mode
                           "tab"
                         "space"))
-    ("indent_size" . nil)
+    ("indent_size" . (let ((s (editorconfig-extract-indent-size major-mode)))
+                       (if s
+                           (int-to-string s)
+                         nil)))
     ("tab_width" . (int-to-string tab-width))
     ("end_of_line" . (let ((type (car (last (split-string (symbol-name buffer-file-coding-system)
                                                        "-")))))
@@ -86,6 +139,29 @@
     ))
   "Alist of EditorConfig properties to extract.
 Each element should be like (PROP . SEXP)")
+
+(defun editorconfig-extract-indent-size (mode)
+  "Get indentation offset for major mode MODE.
+
+If MODE is a derived mode of other mode and no suitable offset value was found,
+it will go up recursively and take the first valid value.
+If MODE is nil this function allways returns nil."
+  (when mode
+    (let ((var-list (cdr (assq mode
+                               editorconfig-extract-mode-offset-alist))))
+      (or (editorconfig-extract-take-first-valid var-list)
+          (editorconfig-extract-indent-size (get mode
+                                                 'derived-mode-parent))))))
+
+(defun editorconfig-extract-take-first-valid (l)
+  "Accept list of variables L and return the first valid value."
+  (when l
+    (let ((v (car l)))
+      (or (and (boundp v)
+               (eval v))
+          (editorconfig-extract-take-first-valid (cdr l))))))
+
+(editorconfig-extract-take-first-valid '(a lisp-indent-offset))
 
 (defun editorconfig-extract-current-buffer ()
   "Extract EditorConfig properties for current buffer."
