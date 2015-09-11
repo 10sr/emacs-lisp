@@ -41,14 +41,51 @@
 ;;; Code:
 
 (defvar editorconfig-extract-properties-alist
+  (setq editorconfig-extract-properties-alist
   '(
-    ("charset" . (if (equal buffer-file-coding-system
-                            'prefer-utf-8-unix)
-                     "utf-8"
-                   (symbol-name buffer-file-coding-system)))
-    )
+    ("indent_style" . (if indent-tabs-mode
+                          "tab"
+                        "space"))
+    ("indent_size" . nil)
+    ("tab_width" . (int-to-string tab-width))
+    ("end_of_line" . (let ((type (car (last (split-string (symbol-name buffer-file-coding-system)
+                                                       "-")))))
+                       (cond ((string-equal type "unix")
+                              "lf")
+                             ((string-equal type "mac")
+                              "cr")
+                             ((string-equal type "dos")
+                              "crlf")
+                             )))
+    ("charset" . (let ((coding (symbol-name buffer-file-coding-system)))
+                   (cond ((or (string-match-p "^utf-8" coding)
+                              (string-match-p "^prefer-utf-8" coding))
+                          "utf-8")
+                         ((string-match-p "^latin-1" coding)
+                          "latin1")
+                         ((string-match-p "^utf-16-be" coding)
+                          "utf-16be")
+                         ((string-match-p "^utf-16-le" coding)
+                          "utf-16le")
+                         )))
+    ("trim_trailing_whitespace" . (if (or (memq 'delete-trailing-whitespace
+                                                before-save-hook)
+                                          (memq 'delete-trailing-whitespace
+                                                write-file-functions)
+                                          ;; NOTE: Are there other hooks that
+                                          ;; can contain this function?
+                                          )
+                                      "true"
+                                    "false"))
+    ("insert_final_newline" . (if require-final-newline
+                                  ;; require-final-newline can take some sort of
+                                  ;; values, but here only nil is translated
+                                  ;; into false
+                                  "true"
+                                "false"))
+    ))
   "Alist of EditorConfig properties to extract.
-Each element should be like (PROP . )")
+Each element should be like (PROP . SEXP)")
 
 (defun editorconfig-extract-current-buffer ()
   "Extract EditorConfig properties for current buffer."
@@ -64,10 +101,12 @@ Each element should be like (PROP . )")
     (dolist (prop editorconfig-extract-properties-alist)
       (let ((value (eval (cdr prop))))
         (message "val:%S" output-buf)
-        (with-current-buffer output-buf
-          (insert (car prop)
-                  " = "
-                  value))))
+        (when value
+          (with-current-buffer output-buf
+            (insert (car prop)
+                    " = "
+                    value
+                    "\n")))))
     (display-buffer output-buf)))
 (editorconfig-extract-current-buffer)
 (defun editorconfig-extract (buf)
