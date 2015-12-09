@@ -89,6 +89,8 @@ git-user-config:
 recipes := $(wildcard recipes/*)
 archives := $(recipes:recipes/%=%)
 
+.PHONY: archive $(archives) archive-all
+
 archive: $(archives)
 
 # Using archive-all is recommended, since this does not generate
