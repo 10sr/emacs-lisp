@@ -51,35 +51,34 @@ info: $(el)
 
 #########################################
 # Package in gh-pages
+# Build packages from current branch and make commit to gh-pages
 
-.PHONY: gh-pages gh-pages-push git-user-config
+.PHONY: gh-pages gh-pages-push
 
 gh_pages_branch := gh-pages
-gh_pages_source_branch := master
 gh_pages_push_target := git@github.com:10sr/emacs-lisp.git
+git_current_branch := $(shell git symbolic-ref --short 2>/dev/null)
 
 git_user_name ?= $(shell git config user.name || echo 10sr)
 git_user_email ?= $(shell git config user.email || echo 8slashes+git@gmail.com)
 
 gh-pages-push: gh-pages
-	$(git) push $(gh_pages_remote) $(gh_pages_branch)
+	$(git) push $(gh_pages_push_target) $(gh_pages_branch)
 
-gh-pages: git-user-config
+gh-pages:
 	# check working tree and index are clean
 	$(git) diff --exit-code
 	$(git) diff --cached --exit-code
-	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_remote)/$(gh_pages_branch) || \
-		$(git) branch $(gh_pages_branch) $(gh_pages_base_branch) || true
+	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_push_target)/$(gh_pages_branch) || \
+		$(git) branch $(gh_pages_branch) || true
 	$(git) checkout -f $(gh_pages_branch)
-	$(git) merge $(gh_pages_base_branch)
-	$(markdown) README.md >index.html
-	$(git) add index.html
-	$(git) diff --cached --exit-code || $(git) commit -m 'Update index.html'
+	$(git) merge $(gh_pages_source_branch)
+	$(MAKE) archive-all
+	$(git) add packages/*
+	$(git) diff --cached --exit-code || $(git) commit -m 'Update packages/'
+ifneq ($(gh_pages_branch),$(git_current_branch))
 	$(git) checkout -f -
-
-git-user-config:
-	test -n "`$(git) config user.name`" || git config user.name $(git_user_name)
-	test -n "`$(git) config user.email`" || git config user.email $(git_user_email)
+endif
 
 
 ######################################3
