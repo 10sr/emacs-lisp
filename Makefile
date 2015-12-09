@@ -49,7 +49,7 @@ info: $(el)
 
 
 #########################################
-# gh-pages
+# Packages in gh-pages
 
 .PHONY: gh-pages gh-pages-push git-user-config
 
@@ -57,8 +57,8 @@ gh_pages_branch := gh-pages
 gh_pages_base_branch := master
 gh_pages_remote := origin
 
-git_user_name ?= 10sr
-git_user_email ?= 8slashes+git@gmail.com
+git_user_name ?= $(shell git config user.name || echo 10sr)
+git_user_email ?= $(shell git config user.email || echo 8slashes+git@gmail.com)
 
 gh-pages-push: gh-pages
 	$(git) push $(gh_pages_remote) $(gh_pages_branch)
