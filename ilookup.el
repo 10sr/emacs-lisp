@@ -293,6 +293,7 @@ Freeze current input and show next prompt."
   "Open ilookup buffer with WORD input.
 Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   ;; TODO: implement me!
+  (interactive "sIlookup Word: ")
   (with-current-buffer (pop-to-buffer (ilookup--get-buffer-create))
     (when (ilookup--input-given-p)
       (ilookup--emit-next-prompt))
