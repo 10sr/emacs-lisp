@@ -55,7 +55,6 @@ info: $(el)
 .PHONY: gh-pages gh-pages-push git-user-config
 
 gh_pages_branch := gh-pages
-
 gh_pages_base_branch := master
 gh_pages_remote := origin
 
