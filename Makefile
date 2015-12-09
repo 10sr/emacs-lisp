@@ -91,13 +91,24 @@ archives := $(recipes:recipes/%=%)
 
 archive: $(archives)
 
+# Using archive-all is recommended, since this does not generate
+# archive-content file
 $(archives): libs/package-build.el
 	$(emacs) -batch -Q \
 		--load libs/package-build.el \
 		--eval '(setq package-build-working-dir (concat "$(project_root)" "/working/"))' \
 		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/packages/"))' \
 		--eval '(setq package-build-recipes-dir (concat "$(project_root)" "/recipes/"))' \
-		--eval '(package-build-archive-ignore-errors (quote $@))'
+		--eval '(package-build-archive (quote $@))'
+
+archive-all: libs/package-build.el
+	$(emacs) -batch -Q \
+		--load libs/package-build.el \
+		--eval '(setq package-build-working-dir (concat "$(project_root)" "/working/"))' \
+		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/packages/"))' \
+		--eval '(setq package-build-recipes-dir (concat "$(project_root)" "/recipes/"))' \
+		--eval '(package-build-all)'
+
 
 
 libs/package-build.el:
