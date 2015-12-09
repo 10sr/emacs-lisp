@@ -79,3 +79,9 @@ gh-pages: git-user-config
 git-user-config:
 	test -n "`$(git) config user.name`" || git config user.name $(git_user_name)
 	test -n "`$(git) config user.email`" || git config user.email $(git_user_email)
+
+
+libs:
+	mkdir -p libs
+	curl -sSL https://github.com/milkypostman/melpa/raw/master/package-build.el \
+		>libs/package-build.el
