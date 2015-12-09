@@ -56,7 +56,7 @@ info: $(el)
 
 gh_pages_branch := gh-pages
 gh_pages_base_branch := master
-gh_pages_remote := origin
+gh_pages_remote := git@github.com:10sr/emacs-lisp.git
 
 git_user_name ?= $(shell git config user.name || echo 10sr)
 git_user_email ?= $(shell git config user.email || echo 8slashes+git@gmail.com)
