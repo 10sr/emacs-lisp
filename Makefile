@@ -8,6 +8,7 @@ all: compile clean
 
 el = $(wildcard *.el)
 elc = $(el:%.el=%.elc)
+project_root := $(PWD)
 
 clean:
 	$(RM) $(elc)
@@ -49,11 +50,12 @@ info: $(el)
 
 
 #########################################
-# Packages in gh-pages
+# Package in gh-pages
 
 .PHONY: gh-pages gh-pages-push git-user-config
 
 gh_pages_branch := gh-pages
+
 gh_pages_base_branch := master
 gh_pages_remote := origin
 
@@ -81,7 +83,24 @@ git-user-config:
 	test -n "`$(git) config user.email`" || git config user.email $(git_user_email)
 
 
-libs:
+######################################3
+# Archives
+
+recipes := $(wildcard recipes/*)
+archives := $(recipes:recipes/%=%)
+
+archive: $(archives)
+
+$(archives): libs/package-build.el
+	$(emacs) -batch -Q \
+		--load libs/package-build.el \
+		--eval '(setq package-build-working-dir (concat "$(project_root)" "/working/"))' \
+		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/packages/"))' \
+		--eval '(setq package-build-recipes-dir (concat "$(project_root)" "/recipes/"))' \
+		--eval '(package-build-archive-ignore-errors (quote $@))'
+
+
+libs/package-build.el:
 	mkdir -p libs
 	curl -sSL https://github.com/milkypostman/melpa/raw/master/package-build.el \
 		>libs/package-build.el
