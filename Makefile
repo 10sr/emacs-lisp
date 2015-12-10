@@ -76,7 +76,7 @@ gh-pages: archive-all
 		$(git) branch $(gh_pages_branch) || true
 
 	$(git) checkout -f $(gh_pages_branch)
-	$(RM) -r p && $(MKDIR) p
+	$(RM) -r p && mkdir p
 	$(CP) packages/* p
 	$(git) add p/*
 	$(git) diff --cached --exit-code || \
