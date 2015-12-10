@@ -80,7 +80,7 @@ gh-pages: archive-all
 	-cp packages/* p
 	$(git) add p/*
 	$(git) diff --cached --quiet || \
-		$(git) commit -m 'Packages build from $(git_current_revision)'
+		$(git) commit -m 'Add packages build from $(git_current_revision)'
 ifneq ($(gh_pages_branch),$(git_current_branch))
 	$(git) checkout -f -
 endif
