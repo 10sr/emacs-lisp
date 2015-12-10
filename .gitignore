@@ -1,3 +1,4 @@
 *.elc
 libs/
 working/
+packages/
