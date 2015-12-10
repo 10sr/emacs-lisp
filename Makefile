@@ -79,7 +79,7 @@ gh-pages: archive-all
 	$(RM) -r p && mkdir p
 	-cp packages/* p
 	$(git) add p/*
-	$(git) diff --cached --exit-code || \
+	$(git) diff --cached --quiet || \
 		$(git) commit -m 'Packages build from $(git_current_revision)'
 ifneq ($(gh_pages_branch),$(git_current_branch))
 	$(git) checkout -f -
