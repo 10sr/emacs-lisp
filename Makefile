@@ -63,27 +63,26 @@ git_current_revision := $(shell $(git) rev-parse HEAD)
 git_user_name ?= $(shell git config user.name || echo 10sr)
 git_user_email ?= $(shell git config user.email || echo 8slashes+git@gmail.com)
 
+private_git_index := $(project_root)/.git/gh-pages.index
+with_save_index := GIT_INDEX_FILE=$(private_git_index)
+
 gh-pages-push: gh-pages
 	$(git) push $(gh_pages_push_target) $(gh_pages_branch)
 
 gh-pages: archive-all
-	# check working tree and index are clean
-	$(git) diff --exit-code
-	$(git) diff --cached --exit-code
-
 	# Create gh-pages branch
 	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_push_target)/$(gh_pages_branch) || \
 		$(git) branch $(gh_pages_branch) || true
 
-	$(git) checkout -f $(gh_pages_branch)
+	cp $(project_root)/.git/index $(private_git_index)
+	$(with_save_index) $(git) reset --mixed HEAD
 	$(RM) -r p && mkdir p
 	-cp packages/* p
-	$(git) add p/*
-	$(git) diff --cached --quiet || \
-		$(git) commit -m 'Add packages build from $(git_current_revision)'
-ifneq ($(gh_pages_branch),$(git_current_branch))
-	$(git) checkout -f -
-endif
+	$(with_save_index) $(git) add p/*
+	treeobj=$$($(with_save_index) $(git) write-tree) && \
+		headrev=$$($(git) rev-parse $(gh_pages_branch)) && \
+		newcommit=$$($(git) commit-tree -p $$headrev -m 'Add packages build from $(git_current_revision)' $$treeobj) && \
+		$(git) update-ref refs/heads/$(gh_pages_branch) $$newcommit $$headrev
 
 
 ######################################3
