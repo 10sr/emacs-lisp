@@ -1,0 +1,3 @@
+(remember-major-modes-mode :fetcher git
+                           :url "."
+                           :files ("remember-major-modes-mode.el"))
