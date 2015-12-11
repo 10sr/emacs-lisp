@@ -1,0 +1,3 @@
+(autosave :fetcher git
+          :url "."
+          :files ("autosave.el"))
