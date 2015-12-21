@@ -9,71 +9,30 @@ Some small Emacs lisp libraries.
 
 
 
-autosave.el
------------
+Public Repository
+-----------------
 
-Autosave buffers.
+Some packages in this repository can be installed with `package.el`.
+To enable this repository, add lines to your init file:
 
-
-pack.el
--------
-
-Pack or unpack files.
-
-Command for pack/unpack can be defined by setting `pack-program-alist'.
+      (setq package-archives
+            `(,@package-archives
+              ("10sr-el" . "http://10sr.github.io/emacs-lisp/p/")))
 
 
-set-modeline-color.el
----------------------
 
-Change modeline color when toggling readonly or entering overwrite-mode.
+### Updating ###
 
+Issue
 
-recentf-show.el
----------------
+    make gh-pages
 
-Show recentf file list in a simplified way inspired by bs-show.
-
-
-git-command.el
---------------
-
-Dead simple git interface.
+to build packages from current el files and commit them to `gh-pages` branch.
+This command does not need the work tree be clean, but it is highly recommended.
 
 
-read-only-only-mode.el
-----------------------
+If you want only to build packages without committing them to `gh-pages`, issue:
 
-Visit all files with view mode enabled.
+    make archive-all
 
-
-pasteboard.el
--------------
-
-Use osx pasteboard for yank and paste.
-
-
-gtkbm.el
---------
-
-Handle ~/.gtk-bookmarks
-
-
-dired-list-all-mode.el
-----------------------
-
-Add buffer local minor mode for dired to toggle whether list dot files.
-
-
-save-window-size.el
--------------------
-
-Library version of <http://www.bookshelf.jp/soft/meadow_30.html#SEC419>.
-
-Automatically save and restore window size and position.
-
-
-ilookup.el
-----------
-
-Incrememtal dictionary lookup.
+This puts built packages into `packages/` directory.
