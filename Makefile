@@ -125,3 +125,15 @@ libs/package-build.el:
 	mkdir -p libs
 	curl -sSL https://github.com/milkypostman/melpa/raw/master/package-build.el \
 		>libs/package-build.el
+
+
+
+###############################33
+# Autogen recipe
+
+autogen_recipe_target := $(el:%.el=recipes/%)
+
+autogen-recipe: $(autogen_recipe_target)
+
+$(autogen_recipe_target):
+	echo '($(@:recipes/%=%) :fetcher git :url "." :files ("$(@:recipes/%=%.el)"))' >$@
