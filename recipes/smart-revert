@@ -1,0 +1,1 @@
+(smart-revert :fetcher git :url "." :files ("smart-revert.el"))

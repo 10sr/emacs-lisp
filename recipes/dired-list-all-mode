@@ -1,0 +1,3 @@
+(dired-list-all-mode :fetcher git
+                     :url "."
+                     :files ("dired-list-all-mode.el"))

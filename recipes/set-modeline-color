@@ -1,0 +1,1 @@
+(set-modeline-color :fetcher git :url "." :files ("set-modeline-color.el"))
