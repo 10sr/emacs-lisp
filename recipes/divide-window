@@ -1,0 +1,1 @@
+(divide-window :fetcher git :url "." :files ("divide-window.el"))

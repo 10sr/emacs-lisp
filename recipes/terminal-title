@@ -1,0 +1,1 @@
+(terminal-title :fetcher git :url "." :files ("terminal-title.el"))
