@@ -1,0 +1,3 @@
+(recentf-show :fetcher git
+              :url "."
+              :files ("recentf-show.el"))
