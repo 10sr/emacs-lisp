@@ -118,12 +118,14 @@ changing.")
   "List of elements for tmux window name.
 Each element must return string when evaluated.")
 
+;;;###autoload
 (define-minor-mode terminal-title-mode
   "Set terminal title."
   :init-value nil
   :global t
   :lighter "")
 
+;;;###autoload
 (define-minor-mode terminal-title-tmux-window-name-mode
   "Set tmux window name."
   :init-value nil

@@ -44,6 +44,7 @@
   "Default number of windows `divide-window-vertically' and
 `divide-window-horizontally' make.")
 
+;;;###autoload
 (defun divide-window-vertically (arg &optional window)
   "Divide window equally vertically."
   (interactive "p")
@@ -57,6 +58,7 @@
                              (/ height n)
                              nil)))
 
+;;;###autoload
 (defun divide-window-horizontally (arg &optional window)
   "Divide window equally horizontally."
   (interactive "p")

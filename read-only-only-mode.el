@@ -40,6 +40,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (define-minor-mode read-only-only-mode
   "Visit all files with view mode enabled."
   :global t

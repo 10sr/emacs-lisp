@@ -74,6 +74,7 @@
   ;;      0)
   )
 
+;;;###autoload
 (defun recentf-show (&optional files buffer-name)
   "Show simplified list of recently opened files.
 If optional argument FILES is non-nil, it is a list of recently-opened
