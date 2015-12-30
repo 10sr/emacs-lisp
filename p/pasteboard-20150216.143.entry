@@ -1,2 +1,0 @@
-
-(pasteboard . [(20150216 143) nil "Use osx pasteboard for yank and paste" single ((:keywords "utility" "clipboard" "osx") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el"))])

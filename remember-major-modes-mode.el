@@ -57,6 +57,7 @@
 
 ;; TODO: use hash-table: make-hash-tabke, gethash, puthash
 
+;;;###autoload
 (define-minor-mode remember-major-modes-mode
   "Remember major mode for specific file."
   :init-value nil

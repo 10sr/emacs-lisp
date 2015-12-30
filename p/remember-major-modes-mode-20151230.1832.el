@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el
-;; Package-Version: 20150213.49
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: major-mode
@@ -58,6 +58,7 @@
 
 ;; TODO: use hash-table: make-hash-tabke, gethash, puthash
 
+;;;###autoload
 (define-minor-mode remember-major-modes-mode
   "Remember major mode for specific file."
   :init-value nil

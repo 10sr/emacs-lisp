@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20150207.2224
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: terminal title console
@@ -119,12 +119,14 @@ changing.")
   "List of elements for tmux window name.
 Each element must return string when evaluated.")
 
+;;;###autoload
 (define-minor-mode terminal-title-mode
   "Set terminal title."
   :init-value nil
   :global t
   :lighter "")
 
+;;;###autoload
 (define-minor-mode terminal-title-tmux-window-name-mode
   "Set tmux window name."
   :init-value nil

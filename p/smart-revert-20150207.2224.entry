@@ -1,2 +1,0 @@
-
-(smart-revert . [(20150207 2224) nil "Revert buffers wisely" single ((:keywords "buffer" "revert") (:url . "https://github.com/10sr/emacs-lisp"))])

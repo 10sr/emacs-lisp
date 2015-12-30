@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el
-;; Package-Version: 20150207.1710
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
@@ -41,6 +41,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (define-minor-mode read-only-only-mode
   "Visit all files with view mode enabled."
   :global t

@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20150216.143
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ((dired "0"))
 ;; Keywords: dired
@@ -56,6 +56,7 @@
   "Switch for listing dot files.
 Should be \"-a\" or \"-A\". Additional switch can be included.")
 
+;;;###autoload
 (define-minor-mode dired-list-all-mode
   "Toggle whether list dot files in dired.
 When using this mode the value of `dired-listing-switches' should not contain

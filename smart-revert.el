@@ -44,6 +44,7 @@
 
 (declare-function dired-directory-changed-p "dired.el")
 
+;;;###autoload
 (defun smart-revert ()
   "Call `smart-revert-revert' if current buffer is changed since last call."
   (unless (eq smart-revert--last-buffer (current-buffer))
@@ -61,12 +62,14 @@
     (revert-buffer t t)
     (message "%s reverted." (buffer-name))))
 
+;;;###autoload
 (defun smart-revert-on ()
   "Enable `smart-revert'."
   (interactive)
   (add-hook 'post-command-hook ; 'window-configuration-change-hook
             'smart-revert))
 
+;;;###autoload
 (defun smart-revert-off ()
   "Disable `smart-revert'."
   (interactive)

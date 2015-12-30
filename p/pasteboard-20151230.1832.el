@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el
-;; Package-Version: 20150216.143
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility clipboard osx
@@ -55,12 +55,14 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
 (defvar pasteboard-copy-command pasteboard-copy-program
   "Command run to put text.")
 
+;;;###autoload
 (defun turn-on-pasteboard ()
   "Enable pasteboard for yank and paste."
   (interactive)
   (setq interprogram-paste-function 'pasteboard-paste)
   (setq interprogram-cut-function 'pasteboard-cut))
 
+;;;###autoload
 (defun turn-off-pasteboard ()
   "Disable pasteboard for yank and paste."
   (interactive)

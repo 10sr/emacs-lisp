@@ -1,2 +1,0 @@
-
-(dired-list-all-mode . [(20150216 143) ((dired (0))) "Toggle listing dot files in dired" single ((:keywords "dired") (:url . "https://github.com/10sr/emacs-lisp"))])

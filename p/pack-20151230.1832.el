@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/pack.el
-;; Package-Version: 20150216.143
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords:
@@ -75,6 +75,7 @@ PACKING-COMMAND and UNPACKING-COMMAND can be nil if the command is not
 available.  Alist is searched from the beginning so pattern for \".tar.gz\"
 should be ahead of pattern for \".gz\"")
 
+;;;###autoload
 (defun dired-do-pack-or-unpack ()
   "Pack or unpack files in dired.
 If targetting one file and that is archive file defined in `pack-program-alist',
@@ -125,6 +126,7 @@ Otherwise, return FILENAME with `pack-default-extension'"
                    'string-match-p
                    nil)))
 
+;;;###autoload
 (defun pack-unpack (archive)
   "Unpack ARCHIVE. Command for unpacking is defined in `pack-program-alist'"
   (interactive "fArchive to extract: ")
@@ -140,6 +142,7 @@ Otherwise, return FILENAME with `pack-default-extension'"
       (message "Cannot find unpacking command for %s"
                archive))))
 
+;;;###autoload
 (defun pack-pack (archive &rest files)
   "Pack FILES into ARCHIVE.
 If ARCHIVE have extension defined in `pack-program-alist', use that command.

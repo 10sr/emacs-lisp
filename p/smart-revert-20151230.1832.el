@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20150207.2224
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: buffer revert
@@ -45,6 +45,7 @@
 
 (declare-function dired-directory-changed-p "dired.el")
 
+;;;###autoload
 (defun smart-revert ()
   "Call `smart-revert-revert' if current buffer is changed since last call."
   (unless (eq smart-revert--last-buffer (current-buffer))
@@ -62,12 +63,14 @@
     (revert-buffer t t)
     (message "%s reverted." (buffer-name))))
 
+;;;###autoload
 (defun smart-revert-on ()
   "Enable `smart-revert'."
   (interactive)
   (add-hook 'post-command-hook ; 'window-configuration-change-hook
             'smart-revert))
 
+;;;###autoload
 (defun smart-revert-off ()
   "Disable `smart-revert'."
   (interactive)

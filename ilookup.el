@@ -284,11 +284,13 @@ Freeze current input and show next prompt."
     (when (< 1 n)
       (ilookup-delete-backward-char (1- n)))))
 
+;;;###autoload
 (defun ilookup-open ()
   "Open ilookup buffer."
   (interactive)
   (pop-to-buffer (ilookup--get-buffer-create)))
 
+;;;###autoload
 (defun ilookup-open-word (word &optional dict)
   "Open ilookup buffer with WORD input.
 Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
@@ -303,6 +305,7 @@ Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
               ":"))
     (insert word)))
 
+;;;###autoload
 (defun ilookup-open-at-point ()
   "Open ilookup buffer with word at point input."
   (interactive)

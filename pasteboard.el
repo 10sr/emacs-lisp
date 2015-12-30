@@ -54,12 +54,14 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
 (defvar pasteboard-copy-command pasteboard-copy-program
   "Command run to put text.")
 
+;;;###autoload
 (defun turn-on-pasteboard ()
   "Enable pasteboard for yank and paste."
   (interactive)
   (setq interprogram-paste-function 'pasteboard-paste)
   (setq interprogram-cut-function 'pasteboard-cut))
 
+;;;###autoload
 (defun turn-off-pasteboard ()
   "Disable pasteboard for yank and paste."
   (interactive)

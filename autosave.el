@@ -72,6 +72,7 @@ the buffer to save being set as current buffer."
 When new timer is set by `autosave-set',the timer object is added to the top
 of this list.")
 
+;;;###autoload
 (defun autosave-set (secs &optional include exclude function)
   "Register timer so that buffers will be saved automatically.
 This will be done each time when Emacs is idle for SECS.  Autosave is done by

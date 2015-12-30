@@ -1,0 +1,2 @@
+
+(remember-major-modes-mode . [(20151230 1832) nil "Remember major-modes for files" single ((:keywords "major-mode") (:url . "https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el"))])

@@ -55,6 +55,7 @@
   "Switch for listing dot files.
 Should be \"-a\" or \"-A\". Additional switch can be included.")
 
+;;;###autoload
 (define-minor-mode dired-list-all-mode
   "Toggle whether list dot files in dired.
 When using this mode the value of `dired-listing-switches' should not contain

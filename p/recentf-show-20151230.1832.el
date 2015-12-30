@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20150207.1710
+;; Package-Version: 20151230.1832
 ;; Version: 0.1
 ;; Package-Requires: ((recentf "0"))
 ;; Keywords: recentf view show
@@ -75,6 +75,7 @@
   ;;      0)
   )
 
+;;;###autoload
 (defun recentf-show (&optional files buffer-name)
   "Show simplified list of recently opened files.
 If optional argument FILES is non-nil, it is a list of recently-opened
