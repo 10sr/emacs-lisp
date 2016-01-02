@@ -7,6 +7,96 @@
 (require 'dired)
 (require 'cl-lib)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sdic
+
+(when (autoload-eval-lazily 'sdic '(sdic-describe-word-at-point))
+  ;; (define-key my-prefix-map "\C-w" 'sdic-describe-word)
+  (defvar sdic-buffer-name)
+  ;;(define-key my-prefix-map "\C-t" 'sdic-describe-word-at-point-echo)
+  (defun sdic-describe-word-at-point-echo ()
+    ""
+    (interactive)
+    (save-window-excursion
+      (sdic-describe-word-at-point))
+    (with-current-buffer sdic-buffer-name
+      (message (buffer-substring (point-min)
+                                 (progn (goto-char (point-min))
+                                        (or (and (re-search-forward "^\\w"
+                                                                    nil
+                                                                    t
+                                                                    4)
+                                                 (progn (forward-line -1) t)
+                                                 (point-at-eol))
+                                            (point-max)))))))
+
+  (set-variable 'sdic-eiwa-dictionary-list '((sdicf-client "/usr/share/dict/gene.sdic")))
+  (set-variable ' sdic-waei-dictionary-list
+                  '((sdicf-client "/usr/share/dict/jedict.sdic" (add-keys-to-headword t))))
+  (set-variable 'sdic-disable-select-window t)
+  (set-variable ' sdic-window-height 7))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GNU GLOBAL(gtags)
+;; http://uguisu.skr.jp/Windows/gtags.html
+;; http://eigyr.dip.jp/gtags.html
+;; http://cha.la.coocan.jp/doc/gnu_global.html
+
+(let ((d "/opt/local/share/gtags/"))
+  (and (file-directory-p d)
+       (add-to-list 'load-path
+                    d)))
+
+(when (autoload-eval-lazily 'gtags '(gtags-mode)
+        ;; (local-set-key "\M-t" 'gtags-find-tag)
+        ;; (local-set-key "\M-r" 'gtags-find-rtag)
+        ;; (local-set-key "\M-s" 'gtags-find-symbol)
+        ;; (local-set-key "\C-t" 'gtags-pop-stack)
+        (defvar gtags-mode-map)
+        (define-key gtags-mode-map (kbd "C-x t h")
+          'gtags-find-tag-from-here)
+        (define-key gtags-mode-map (kbd "C-x t t") 'gtags-find-tag)
+        (define-key gtags-mode-map (kbd "C-x t r") 'gtags-find-rtag)
+        (define-key gtags-mode-map (kbd "C-x t s") 'gtags-find-symbol)
+        (define-key gtags-mode-map (kbd "C-x t p") 'gtags-find-pattern)
+        (define-key gtags-mode-map (kbd "C-x t f") 'gtags-find-file)
+        (define-key gtags-mode-map (kbd "C-x t b") 'gtags-pop-stack) ;back
+
+        (defvar gtags-select-mode-map)
+        (define-key gtags-select-mode-map (kbd "C-m") 'gtags-select-tag)
+        )
+  (add-hook 'gtags-mode-hook
+            (lambda ()
+              (view-mode 1)
+              (set-variable 'gtags-select-buffer-single t)
+              )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; some modes and hooks
+
+;; (when (require 'ensime nil t)
+;;   (set-variable 'ensime-ac-case-sensitive t)
+;;   (set-variable 'ensime-company-case-sensitive t)
+;;   (add-hook 'scala-mode-hook
+;;             'ensime-scala-mode-hook)
+;;   (add-hook 'ensime-scala-mode-hook
+;;             'ac-stop))
+
+;; (defun my-view-mode-search-word (word)
+;;   "Search for word current directory and subdirectories.
+;; If called intearctively, find word at point."
+;;   (interactive (list (thing-at-point 'symbol)))
+;;   (if word
+;;       (if (and (require 'gtags nil t)
+;;                (gtags-get-rootpath))
+;;           (gtags-goto-tag word "s")
+;;         (my-rgrep word))
+;;     (message "No word at point.")
+;;     nil))
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; gmail
 
@@ -390,6 +480,43 @@ this is test, does not rename files."
 ;;  0.1
 ;;  1
 ;;  'my-set-terminal-header)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Check if given function is a built-in one
+(defun my-real-function-subr-p (function)
+  "Return t if FUNCTION is a built-in function even if it is advised."
+  (let* ((advised (and (symbolp function)
+                       (featurep 'advice)
+                       (ad-get-advice-info function)))
+         (real-function
+          (or (and advised (let ((origname (cdr (assq 'origname advised))))
+                             (and (fboundp origname)
+                                  origname)))
+              function))
+         (def (if (symbolp real-function)
+                  (symbol-function real-function)
+                function)))
+    (subrp def)))
+
+;; (my-real-function-subr-p 'my-real-function-subr-p)
+;; (defadvice read-from-minibuffer (before info-in-prompt activate)
+;;   "Show system info when use `read-from-minibuffer'."
+;;   (ad-set-arg 0
+;;               (concat my-system-info
+;;                       (ad-get-arg 0))))
+
+;; (defadvice read-string (before info-in-prompt activate)
+;;   "Show system info when use `read-string'."
+;;   (ad-set-arg 0
+;;               (concat my-system-info
+;;                       (ad-get-arg 0))))
+
+;; (when (< emacs-major-version 24)
+;;   (defadvice completing-read (before info-in-prompt activate)
+;;     "Show system info when use `completing-read'."
+;;     (ad-set-arg 0
+;;                 (concat my-system-info
+;;                         (ad-get-arg 0)))))
 
 (provide '10sr-extras)
 ;;; 10sr-extras.el ends here
