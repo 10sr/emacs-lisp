@@ -1,5 +1,9 @@
 ;;; 10sr-extras.el --- 10sr extra utilities
 
+;; Author: 10sr <>
+;; Version: 0.0.1
+;; URL: https://github.com/10sr/emacs-lisp/blob/master/10sr-extras.el
+
 ;;; Commentary:
 
 ;;; Code:
