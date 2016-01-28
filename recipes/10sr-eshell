@@ -1,0 +1,1 @@
+(10sr-eshell :fetcher git :url "." :files ("10sr-eshell.el"))
