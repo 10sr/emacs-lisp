@@ -195,6 +195,7 @@
 
 (defun 10sr-load-scim ()
   "Use scim-bridge.el as japanese im."
+  (interactive)
   ;; Load scim-bridge.
   (when (require 'scim-bridge nil t)
     ;; Turn on scim-mode automatically after loading .emacs
@@ -206,6 +207,7 @@
 
 (defun 10sr-load-anthy ()
   "Use anthy.el as japanese im."
+  (interactive)
   ;; anthy
   (when (require 'anthy nil t)
     (global-set-key
@@ -219,6 +221,7 @@
 ;; (setq default-input-method "japanese")
 (defun 10sr-load-mozc-el ()
   "Use mozc.el as japanese im."
+  (interactive)
   (when (require 'mozc nil t)
     (set-variable 'defauit-input-method "japanese-mozc")
     (set-variable 'mozc-leim-title "[MZ]")
