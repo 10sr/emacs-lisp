@@ -211,12 +211,18 @@
   (interactive)
   ;; anthy
   (set-variable 'quail-japanese-use-double-n t)
-  (when (require 'anthy nil t)
-    (global-set-key
-     (kbd "<muhenkan>") (lambda () (interactive) (anthy-mode-off)))
-    (global-set-key (kbd "<henkan>") (lambda () (interactive) (anthy-mode-on)))
-    (when (>= emacs-major-version 23)
-      (set-variable 'anthy-accept-timeout 1))))
+  ;; http://cosmos.ge.ce.nihon-u.ac.jp/diary/20120817.html
+  (unless (boundp 'last-command-char)
+    (define-obsolete-variable-alias 'last-command-char
+      'last-command-event
+      "at least 19.34"))
+  (set-variable 'default-input-method "japanese-anthy")
+  ;; (when (require 'anthy nil t)
+  ;;   (global-set-key
+  ;;    (kbd "<muhenkan>") (lambda () (interactive) (anthy-mode-off)))
+  ;;   (global-set-key (kbd "<henkan>") (lambda () (interactive) (anthy-mode-on))))
+  (when (>= emacs-major-version 23)
+    (set-variable 'anthy-accept-timeout 1)))
 
 ;; quail
 ;; aproposs input-method for some information
