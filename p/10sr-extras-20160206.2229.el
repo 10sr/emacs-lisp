@@ -2,6 +2,7 @@
 
 ;; Author: 10sr <>
 ;; Version: 0.0.1
+;; Package-Version: 20160206.2229
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/10sr-extras.el
 
 ;;; Commentary:
