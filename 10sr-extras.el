@@ -197,6 +197,7 @@
   "Use scim-bridge.el as japanese im."
   (interactive)
   ;; Load scim-bridge.
+  (set-variable 'quail-japanese-use-double-n t)
   (when (require 'scim-bridge nil t)
     ;; Turn on scim-mode automatically after loading .emacs
     (scim-mode-on)
@@ -209,12 +210,19 @@
   "Use anthy.el as japanese im."
   (interactive)
   ;; anthy
-  (when (require 'anthy nil t)
-    (global-set-key
-     (kbd "<muhenkan>") (lambda () (interactive) (anthy-mode-off)))
-    (global-set-key (kbd "<henkan>") (lambda () (interactive) (anthy-mode-on)))
-    (when (>= emacs-major-version 23)
-      (set-variable 'anthy-accept-timeout 1))))
+  (set-variable 'quail-japanese-use-double-n t)
+  ;; http://cosmos.ge.ce.nihon-u.ac.jp/diary/20120817.html
+  (unless (boundp 'last-command-char)
+    (define-obsolete-variable-alias 'last-command-char
+      'last-command-event
+      "at least 19.34"))
+  (set-variable 'default-input-method "japanese-anthy")
+  ;; (when (require 'anthy nil t)
+  ;;   (global-set-key
+  ;;    (kbd "<muhenkan>") (lambda () (interactive) (anthy-mode-off)))
+  ;;   (global-set-key (kbd "<henkan>") (lambda () (interactive) (anthy-mode-on))))
+  (when (>= emacs-major-version 23)
+    (set-variable 'anthy-accept-timeout 1)))
 
 ;; quail
 ;; aproposs input-method for some information
@@ -222,6 +230,7 @@
 (defun 10sr-load-mozc-el ()
   "Use mozc.el as japanese im."
   (interactive)
+  (set-variable 'quail-japanese-use-double-n t)
   (when (require 'mozc nil t)
     (set-variable 'defauit-input-method "japanese-mozc")
     (set-variable 'mozc-leim-title "[MZ]")

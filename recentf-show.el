@@ -87,9 +87,10 @@ use for the buffer. It defaults to \"*recetf-show*\"."
         (progn
           ;; (recentf-save-list)
           (setq recentf-show-window-configuration (current-window-configuration))
-          (pop-to-buffer bf t t)
-          (set-window-text-height (selected-window)
-                                  recentf-show-window-height)
+          ;;(pop-to-buffer bf t t)
+          (display-buffer bf)
+          ;; (set-window-text-height (selected-window)
+          ;;                         recentf-show-window-height)
           (shrink-window-if-larger-than-buffer (selected-window)))
       (message "No recent file!"))))
 

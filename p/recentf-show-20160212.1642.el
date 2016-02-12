@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20151230.1832
+;; Package-Version: 20160212.1642
 ;; Version: 0.1
 ;; Package-Requires: ((recentf "0"))
 ;; Keywords: recentf view show
@@ -88,9 +88,10 @@ use for the buffer. It defaults to \"*recetf-show*\"."
         (progn
           ;; (recentf-save-list)
           (setq recentf-show-window-configuration (current-window-configuration))
-          (pop-to-buffer bf t t)
-          (set-window-text-height (selected-window)
-                                  recentf-show-window-height)
+          ;;(pop-to-buffer bf t t)
+          (display-buffer bf)
+          ;; (set-window-text-height (selected-window)
+          ;;                         recentf-show-window-height)
           (shrink-window-if-larger-than-buffer (selected-window)))
       (message "No recent file!"))))
 
