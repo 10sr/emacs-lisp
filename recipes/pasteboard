@@ -1,1 +1,1 @@
-(pasteboard :fetcher git :url "." :files ("pasteboard.el"))
+(pasteboard :fetcher git :url "." :files ("el/pasteboard.el"))

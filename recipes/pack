@@ -1,1 +1,1 @@
-(pack :fetcher git :url "." :files ("pack.el"))
+(pack :fetcher git :url "." :files ("el/pack.el"))
