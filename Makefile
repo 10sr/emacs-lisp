@@ -6,7 +6,7 @@ all: compile clean
 
 .PHONY: all
 
-el = $(wildcard *.el)
+el = $(wildcard el/*.el)
 elc = $(el:%.el=%.elc)
 project_root := $(PWD)
 
@@ -131,7 +131,7 @@ libs/package-build.el:
 ###############################33
 # Autogen recipe
 
-autogen_recipe_target := $(el:%.el=recipes/%)
+autogen_recipe_target := $(el:el/%.el=recipes/%)
 
 autogen-recipe: $(autogen_recipe_target)
 
