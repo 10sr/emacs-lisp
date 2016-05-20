@@ -1,12 +1,9 @@
-
-
-
 Emacs lisp
 ==========
 10sr
 v0.0.1
 
-[![Build Status](https://travis-ci.org/10sr/emacs-lisp.svg?branch=master)](https://travis-ci.org/10sr/emacs-lisp)
+image:https://travis-ci.org/10sr/emacs-lisp.svg?branch=master["Build Status", link="https://travis-ci.org/10sr/emacs-lisp"]
 
 Some small Emacs lisp libraries.
 
