@@ -76,8 +76,6 @@ gh-pages: archive-all
 
 	cp $(project_root)/.git/index $(private_git_index)
 	$(with_save_index) $(git) reset --mixed HEAD
-	$(RM) -r p && mkdir p
-	-cp packages/* p
 	$(with_save_index) $(git) add p/*
 	treeobj=$$($(with_save_index) $(git) write-tree) && \
 		headrev=$$($(git) rev-parse $(gh_pages_branch)) && \
@@ -105,7 +103,7 @@ $(archives): libs/package-build.el
 	$(emacs) -batch -Q \
 		--load libs/package-build.el \
 		--eval '(setq package-build-working-dir (concat "$(project_root)" "/working/"))' \
-		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/packages/"))' \
+		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/p/"))' \
 		--eval '(setq package-build-recipes-dir (concat "$(project_root)" "/recipes/"))' \
 		--eval '(package-build-archive (quote $@))'
 
@@ -113,7 +111,7 @@ archive-all: archive-clean libs/package-build.el
 	$(emacs) -batch -Q \
 		--load libs/package-build.el \
 		--eval '(setq package-build-working-dir (concat "$(project_root)" "/working/"))' \
-		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/packages/"))' \
+		--eval '(setq package-build-archive-dir (concat "$(project_root)" "/p/"))' \
 		--eval '(setq package-build-recipes-dir (concat "$(project_root)" "/recipes/"))' \
 		--eval '(package-build-all)'
 
