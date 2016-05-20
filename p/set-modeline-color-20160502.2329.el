@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/set-modeline-color.el
-;; Package-Version: 20140125.252
+;; Package-Version: 20160502.2329
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility modeline

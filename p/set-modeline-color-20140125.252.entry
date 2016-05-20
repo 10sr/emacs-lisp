@@ -1,2 +1,0 @@
-
-(set-modeline-color . [(20140125 252) nil "Set mode-line color according to writability state" single ((:keywords "utility" "modeline") (:url . "https://github.com/10sr/emacs-lisp/blob/master/set-modeline-color.el"))])

@@ -216,6 +216,7 @@
     (define-obsolete-variable-alias 'last-command-char
       'last-command-event
       "at least 19.34"))
+  (define-key anthy-mode-map (kbd "SPC") 'self-insert-command)
   (set-variable 'default-input-method "japanese-anthy")
   ;; (when (require 'anthy nil t)
   ;;   (global-set-key

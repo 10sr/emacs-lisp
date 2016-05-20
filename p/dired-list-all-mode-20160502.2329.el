@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20151230.1919
+;; Package-Version: 20160502.2329
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: dired

@@ -1,1 +1,1 @@
-(divide-window :fetcher git :url "." :files ("divide-window.el"))
+(divide-window :fetcher git :url "." :files ("el/divide-window.el"))
