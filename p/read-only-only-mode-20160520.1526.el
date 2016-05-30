@@ -1,11 +1,11 @@
-;;; smart-revert.el --- Revert buffers wisely
+;;; read-only-only-mode.el --- Always view-mode
 
 ;; Author: 10sr <>
-;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160502.2329
+;; URL: https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el
+;; Package-Version: 20160520.1526
 ;; Version: 0.1
 ;; Package-Requires: ()
-;; Keywords: buffer revert
+;; Keywords: utility
 
 ;; This file is not part of GNU Emacs.
 
@@ -36,47 +36,34 @@
 
 ;;; Commentary:
 
-;; Revert buffers wisely..
+;; `read-only-only-mode' is a global minor mode to Visit all files with
+;; view-mode enabled.
 
 ;;; Code:
 
-(defvar smart-revert--last-buffer nil
-  "Last buffer.")
-
-(declare-function dired-directory-changed-p "dired.el")
-
 ;;;###autoload
-(defun smart-revert ()
-  "Call `smart-revert-revert' if current buffer is changed since last call."
-  (unless (eq smart-revert--last-buffer (current-buffer))
-    (setq smart-revert--last-buffer (current-buffer))
-    (smart-revert-revert)))
+(define-minor-mode read-only-only-mode
+  "Visit all files with view mode enabled."
+  :global t
+  :init-value nil
+  :lighter " ROO"
+  (ignore)
+  ;; (if read-only-only-mode
+  ;;     (add-hook 'find-file-hook
+  ;;               'view-mode-enable)
+  ;;   (remove-hook 'find-file-hook
+  ;;                'view-mode-disable))
+  )
 
-(defun smart-revert-revert ()
-  "Revert current buffer when and only when change is found."
-  (interactive)
-  (when (or (and (eq major-mode 'dired-mode)
-                 (dired-directory-changed-p default-directory))
-            (and buffer-file-name
-                 (file-readable-p buffer-file-name)
-                 (not (verify-visited-file-modtime (current-buffer)))))
-    (revert-buffer t t)
-    (message "%s reverted." (buffer-name))))
+(defun read-only-only-set ()
+  "Enable function `view-mode' if `read-only-only-mode' is non-nil."
+  (and buffer-file-name
+       read-only-only-mode
+       (view-mode 1)))
 
-;;;###autoload
-(defun smart-revert-on ()
-  "Enable `smart-revert'."
-  (interactive)
-  (add-hook 'post-command-hook ; 'window-configuration-change-hook
-            'smart-revert))
+(add-hook 'find-file-hook
+          'read-only-only-set)
 
-;;;###autoload
-(defun smart-revert-off ()
-  "Disable `smart-revert'."
-  (interactive)
-  (remove-hook 'post-command-hook
-               'smart-revert))
+(provide 'read-only-only-mode)
 
-(provide 'smart-revert)
-
-;;; smart-revert.el ends here
+;;; read-only-only-mode.el ends here

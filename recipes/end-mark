@@ -1,0 +1,1 @@
+(end-mark :fetcher github :repo "tarao/elisp" :files ("end-mark.el"))
