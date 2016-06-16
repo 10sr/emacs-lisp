@@ -56,7 +56,7 @@ info: $(el)
 .PHONY: gh-pages gh-pages-push
 
 gh_pages_branch := gh-pages
-gh_pages_push_target := git@github.com:10sr/emacs-lisp.git
+gh_pages_push_target := origin
 git_current_branch := $(shell git symbolic-ref --short 2>/dev/null)
 git_current_revision := $(shell $(git) rev-parse HEAD)
 
