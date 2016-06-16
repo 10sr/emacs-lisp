@@ -70,7 +70,7 @@ gh-pages-push: gh-pages
 	$(git) push $(gh_pages_push_target) $(gh_pages_branch)
 
 gh-pages: archive-all
-	$(git) fetch $(gh_paghes_push_target) $(gh_pages_branch)
+	$(git) fetch $(gh_pages_push_target) $(gh_pages_branch)
 	$(git) branch -D $(gh_pages_branch) || true
 	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_push_target)/$(gh_pages_branch)
 
