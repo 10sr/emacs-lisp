@@ -1,0 +1,2 @@
+
+(editorconfig-custom-majormode . [(20160622 1433) ((editorconfig (0 6 0))) "Decide major-mode from EditorConfig" single ((:keywords "editorconfig" "util") (:url . "https://github.com/10sr/editorconfig-custom-major-mode-el"))])

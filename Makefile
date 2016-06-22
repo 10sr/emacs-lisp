@@ -78,7 +78,7 @@ gh-pages: archive-all
 	$(with_save_index) $(git) reset --mixed HEAD
 	$(with_save_index) $(git) add p/*
 	treeobj=$$($(with_save_index) $(git) write-tree) && \
-		headrev=$$($(git) rev-parse $(gh_pages_branch)) && \
+		headrev=$$($(git) rev-parse refs/heads/$(gh_pages_branch)) && \
 		newcommit=$$($(git) commit-tree -p $$headrev -m 'Add packages build from $(git_current_revision)' $$treeobj) && \
 		$(git) update-ref refs/heads/$(gh_pages_branch) $$newcommit $$headrev
 
