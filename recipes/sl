@@ -1,1 +1,1 @@
-(sl :fetcher wiki)
+(sl :fetcher github :repo "emacsmirror/sl")

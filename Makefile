@@ -56,7 +56,7 @@ info: $(el)
 .PHONY: gh-pages gh-pages-push
 
 gh_pages_branch := gh-pages
-gh_pages_push_target := git@github.com:10sr/emacs-lisp.git
+gh_pages_push_target := origin
 git_current_branch := $(shell git symbolic-ref --short 2>/dev/null)
 git_current_revision := $(shell $(git) rev-parse HEAD)
 
@@ -70,15 +70,15 @@ gh-pages-push: gh-pages
 	$(git) push $(gh_pages_push_target) $(gh_pages_branch)
 
 gh-pages: archive-all
-	# Create gh-pages branch
-	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_push_target)/$(gh_pages_branch) || \
-		$(git) branch $(gh_pages_branch) || true
+	$(git) fetch $(gh_pages_push_target) $(gh_pages_branch)
+	$(git) branch -D $(gh_pages_branch) || true
+	$(git) branch $(gh_pages_branch) remotes/$(gh_pages_push_target)/$(gh_pages_branch)
 
 	cp $(project_root)/.git/index $(private_git_index)
 	$(with_save_index) $(git) reset --mixed HEAD
 	$(with_save_index) $(git) add p/*
 	treeobj=$$($(with_save_index) $(git) write-tree) && \
-		headrev=$$($(git) rev-parse $(gh_pages_branch)) && \
+		headrev=$$($(git) rev-parse refs/heads/$(gh_pages_branch)) && \
 		newcommit=$$($(git) commit-tree -p $$headrev -m 'Add packages build from $(git_current_revision)' $$treeobj) && \
 		$(git) update-ref refs/heads/$(gh_pages_branch) $$newcommit $$headrev
 
