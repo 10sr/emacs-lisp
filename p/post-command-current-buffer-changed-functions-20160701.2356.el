@@ -2,6 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/emacs-lisp
+;; Package-Version: 20160701.2356
 ;; Version: 0.0.1
 ;; Keywords: hook utility
 

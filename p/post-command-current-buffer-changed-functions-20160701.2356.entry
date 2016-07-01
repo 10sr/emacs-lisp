@@ -1,0 +1,2 @@
+
+(post-command-current-buffer-changed-functions . [(20160701 2356) nil "Hook for current buffer change" single ((:keywords "hook" "utility") (:url . "https://github.com/10sr/emacs-lisp"))])

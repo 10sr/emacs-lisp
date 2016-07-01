@@ -11,6 +11,92 @@
 (require 'dired)
 (require 'cl-lib)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; download library from web
+
+(defvar fetch-library-enabled-p t
+  "Set nil to skip downloading with `fetch-library'.")
+(defun fetch-library (url &optional byte-compile-p force-download-p)
+  "Download a library from URL and locate it in \"~/emacs.d/lisp/\".
+Return nil if library unfound and failed to download,
+otherwise the path where the library installed.
+If BYTE-COMPILE-P is t byte compile the file after downloading.
+If FORCE-DOWNLOAD-P it t ignore exisiting library and always download.
+
+This function also checks the value of `fetch-library-enabled-p' and do not
+fetch libraries if this value is nil.  In this case all arguments (including
+FORCE-DOWNLOAD-P) will be ignored."
+  (let* ((dir (expand-file-name (concat user-emacs-directory "lisp/")))
+         (lib (file-name-sans-extension (file-name-nondirectory url)))
+         (lpath (concat dir lib ".el"))
+         (locate-p (locate-library lib)))
+    (if (and fetch-library-enabled-p
+             (or force-download-p
+                 (not locate-p)))
+        (if (progn (message "Downloading %s..."
+                            url)
+                   (download-file url
+                                  lpath
+                                  t))
+            (progn (message "Downloading %s...done"
+                            url)
+                   (when (and byte-compile-p
+                              (require 'bytecomp nil t))
+                     (and (file-exists-p (byte-compile-dest-file lpath))
+                          (delete-file (byte-compile-dest-file lpath)))
+                     (message "Byte-compiling %s..."
+                              lpath)
+                     (byte-compile-file lpath)
+                     (message "Byte-compiling %s...done"
+                              lpath)))
+          (progn (and (file-writable-p lpath)
+                      (delete-file lpath))
+                 (message "Downloading %s...failed"
+                          url))))
+    (locate-library lib)))
+
+(defun download-file (url path &optional ok-if-already-exists)
+  "Download file from URL and output to PATH.
+IF OK-IF-ALREADY-EXISTS is true force download."
+  (let ((curl (executable-find "curl"))
+        (wget (executable-find "wget")))
+    (cond (wget
+           (if (and (not ok-if-already-exists)
+                    (file-exists-p path))
+               nil
+             (and (eq 0
+                      (call-process wget
+                                    nil
+                                    nil
+                                    nil
+                                    "-O"
+                                    path
+                                    url
+                                    ))
+                  path)))
+          (curl
+           (if (and (not ok-if-already-exists)
+                    (file-exists-p path))
+               nil
+             (and (eq 0
+                      (call-process curl
+                                    nil
+                                    nil
+                                    nil
+                                    "--output"
+                                    path
+                                    "-L"
+                                    url
+                                    ))
+                  path)))
+          (t
+           (ignore-errors
+             (require 'url)
+             (url-copy-file url
+                            path
+                            ok-if-already-exists)
+             path)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; sdic
 
