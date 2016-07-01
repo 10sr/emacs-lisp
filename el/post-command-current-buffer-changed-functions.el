@@ -1,4 +1,4 @@
-;;; post-command-current-buffer-changed-functions --- Hook run after current buffer changed
+;;; post-command-current-buffer-changed-functions --- Hook for current buffer change
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/emacs-lisp
