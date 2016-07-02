@@ -46,7 +46,7 @@
 ;; (add-hook 'post-command-current-buffer-changed-functions
 ;;           (lambda (prev cur) (message "%S -> %S" prev cur)))
 
-;; then the message like "#<buffer *Messages*> to #<buffer init.el<.emacs.d>>"
+;; then the message like "#<buffer *Messages*> -> #<buffer init.el<.emacs.d>>"
 ;; will be displayed to the echo area each time when you switch the current
 ;; buffer.
 
@@ -55,7 +55,8 @@
 ;;;###autoload
 (defvar post-command-current-buffer-changed-functions
   nil
-  "Hook run when the result of `current-buffer' has been changed.")
+  "A list of functions to be called when the current buffer has been changed.
+Each is passed two arguent, the previous buffer and the current buffer.")
 
 (defvar post-command-current-buffer-changed-functions--last-buffer
   nil
