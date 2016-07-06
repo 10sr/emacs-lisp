@@ -2,9 +2,9 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160520.1526
+;; Package-Version: 20160706.1300
 ;; Version: 0.1
-;; Package-Requires: ()
+;; Package-Requires: ((switch-buffer-functions "0.0.1"))
 ;; Keywords: buffer revert
 
 ;; This file is not part of GNU Emacs.
@@ -36,24 +36,17 @@
 
 ;;; Commentary:
 
-;; Revert buffers wisely..
+;; Revert buffers in a somewhat smart way.
 
 ;;; Code:
-
-(defvar smart-revert--last-buffer nil
-  "Last buffer.")
 
 (declare-function dired-directory-changed-p "dired.el")
 
 ;;;###autoload
-(defun smart-revert ()
-  "Call `smart-revert-revert' if current buffer is changed since last call."
-  (unless (eq smart-revert--last-buffer (current-buffer))
-    (setq smart-revert--last-buffer (current-buffer))
-    (smart-revert-revert)))
+(defun smart-revert (prev cur)
+  "Revert current buffer when and only when change is found.
 
-(defun smart-revert-revert ()
-  "Revert current buffer when and only when change is found."
+PREV and CUR are ignored."
   (interactive)
   (when (or (and (eq major-mode 'dired-mode)
                  (dired-directory-changed-p default-directory))
@@ -67,14 +60,14 @@
 (defun smart-revert-on ()
   "Enable `smart-revert'."
   (interactive)
-  (add-hook 'post-command-hook ; 'window-configuration-change-hook
+  (add-hook 'switch-buffer-functions ; 'window-configuration-change-hook
             'smart-revert))
 
 ;;;###autoload
 (defun smart-revert-off ()
   "Disable `smart-revert'."
   (interactive)
-  (remove-hook 'post-command-hook
+  (remove-hook 'switch-buffer-functions
                'smart-revert))
 
 (provide 'smart-revert)

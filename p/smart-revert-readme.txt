@@ -1,1 +1,1 @@
-Revert buffers wisely..
+Revert buffers in a somewhat smart way.
