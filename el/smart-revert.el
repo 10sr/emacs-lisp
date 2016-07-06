@@ -39,6 +39,8 @@
 
 ;;; Code:
 
+(require 'switch-buffer-functions)
+
 (declare-function dired-directory-changed-p "dired.el")
 
 ;;;###autoload
