@@ -1,3 +1,0 @@
-(post-command-current-buffer-changed-functions :fetcher git
-                                               :url "."
-                                               :files ("el/post-command-current-buffer-changed-functions.el"))
