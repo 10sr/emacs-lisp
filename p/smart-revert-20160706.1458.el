@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160706.1300
+;; Package-Version: 20160706.1458
 ;; Version: 0.1
 ;; Package-Requires: ((switch-buffer-functions "0.0.1"))
 ;; Keywords: buffer revert
@@ -39,6 +39,8 @@
 ;; Revert buffers in a somewhat smart way.
 
 ;;; Code:
+
+(require 'switch-buffer-functions)
 
 (declare-function dired-directory-changed-p "dired.el")
 
