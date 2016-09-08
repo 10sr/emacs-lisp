@@ -121,7 +121,7 @@ archive-clean:
 
 libs/package-build.el:
 	mkdir -p libs
-	curl -sSL https://github.com/milkypostman/melpa/raw/master/package-build.el \
+	curl -sSL https://github.com/melpa/package-build/raw/master/package-build.el \
 		>libs/package-build.el
 
 
