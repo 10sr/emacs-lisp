@@ -23,7 +23,7 @@ To enable this repository, add lines to your init file:
 
 
 Update
-~~~~~~~~
+~~~~~~
 
 Issue
 
