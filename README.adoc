@@ -18,27 +18,15 @@ To enable this repository, add lines to your init file:
 ----
 (setq package-archives
       `(,@package-archives
-        ("10sr-el" . "http://10sr.github.io/emacs-lisp/p/")))
+        ("10sr-el" . "http://10sr.github.io/emacs-lisp/elpa/")))
 ----
 
 
-Updating
+Update
 ~~~~~~~~
 
 Issue
 
 ----
-make gh-pages
+make elpa
 ----
-
-to build packages from current el files and commit them to `gh-pages` branch.
-This command does not need the work tree be clean, but it is highly recommended.
-
-
-If you want only to build packages without committing them to `gh-pages`, issue:
-
-----
-make archive-all
-----
-
-This puts built packages into `packages/` directory.

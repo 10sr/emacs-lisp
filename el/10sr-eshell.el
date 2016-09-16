@@ -8,6 +8,8 @@
 
 ;;; Code:
 
+hoge
+
 (require 'eshell)
 (require 'em-hist)
 
