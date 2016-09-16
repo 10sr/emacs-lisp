@@ -2,3 +2,5 @@
 libs/
 working/
 packages/
+.cask/
+github-elpa-working/
