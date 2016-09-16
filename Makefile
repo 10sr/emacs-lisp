@@ -46,3 +46,10 @@ info: $(el)
 		--eval "(require 'package)" \
 		--eval "$(elisp_print_infos)" \
 		$^
+
+
+elpa:
+	cask exec github-elpa update
+
+cask-install:
+	cask install
