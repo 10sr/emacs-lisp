@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160706.1458
+;; Package-Version: 20160923.104
 ;; Version: 0.1
 ;; Package-Requires: ((switch-buffer-functions "0.0.1"))
 ;; Keywords: buffer revert
