@@ -49,7 +49,7 @@ info: $(el)
 
 
 elpa:
-	cask exec github-elpa update
+	CASK_EMACS=$(emacs) cask exec github-elpa update
 
 cask-install:
-	cask install
+	CASK_EMACS=$(emacs) cask install
