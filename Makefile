@@ -55,7 +55,7 @@ elpa:
 
 ##############################
 
-cask_install_path := $(project_root)/cask
+cask_install_path := $(project_root)/cask-repository
 cask_repository := https://github.com/cask/cask.git
 cask_version := v0.8.0
 
