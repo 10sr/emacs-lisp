@@ -1,2 +1,2 @@
 
-(sl . [(20160730 1301) ((emacs (24)) (cl-lib (0 5))) "Clone of sl(1)" single ((:url . "https://github.com/xuchunyang/sl.el"))])
+(sl . [(20160730 1301) ((emacs (24)) (cl-lib (0 5))) "Clone of sl(1)" single ((:authors ("Chunyang Xu" . "xuchunyang.me@gmail.com")) (:maintainer "Chunyang Xu" . "xuchunyang.me@gmail.com") (:url . "https://github.com/xuchunyang/sl.el"))])
