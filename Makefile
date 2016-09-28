@@ -1,5 +1,6 @@
 emacs ?= emacs
-casked_emacs := cask exec $(emacs)
+cask ?= CASK_EMACS=$(emacs) cask
+casked_emacs := $(cask) emacs
 git ?= git
 markdown ?= markdown
 
@@ -26,7 +27,7 @@ test: compile info
 compile: $(elc)
 
 $(elc): %.elc: %.el
-	$(emacs) -batch -Q -f batch-byte-compile $<
+	$(casked_emacs) -batch -Q -f batch-byte-compile $<
 
 
 elisp_get_file_package_info := \
@@ -43,14 +44,14 @@ elisp_print_infos := \
 		command-line-args-left)
 
 info: $(el)
-	$(emacs) -batch -Q \
+	$(casked_emacs) -batch -Q \
 		--eval "(require 'package)" \
 		--eval "$(elisp_print_infos)" \
 		$^
 
 
 elpa:
-	CASK_EMACS=$(emacs) cask exec github-elpa update
+	$(cask) exec github-elpa update
 
 
 ##############################
@@ -65,4 +66,4 @@ install-cask:
 
 
 cask-install:
-	CASK_EMACS=$(emacs) cask install
+	$(cask) install
