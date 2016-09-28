@@ -1,9 +1,8 @@
 ;;; dired-list-all-mode.el --- Toggle listing dot files in dired
 
-;; Author: 10sr <>
+;; Author: 10sr <8slashes+el@gmail.com>
 ;; URL: https://github.com/10sr/emacs-lisp
 ;; Version: 0.1
-;; Package-Requires: ()
 ;; Keywords: dired
 
 ;; This file is not part of GNU Emacs.
@@ -82,6 +81,7 @@ When using this mode the value of `dired-listing-switches' should not contain
                                     ""
                                     dired-actual-switches))))
 
+;;;###autoload
 (add-hook 'dired-mode-hook
           'dired-list-all-set)
 
