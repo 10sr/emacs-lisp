@@ -61,9 +61,7 @@ cask_version := v0.8.0
 
 install-cask:
 	test -d $(cask_install_path) || $(git) clone $(cask_repository) $(cask_install_path)
-	cd $(cask_install_path)
-	$(git) checkout -f $(cask_version)
-	$(git) clean -xdf
+	cd $(cask_install_path) && $(git) checkout -f $(cask_version) && $(git) clean -xdf
 
 
 cask-install:
