@@ -1,4 +1,5 @@
 emacs ?= emacs
+casked_emacs := cask exec $(emacs)
 git ?= git
 markdown ?= markdown
 
@@ -50,6 +51,20 @@ info: $(el)
 
 elpa:
 	CASK_EMACS=$(emacs) cask exec github-elpa update
+
+
+##############################
+
+cask_install_path := $(project_root)/cask
+cask_repository := https://github.com/cask/cask.git
+cask_version := v0.8.0
+
+install-cask:
+	test -d $(cask_install_path) || $(git) clone $(cask_repository) $(cask_install_path)
+	cd $(cask_install_path)
+	$(git) checkout -f $(cask_version)
+	$(git) clean -xdf
+
 
 cask-install:
 	CASK_EMACS=$(emacs) cask install
