@@ -1,0 +1,1 @@
+(hjson-mode :fetcher github :repo "xuchunyang/hjson-mode")
