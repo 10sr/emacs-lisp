@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el@gmail.com>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160928.1300
+;; Package-Version: 20161115.118
 ;; Version: 0.1
 ;; Keywords: dired
 
@@ -67,6 +67,7 @@ When using this mode the value of `dired-listing-switches' should not contain
     (dired-list-all-set)
     (revert-buffer)))
 
+;;;###autoload
 (defun dired-list-all-set ()
   "Update `dired-actual-switches'."
   (if dired-list-all-mode
