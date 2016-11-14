@@ -66,6 +66,7 @@ When using this mode the value of `dired-listing-switches' should not contain
     (dired-list-all-set)
     (revert-buffer)))
 
+;;;###autoload
 (defun dired-list-all-set ()
   "Update `dired-actual-switches'."
   (if dired-list-all-mode
