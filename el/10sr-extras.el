@@ -432,6 +432,82 @@ Optional prefix ARG says how many lines to unflag; default is one line."
   (message "Opening %s...done" file))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; term mode
+
+;; (setq multi-term-program shell-file-name)
+(when (autoload-eval-lazily 'multi-term)
+  (set-variable 'multi-term-switch-after-close nil)
+  (set-variable 'multi-term-dedicated-select-after-open-p t)
+  (set-variable 'multi-term-dedicated-window-height 20))
+
+(when (autoload-eval-lazily 'term '(term ansi-term)
+        (defvar term-raw-map (make-sparse-keymap))
+        ;; (define-key term-raw-map "\C-xl" 'term-line-mode)
+        ;; (define-key term-mode-map "\C-xc" 'term-char-mode)
+        (define-key term-raw-map (kbd "<up>") 'scroll-down-line)
+        (define-key term-raw-map (kbd "<down>") 'scroll-up-line)
+        (define-key term-raw-map (kbd "<right>") 'scroll-up)
+        (define-key term-raw-map (kbd "<left>") 'scroll-down)
+        (define-key term-raw-map (kbd "C-p") 'term-send-raw)
+        (define-key term-raw-map (kbd "C-n") 'term-send-raw)
+        (define-key term-raw-map "q" 'my-term-quit-or-send-raw)
+        ;; (define-key term-raw-map (kbd "ESC") 'term-send-raw)
+        (define-key term-raw-map [delete] 'term-send-raw)
+        (define-key term-raw-map (kbd "DEL") 'term-send-backspace)
+        (define-key term-raw-map "\C-y" 'term-paste)
+        (define-key term-raw-map
+          "\C-c" 'term-send-raw) ;; 'term-interrupt-subjob)
+        '(define-key term-mode-map (kbd "C-x C-q") 'term-pager-toggle)
+        ;; (dolist (key '("<up>" "<down>" "<right>" "<left>"))
+        ;;   (define-key term-raw-map (read-kbd-macro key) 'term-send-raw))
+        ;; (define-key term-raw-map "\C-d" 'delete-char)
+        ;; (define-key term-raw-map "\C-q" 'move-beginning-of-line)
+        ;; (define-key term-raw-map "\C-r" 'term-send-raw)
+        ;; (define-key term-raw-map "\C-s" 'term-send-raw)
+        ;; (define-key term-raw-map "\C-f" 'forward-char)
+        ;; (define-key term-raw-map "\C-b" 'backward-char)
+        ;; (define-key term-raw-map "\C-t" 'set-mark-command)
+        )
+  (defun my-term-quit-or-send-raw ()
+    ""
+    (interactive)
+    (if (get-buffer-process (current-buffer))
+        (call-interactively 'term-send-raw)
+      (kill-buffer)))
+
+  ;; http://d.hatena.ne.jp/goinger/20100416/1271399150
+  ;; (setq term-ansi-default-program shell-file-name)
+  (add-hook 'term-setup-hook
+            (lambda ()
+              (set-variable 'term-display-table (make-display-table))))
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (defvar term-raw-map (make-sparse-keymap))
+              ;; (unless (memq (current-buffer)
+              ;;               (and (featurep 'multi-term)
+              ;;                    (defvar multi-term-buffer-list)
+              ;;                    ;; current buffer is not multi-term buffer
+              ;;                    multi-term-buffer-list))
+              ;;   )
+              (set (make-local-variable 'scroll-margin) 0)
+              ;; (set (make-local-variable 'cua-enable-cua-keys) nil)
+              ;; (cua-mode 0)
+              ;; (and cua-mode
+              ;;      (local-unset-key (kbd "C-c")))
+              ;; (define-key cua--prefix-override-keymap
+              ;;"\C-c" 'term-interrupt-subjob)
+              (set (make-local-variable (defvar hl-line-range-function))
+                   (lambda ()
+                     '(0 . 0)))
+              (define-key term-raw-map
+                "\C-x" (lookup-key (current-global-map) "\C-x"))
+              (define-key term-raw-map
+                "\C-z" (lookup-key (current-global-map) "\C-z"))
+              ))
+  ;; (add-hook 'term-exec-hook 'forward-char)
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
