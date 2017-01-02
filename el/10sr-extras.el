@@ -614,6 +614,38 @@ If ARG is given or called with prefix argument, create new buffer."
         (cons '("\.gaucherc\\'" . gauche-mode) auto-mode-alist))
   )
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; python
+
+(when (autoload-eval-lazily 'python '(python-mode)
+        (defvar python-mode-map (make-sparse-keymap))
+        (define-key python-mode-map (kbd "C-c C-e") 'my-python-run-as-command)
+        (define-key python-mode-map (kbd "C-c C-b") 'my-python-display-python-buffer)
+        (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+
+        (defvar inferior-python-mode-map (make-sparse-keymap))
+        (define-key inferior-python-mode-map (kbd "<up>") 'comint-previous-input)
+        (define-key inferior-python-mode-map (kbd "<down>") 'comint-next-input)
+        )
+  (set-variable 'python-python-command (or (executable-find "python3")
+                                           (executable-find "python")))
+  ;; (defun my-python-run-as-command ()
+  ;;   ""
+  ;;   (interactive)
+  ;;   (shell-command (concat python-python-command " " buffer-file-name)))
+  (defun my-python-display-python-buffer ()
+    ""
+    (interactive)
+    (defvar python-buffer nil)
+    (set-window-text-height (display-buffer python-buffer
+                                            t)
+                            7))
+  (add-hook 'inferior-python-mode-hook
+            (lambda ()
+              (my-python-display-python-buffer))))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
