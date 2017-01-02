@@ -545,6 +545,75 @@ If ARG is given or called with prefix argument, create new buffer."
 (define-key ctl-x-map "i" 'my-term)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; gauche-mode
+;; http://d.hatena.ne.jp/kobapan/20090305/1236261804
+;; http://www.katch.ne.jp/~leque/software/repos/gauche-mode/gauche-mode.el
+
+;; NOTE: This gauche-mode returns 404.
+;; There is another gosh-mode, so for now I submitted a recipe for that into
+;; github.com/10sr/emacs-lisp/p.  I'll add setup for that later.
+
+(when nil (and '(fetch-library
+            "http://www.katch.ne.jp/~leque/software/repos/gauche-mode/gauche-mode.el"
+            t)
+           (autoload-eval-lazily 'gauche-mode '(gauche-mode run-scheme)
+             (defvar gauche-mode-map (make-sparse-keymap))
+             (defvar scheme-mode-map (make-sparse-keymap))
+             (define-key gauche-mode-map
+               (kbd "C-c C-z") 'run-gauche-other-window)
+             (define-key scheme-mode-map
+               (kbd "C-c C-c") 'scheme-send-buffer)
+             (define-key scheme-mode-map
+               (kbd "C-c C-b") 'my-scheme-display-scheme-buffer)))
+  (let ((s (executable-find "gosh")))
+    (set-variable 'scheme-program-name s)
+    (set-variable 'gauche-program-name s))
+
+  (defvar gauche-program-name nil)
+  (defvar scheme-buffer nil)
+
+  (defun run-gauche-other-window ()
+    "Run gauche on other window"
+    (interactive)
+    (switch-to-buffer-other-window
+     (get-buffer-create "*scheme*"))
+    (run-gauche))
+
+  (defun run-gauche ()
+    "run gauche"
+    (interactive)
+    (run-scheme gauche-program-name)
+    )
+
+  (defun scheme-send-buffer ()
+    ""
+    (interactive)
+    (scheme-send-region (point-min) (point-max))
+    (my-scheme-display-scheme-buffer)
+    )
+
+  (defun my-scheme-display-scheme-buffer ()
+    ""
+    (interactive)
+    (set-window-text-height (display-buffer scheme-buffer
+                                            t)
+                            7))
+
+  (add-hook 'scheme-mode-hook
+            (lambda ()
+              nil))
+
+  (add-hook 'inferior-scheme-mode-hook
+            (lambda ()
+              ;; (my-scheme-display-scheme-buffer)
+              ))
+  (setq auto-mode-alist
+        (cons '("\.gosh\\'" . gauche-mode) auto-mode-alist))
+  (setq auto-mode-alist
+        (cons '("\.gaucherc\\'" . gauche-mode) auto-mode-alist))
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
