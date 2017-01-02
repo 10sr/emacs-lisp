@@ -508,6 +508,43 @@ Optional prefix ARG says how many lines to unflag; default is one line."
   ;; (add-hook 'term-exec-hook 'forward-char)
   )
 
+;; my-term
+
+(defvar my-term nil
+  "My terminal buffer.")
+(defvar my-term-function nil
+  "Function to create terminal buffer.
+This function accept no argument and return newly created buffer of terminal.")
+
+(defun my-term (&optional arg)
+  "Open terminal buffer and return that buffer.
+
+If ARG is given or called with prefix argument, create new buffer."
+  (interactive "P")
+  (if (and (not arg)
+           my-term
+           (buffer-name my-term))
+      (pop-to-buffer my-term)
+    (setq my-term
+          (save-window-excursion
+            (funcall my-term-function)))
+    (and my-term
+         (my-term))))
+
+
+;; (setq my-term-function
+;;       (lambda ()
+;;         (if (eq system-type 'windows-nt)
+;;             (eshell)
+;;           (if (require 'multi-term nil t)
+;;               (multi-term)
+;;             (ansi-term shell-file-name)))))
+
+(setq my-term-function (lambda () (eshell t)))
+;;(define-key my-prefix-map (kbd "C-s") 'my-term)
+(define-key ctl-x-map "i" 'my-term)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
