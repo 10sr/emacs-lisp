@@ -53,7 +53,7 @@
   "Path to 7z program.")
 
 (defvar pack-buffer-name "*Pack*"
-  "Buffer name for `pack'")
+  "Buffer name for `pack'.")
 
 (defvar pack-default-extension
   "7z"
@@ -117,8 +117,10 @@ Otherwise, return FILENAME with `pack-default-extension'"
     (concat filename "." pack-default-extension)))
 
 (defun pack-file-name-association (filename)
-  "If the pattern matching FILENAME is found at car of the list in
-`pack-program-alist', return cdr of that list. Otherwise, return nil."
+  "Return commands to pack and unpack FILENAME archive file.
+
+If the pattern matching FILENAME is found at car of the list in
+`pack-program-alist', return cdr of that list.  Otherwise, return nil."
   (let ((case-fold-search nil))
     (assoc-default filename
                    pack-program-alist
@@ -127,7 +129,7 @@ Otherwise, return FILENAME with `pack-default-extension'"
 
 ;;;###autoload
 (defun pack-unpack (archive)
-  "Unpack ARCHIVE. Command for unpacking is defined in `pack-program-alist'"
+  "Unpack ARCHIVE.  Command for unpacking is defined in `pack-program-alist'."
   (interactive "fArchive to extract: ")
   (let* ((earchive (expand-file-name archive))
          (cmd (nth 1
@@ -143,7 +145,7 @@ Otherwise, return FILENAME with `pack-default-extension'"
 
 ;;;###autoload
 (defun pack-pack (archive &rest files)
-  "Pack FILES into ARCHIVE.
+  "Make ARCHIVE from FILES.
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
   (let* ((archive-ext (pack-file-extension (expand-file-name archive)))
