@@ -36,7 +36,7 @@
 ;;; Commentary:
 
 ;; pack.el provides 3 functions: `pack-pack', `pack-unpack' and
-;; `dired-do-pack-or-unpack'.
+;; `pack-dired-dwim'.
 
 ;;; Code:
 
@@ -46,40 +46,37 @@
 (declare-function dired-dwim-target-directory "dired-aux")
 (declare-function dired-get-marked-files "dired")
 
-(defvar 7z-program-name
-  (or (executable-find "7z")
-      (executable-find "7za")
-      (executable-find "7zr"))
-  "Path to 7z program.")
-
 (defvar pack-buffer-name "*Pack*"
   "Buffer name for `pack'.")
 
 (defvar pack-default-extension
   "7z"
   "Default suffix for packing.
-Filename with this suffix must matches one of `pack-program-alist'.")
+Filename with this suffix must matches one of the cars in
+`pack-program-alist'.")
 
 (defvar pack-program-alist
   `(
-    ("\\.7z\\'" ,(concat 7z-program-name " a") ,(concat 7z-program-name " x"))
+    ("\\.7z\\'" "7z a" "7z x")
     ("\\.zip\\'" "zip -r" "unzip")
     ("\\.tar\\'" "tar cf" "tar xf")
     ("\\.tgz\\'" "tar czf" "tar xzf")
     ("\\.tar\\.gz\\'" "tar czf" "tar xzf")
     )
-  "Alist of filename patterns, command for pack and unpack.
+  "Alist of filename patterns, and command for pack and unpack.
+
 Each element looks like (REGEXP PACKING-COMMAND UNPACKING-COMMAND).
 PACKING-COMMAND and UNPACKING-COMMAND can be nil if the command is not
 available.  Alist is searched from the beginning so pattern for \".tar.gz\"
 should be ahead of pattern for \".gz\"")
 
 ;;;###autoload
-(defun dired-do-pack-or-unpack ()
+(defun pack-dired-dwim ()
   "Pack or unpack files in dired.
-If targetting one file and that is archive file defined in `pack-program-alist',
-unpack that.
-Otherwise, pack marked files, prompting user to decide filename for archive."
+
+If targetting one file and that has a archive suffix defined in
+`pack-program-alist', unpack that.
+Otherwise, pack marked files, prompting user to decide archive filename."
   (interactive)
   (let* ((infiles (dired-get-marked-files t))
          (onefile (and (eq 1 ; filename if only one file targeted, otherwise nil
@@ -129,7 +126,9 @@ If the pattern matching FILENAME is found at car of the list in
 
 ;;;###autoload
 (defun pack-unpack (archive)
-  "Unpack ARCHIVE.  Command for unpacking is defined in `pack-program-alist'."
+  "Unpack ARCHIVE.
+
+Command for unpacking is defined in `pack-program-alist'."
   (interactive "fArchive to extract: ")
   (let* ((earchive (expand-file-name archive))
          (cmd (nth 1
@@ -146,6 +145,7 @@ If the pattern matching FILENAME is found at car of the list in
 ;;;###autoload
 (defun pack-pack (archive &rest files)
   "Make ARCHIVE from FILES.
+
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
   (let* ((archive-ext (pack-file-extension (expand-file-name archive)))
