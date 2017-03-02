@@ -1,0 +1,2 @@
+
+(sl . [(20161217 2304) ((cl-lib (0 5))) "An Emacs clone of sl(1)" single ((:authors ("Chunyang Xu" . "mail@xuchunyang.me")) (:maintainer "Chunyang Xu" . "mail@xuchunyang.me") (:url . "https://github.com/xuchunyang/sl.el"))])
