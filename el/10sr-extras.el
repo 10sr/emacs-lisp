@@ -649,6 +649,51 @@ If ARG is given or called with prefix argument, create new buffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc
 
+;; ;; current directory
+;; (let ((ls (member 'mode-line-buffer-identification
+;;                   mode-line-format)))
+;;   (setcdr ls
+;;           (cons '(:eval (concat " ("
+;;                                 (abbreviate-file-name default-directory)
+;;                                 ")"))
+;;                 (cdr ls))))
+
+;; ;; display last modified time
+;; (let ((ls (member 'mode-line-buffer-identification
+;;                   mode-line-format)))
+;;   (setcdr ls
+;;           (cons '(:eval (concat " "
+;;                                 my-buffer-file-last-modified-time))
+;;                 (cdr ls))))
+
+;; display date
+
+(when (safe-require-or-eval 'time)
+  (setq display-time-interval 29)
+  (setq display-time-day-and-date t)
+  ;; (if window-system
+  ;;     (display-time-mode 0)
+  ;;   (display-time-mode 1))
+  (when display-time-mode
+    (display-time-update)))
+
+(defun buffer-list-not-start-with-space ()
+  "Return a list of buffers that not start with whitespaces."
+  (let ((bl (buffer-list))
+        b nbl)
+    (while bl
+      (setq b (pop bl))
+      (unless (string-equal " "
+                            (substring (buffer-name b)
+                                       0
+                                       1))
+        (add-to-list 'nbl b)))
+    nbl))
+
+;; http://www.masteringemacs.org/articles/2012/09/10/hiding-replacing-modeline-strings/
+;; (add-to-list 'minor-mode-alist
+;;              '(global-whitespace-mode ""))
+
 (defun my-git-apply-index-from-buffer (&optional buf)
   "Git apply buffer.  BUF is buffer to apply.  nil to use current buffer."
   (interactive)
