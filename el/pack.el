@@ -153,7 +153,7 @@ Command for unpacking is defined in `pack-program-alist'."
                                " "
                                (shell-quote-argument earchive))
                        (get-buffer-create pack-buffer-name))
-      (message "Cannot find unpacking command for %s"
+      (error "Cannot find unpacking command for %s"
                archive))))
 
 (defun pack-pack (archive &rest files)
@@ -171,7 +171,7 @@ Otherwise, use `pack-default-extension' for pack."
                                                 files
                                                 " "))
                              (get-buffer-create pack-buffer-name))
-      (message "Invalid extension for packing: %s"
+      (error "Invalid extension for packing: %s"
                archive))))
 
 (provide 'pack)
