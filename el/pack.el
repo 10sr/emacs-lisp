@@ -83,7 +83,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
                            (length infiles))
                        (car infiles))))
     (if (and onefile
-             (pack-file-name-association onefile))
+             (pack--get-commands-for onefile))
         (when (y-or-n-p (format "Unpack %s? " onefile))
           (pack-unpack onefile))
       (let* ((dir-default (if (require 'dired-aux nil t)
@@ -109,11 +109,11 @@ Otherwise, pack marked files, prompting user to decide archive filename."
 (defun pack--ensure-archive-extension (filename)
   "If FILENAME has extension and it can be used for pack, return FILENAME.
 Otherwise, return FILENAME with `pack-default-extension'"
-  (if (pack-file-name-association filename)
+  (if (pack--get-commands-for filename)
       filename
     (concat filename "." pack-default-extension)))
 
-(defun pack-file-name-association (filename)
+(defun pack--get-commands-for (filename)
   "Return commands to pack and unpack FILENAME archive file.
 
 If the pattern matching FILENAME is found at car of the list in
@@ -132,7 +132,7 @@ Command for unpacking is defined in `pack-program-alist'."
   (interactive "fArchive to extract: ")
   (let* ((earchive (expand-file-name archive))
          (cmd (nth 1
-                   (pack-file-name-association earchive)))
+                   (pack--get-commands-for earchive)))
          )
     (if cmd
         (async-shell-command (concat cmd
@@ -149,7 +149,7 @@ Command for unpacking is defined in `pack-program-alist'."
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
   (let* ((archive-ext (pack--ensure-archive-extension (expand-file-name archive)))
-         (cmd (car (pack-file-name-association archive-ext)))
+         (cmd (car (pack--get-commands-for archive-ext)))
          )
     (if cmd
         (async-shell-command (concat cmd
