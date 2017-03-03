@@ -71,17 +71,16 @@ available.  Alist is searched from the beginning so pattern for \".tar.gz\"
 should be ahead of pattern for \".gz\"")
 
 ;;;###autoload
-(defun pack-dired-dwim ()
-  "Pack or unpack files in dired.
+(defun pack-dired-dwim (&rest files)
+  "Pack or unpack FILES in dired.
 
 If targetting one file and that has a archive suffix defined in
 `pack-program-alist', unpack that.
 Otherwise, pack marked files, prompting user to decide archive filename."
-  (interactive)
-  (let* ((infiles (dired-get-marked-files t))
-         (onefile (and (eq 1 ; filename if only one file targeted, otherwise nil
-                           (length infiles))
-                       (car infiles))))
+  (interactive (dired-get-marked-files t))
+  (let ((onefile (and (eq 1 ; filename if only one file targeted, otherwise nil
+                          (length files))
+                      (car files))))
     (if (and onefile
              (pack--get-commands-for onefile))
         (when (y-or-n-p (format "Unpack %s? " onefile))
@@ -90,7 +89,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
                               (dired-dwim-target-directory)
                             default-directory))
              (archive-default (pack--ensure-archive-extension (file-name-nondirectory
-                                                    (car infiles))))
+                                                    (car files))))
              (archive ;; (if (interactive-p)
               (read-file-name "Archive file name: "
                               dir-default
@@ -101,7 +100,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
               ))
         (apply 'pack-pack
                archive
-               infiles))))
+               files))))
   (revert-buffer)
   ;; (dired-unmark-all-marks)
   )
