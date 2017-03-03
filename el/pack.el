@@ -78,12 +78,10 @@ If targetting one file and that has a archive suffix defined in
 `pack-program-alist', unpack that.
 Otherwise, pack marked files, prompting user to decide archive filename."
   (interactive (dired-get-marked-files t))
-  (let ((onefile (and (eq 1 ; filename if only one file targeted, otherwise nil
-                          (length files))
-                      (car files))))
-    (if (and onefile
-             (pack--get-commands-for onefile))
-        (pack-dired-do-unpack onefile)
+  (let ((firstfile (car files)))
+    (if (and (eq 1 (length files))
+             (pack--get-commands-for firstfile))
+        (pack-dired-do-unpack firstfile)
       (pack-dired-do-pack files))))
 
 ;;;###autoload
