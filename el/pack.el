@@ -89,7 +89,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
       (let* ((dir-default (if (require 'dired-aux nil t)
                               (dired-dwim-target-directory)
                             default-directory))
-             (archive-default (pack-file-extension (file-name-nondirectory
+             (archive-default (pack--ensure-archive-extension (file-name-nondirectory
                                                     (car infiles))))
              (archive ;; (if (interactive-p)
               (read-file-name "Archive file name: "
@@ -106,7 +106,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
   ;; (dired-unmark-all-marks)
   )
 
-(defun pack-file-extension (filename)
+(defun pack--ensure-archive-extension (filename)
   "If FILENAME has extension and it can be used for pack, return FILENAME.
 Otherwise, return FILENAME with `pack-default-extension'"
   (if (pack-file-name-association filename)
@@ -148,7 +148,7 @@ Command for unpacking is defined in `pack-program-alist'."
 
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
-  (let* ((archive-ext (pack-file-extension (expand-file-name archive)))
+  (let* ((archive-ext (pack--ensure-archive-extension (expand-file-name archive)))
          (cmd (car (pack-file-name-association archive-ext)))
          )
     (if cmd
