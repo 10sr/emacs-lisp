@@ -49,9 +49,9 @@
 (defvar pack-buffer-name "*Pack*"
   "Buffer name for `pack'.")
 
-(defvar pack-default-extension
-  "7z"
-  "Default suffix for packing.
+(defvar pack-dired-default-extension
+  ".7z"
+  "Default suffix for pack-dired functions.
 Filename with this suffix must matches one of the cars in
 `pack-program-alist'.")
 
@@ -105,7 +105,7 @@ Prompt user to input output archive file name."
                           (dired-dwim-target-directory)
                         default-directory))
          (archive-default (concat (file-name-nondirectory (car files))
-                                  pack-default-extension))
+                                  pack-dired-default-extension))
          (archive ;; (if (interactive-p)
           (read-file-name "Archive file name: "
                           dir-default
@@ -125,7 +125,7 @@ Prompt user to input output archive file name."
 Otherwise, return FILENAME with `pack-default-extension'"
   (if (pack--get-commands-for filename)
       filename
-    (concat filename "." pack-default-extension)))
+    (concat filename pack-dired-default-extension)))
 
 (defun pack--get-commands-for (filename)
   "Return commands to pack and unpack FILENAME archive file.
