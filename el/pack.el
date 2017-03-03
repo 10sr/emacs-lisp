@@ -83,28 +83,45 @@ Otherwise, pack marked files, prompting user to decide archive filename."
                       (car files))))
     (if (and onefile
              (pack--get-commands-for onefile))
-        (when (y-or-n-p (format "Unpack %s? " onefile))
-          (pack-unpack onefile))
-      (let* ((dir-default (if (require 'dired-aux nil t)
-                              (dired-dwim-target-directory)
-                            default-directory))
-             (archive-default (pack--ensure-archive-extension (file-name-nondirectory
-                                                    (car files))))
-             (archive ;; (if (interactive-p)
-              (read-file-name "Archive file name: "
-                              dir-default
-                              nil
-                              nil
-                              archive-default)
-              ;; (concat dir-default archive-default)
-              ))
-        (apply 'pack-pack
-               archive
-               files))))
-  (revert-buffer)
-  ;; (dired-unmark-all-marks)
-  )
+        (pack-dired-do-unpack onefile)
+      (pack-dired-do-pack files))))
 
+;;;###autoload
+(defun pack-dired-do-unpack (&rest files)
+  "Unpack FILES.
+
+Prompt user to unpack files for sure."
+  (interactive (dired-get-marked-files t))
+  (dolist (file files)
+    (when (yes-or-no-p (format "Unpack %s?: " file))
+      (pack-unpack file)))
+  (revert-buffer))
+
+;;;###autoload
+(defun pack-dired-do-pack (&rest files)
+  "Pack FILES.
+
+Prompt user to input output archive file name."
+  (interactive (dired-get-marked-files t))
+  (let* ((dir-default (if (require 'dired-aux nil t)
+                          (dired-dwim-target-directory)
+                        default-directory))
+         (archive-default (concat (file-name-nondirectory (car files))
+                                  pack-default-extension))
+         (archive ;; (if (interactive-p)
+          (read-file-name "Archive file name: "
+                          dir-default
+                          nil
+                          nil
+                          archive-default)
+          ;; (concat dir-default archive-default)
+          ))
+    (apply 'pack-pack
+           archive
+           files))
+  (revert-buffer))
+
+;; DEPRECATED
 (defun pack--ensure-archive-extension (filename)
   "If FILENAME has extension and it can be used for pack, return FILENAME.
 Otherwise, return FILENAME with `pack-default-extension'"
@@ -141,26 +158,23 @@ Command for unpacking is defined in `pack-program-alist'."
       (message "Cannot find unpacking command for %s"
                archive))))
 
-;;;###autoload
 (defun pack-pack (archive &rest files)
   "Make ARCHIVE from FILES.
 
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
-  (let* ((archive-ext (pack--ensure-archive-extension (expand-file-name archive)))
-         (cmd (car (pack--get-commands-for archive-ext)))
-         )
+  (let* ((cmd (car (pack--get-commands-for archive))))
     (if cmd
         (async-shell-command (concat cmd
                                      " "
-                                     (shell-quote-argument archive-ext)
+                                     (shell-quote-argument archive)
                                      " "
                                      (mapconcat 'shell-quote-argument
                                                 files
                                                 " "))
                              (get-buffer-create pack-buffer-name))
       (message "Invalid extension for packing: %s"
-               archive-ext))))
+               archive))))
 
 (provide 'pack)
 
