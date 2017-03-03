@@ -165,9 +165,13 @@ Otherwise, use `pack-default-extension' for pack."
     (if cmd
         (async-shell-command (concat cmd
                                      " "
-                                     (shell-quote-argument archive)
+                                     (shell-quote-argument (expand-file-name
+                                                            archive))
                                      " "
-                                     (mapconcat 'shell-quote-argument
+                                     (mapconcat (lambda (f)
+                                                  (shell-quote-argument
+                                                   (expand-file-name
+                                                    f)))
                                                 files
                                                 " "))
                              (get-buffer-create pack-buffer-name))
