@@ -60,7 +60,7 @@ elpa:
 ##############################
 
 cask_repository := https://github.com/cask/cask.git
-cask_version := v0.8.0
+cask_version := v0.8.1
 
 install-cask:
 	test -d $(cask_install_path) || $(git) clone $(cask_repository) $(cask_install_path)
