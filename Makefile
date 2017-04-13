@@ -30,7 +30,7 @@ test: compile info
 compile: $(elc)
 
 $(elc): %.elc: %.el
-	$(casked_emacs) -batch -Q -f batch-byte-compile $<
+	$(casked_emacs) -batch -q -f batch-byte-compile $<
 
 
 elisp_get_file_package_info := \
