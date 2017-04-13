@@ -10,4 +10,4 @@ install:
 before_script:
   - $EMACS --version
 script:
-  - make test emacs=$EMACS
+  - make install-cask cask-install test emacs=$EMACS

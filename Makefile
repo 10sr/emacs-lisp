@@ -1,5 +1,9 @@
+project_root := $(PWD)
+
+cask_install_path := $(project_root)/cask-repository
+
 emacs ?= emacs
-cask ?= CASK_EMACS=$(emacs) cask
+cask ?= CASK_EMACS=$(emacs) $(cask_install_path)/bin/cask
 casked_emacs := $(cask) emacs
 git ?= git
 markdown ?= markdown
@@ -10,7 +14,6 @@ all: compile clean
 
 el = $(wildcard el/*.el)
 elc = $(el:%.el=%.elc)
-project_root := $(PWD)
 
 clean:
 	$(RM) $(elc)
@@ -56,7 +59,6 @@ elpa:
 
 ##############################
 
-cask_install_path := $(project_root)/cask-repository
 cask_repository := https://github.com/cask/cask.git
 cask_version := v0.8.0
 
