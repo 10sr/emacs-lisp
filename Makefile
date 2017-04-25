@@ -1,4 +1,10 @@
+project_root := $(PWD)
+
+cask_install_path := $(project_root)/cask-repository
+
 emacs ?= emacs
+cask ?= CASK_EMACS=$(emacs) $(cask_install_path)/bin/cask
+casked_emacs := $(cask) emacs
 git ?= git
 markdown ?= markdown
 
@@ -8,7 +14,6 @@ all: compile clean
 
 el = $(wildcard el/*.el)
 elc = $(el:%.el=%.elc)
-project_root := $(PWD)
 
 clean:
 	$(RM) $(elc)
@@ -25,7 +30,7 @@ test: compile info
 compile: $(elc)
 
 $(elc): %.elc: %.el
-	$(emacs) -batch -Q -f batch-byte-compile $<
+	$(casked_emacs) -batch -q -f batch-byte-compile $<
 
 
 elisp_get_file_package_info := \
@@ -42,14 +47,25 @@ elisp_print_infos := \
 		command-line-args-left)
 
 info: $(el)
-	$(emacs) -batch -Q \
+	$(casked_emacs) -batch -Q \
 		--eval "(require 'package)" \
 		--eval "$(elisp_print_infos)" \
 		$^
 
 
 elpa:
-	CASK_EMACS=$(emacs) cask exec github-elpa update
+	$(cask) exec github-elpa update
+
+
+##############################
+
+cask_repository := https://github.com/cask/cask.git
+cask_version := v0.8.1
+
+install-cask:
+	test -d $(cask_install_path) || $(git) clone $(cask_repository) $(cask_install_path)
+	cd $(cask_install_path) && $(git) checkout -f $(cask_version) && $(git) clean -xdf
+
 
 cask-install:
-	CASK_EMACS=$(emacs) cask install
+	$(cask) install
