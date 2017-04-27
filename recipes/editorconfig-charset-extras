@@ -1,0 +1,3 @@
+(editorconfig-charset-extras :fetcher git
+                             :repo "."
+                             :branch "edcharset")
