@@ -44,20 +44,52 @@
 ;;     [sjis.txt]
 ;;     charset = sjis
 
-;; Alternatively, you can specify `emacs_charset` instead:
+;; Alternatively, you can specify `emacs_charset` as:
 
 ;;     [sjis.txt]
 ;;     emacs_charset = sjis
 
-;; If both `charset` and `emacs_charset` are defined, the value of
+;; If both `charset' and `emacs_charset' are defined, the value of
 ;; `emacs_charset' takes precedence.
 
 ;;; Code:
 
+(defun editorconfig-charset-extras--decide (charset emacs-charset)
+  "Decide whcih charset to use from CHARSET and EMACS-CHARSET.
+
+CHARSET and EMACS-CHARSET are directly passwd from .editorconfig hash object.
+If no apropriate charset found return nil."
+  (let ((coding-systems (coding-system-list))
+        (charset-interned (and (not (string= "" charset))
+                               (intern charset)))
+        (emacs-charset-interned (and (not (string= "" emacs-charset))
+                                     (intern emacs-charset))))
+    (if (and emacs-charset-interned
+             (memq emacs-charset-interned
+                   coding-systems))
+        emacs-charset-interned
+      (display-warning :error
+                       (format "Charset not found: %S"
+                               emacs-charset-interned))
+      (if (and charset-interned
+               (memq charset-interned
+                     coding-systems))
+          charset-interned
+        (display-warning :error
+                         (format "Charset not found: %S"
+                                 charset-interned))
+        nil))))
+
 ;;;###autoload
 (defun editorconfig-charset-extras (hash)
   "Add support for all charset to editorconfig from editorconfig HASH."
-  coding-system-alist)
+  (let ((charset (gethash 'charset
+                          hash))
+        (emacs-charset (gethash 'emacs_charset
+                                hash)))
+    (let ((decided (editorconfig-charset-extras--decide charset emacs-charset)))
+      (when decided
+        (set-buffer-file-coding-system decided)))))
 
 (provide 'editorconfig-charset-extras)
 
