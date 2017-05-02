@@ -1,8 +1,8 @@
 ;;; editorconfig-charset-extras.el --- Extra EditorConfig Charset Support
 
 ;; Author: 10sr <>
-;; URL: https://github.com/10sr/emacs-lisp/blob/master/editorconfig-charset-extras.el
-;; Package-Version: 20170427.1528
+;; URL: https://github.com/10sr/editorconfig-charset-extras-el
+;; Package-Version: 20170502.2305
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
@@ -37,7 +37,8 @@
 ;;; Commentary:
 
 ;; This library adds extra charset supports to editorconfig-emacs.
-;; Charsets defined in `coding-system-alist' are newly supported.
+;; The list of supported charsets is taken from the result of
+;; `coding-system-list'.
 
 ;; For example, add following to your `.editorconfig`
 ;; and `sjis.txt` will be opend with `sjis' encoding:
@@ -61,22 +62,24 @@
 CHARSET and EMACS-CHARSET are directly passwd from .editorconfig hash object.
 If no apropriate charset found return nil."
   (let ((coding-systems (coding-system-list))
-        (charset-interned (and (not (string= "" charset))
+        (charset-interned (and charset
+                               (not (string= "" charset))
                                (intern charset)))
-        (emacs-charset-interned (and (not (string= "" emacs-charset))
+        (emacs-charset-interned (and emacs-charset
+                                     (not (string= "" emacs-charset))
                                      (intern emacs-charset))))
     (if (and emacs-charset-interned
              (memq emacs-charset-interned
                    coding-systems))
         emacs-charset-interned
-      (display-warning :error
+      (display-warning 'editorconfig-charset-extras
                        (format "Charset not found: %S"
                                emacs-charset-interned))
       (if (and charset-interned
                (memq charset-interned
                      coding-systems))
           charset-interned
-        (display-warning :error
+        (display-warning 'editorconfig-charset-extras
                          (format "Charset not found: %S"
                                  charset-interned))
         nil))))
@@ -85,7 +88,8 @@ If no apropriate charset found return nil."
 (defun editorconfig-charset-extras (hash)
   "Add support for extra charsets to editorconfig from editorconfig HASH.
 
-Charsets defined in `coding-system-alist' are newly supported."
+The list of supported charsets is taken from the result of function
+`coding-system-list'."
   (let ((charset (gethash 'charset
                           hash))
         (emacs-charset (gethash 'emacs_charset
