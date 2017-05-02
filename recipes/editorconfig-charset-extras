@@ -1,4 +1,2 @@
-(editorconfig-charset-extras :fetcher git
-                             :url "."
-                             :branch "edcharset"
-                             :files ("el/editorconfig-charset-extras.el"))
+(editorconfig-charset-extras :fetcher github
+                             :repo "10sr/editorconfig-charset-extras-el")
