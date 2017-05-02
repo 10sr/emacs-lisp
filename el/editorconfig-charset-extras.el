@@ -36,7 +36,8 @@
 ;;; Commentary:
 
 ;; This library adds extra charset supports to editorconfig-emacs.
-;; Charsets defined in `coding-system-alist' are newly supported.
+;; The list of supported charsets is taken from the result of
+;; `coding-system-list'.
 
 ;; For example, add following to your `.editorconfig`
 ;; and `sjis.txt` will be opend with `sjis' encoding:
@@ -84,7 +85,8 @@ If no apropriate charset found return nil."
 (defun editorconfig-charset-extras (hash)
   "Add support for extra charsets to editorconfig from editorconfig HASH.
 
-Charsets defined in `coding-system-alist' are newly supported."
+The list of supported charsets is taken from the result of function
+`coding-system-list'."
   (let ((charset (gethash 'charset
                           hash))
         (emacs-charset (gethash 'emacs_charset
