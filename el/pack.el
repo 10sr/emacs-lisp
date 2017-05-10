@@ -58,16 +58,26 @@
 (declare-function dired-dwim-target-directory "dired-aux")
 (declare-function dired-get-marked-files "dired")
 
-(defvar pack-buffer-name "*Pack*"
-  "Buffer name for `pack'.")
+(defgroup pack nil
+  "Pack and unpack archive files."
+  :tag "Pack"
+  :prefix "pack-"
+  :group 'tools)
 
-(defvar pack-dired-default-extension
+(defcustom pack-buffer-name "*Pack*"
+  "Buffer name for `pack'."
+  :type 'string
+  :group 'pack)
+
+(defcustom pack-dired-default-extension
   ".7z"
   "Default suffix for pack-dired functions.
 Filename with this suffix must matches one of the cars in
-`pack-program-alist'.")
+`pack-program-alist'."
+  :type 'string
+  :group 'pack)
 
-(defvar pack-program-alist
+(defcustom pack-program-alist
   `(
     ("\\.7z\\'" "7z a" "7z x")
     ("\\.zip\\'" "zip -r" "unzip")
@@ -80,7 +90,9 @@ Filename with this suffix must matches one of the cars in
 Each element looks like (REGEXP PACKING-COMMAND UNPACKING-COMMAND).
 PACKING-COMMAND and UNPACKING-COMMAND can be nil if the command is not
 available.  Alist is searched from the beginning so pattern for \".tar.gz\"
-should be ahead of pattern for \".gz\"")
+should be ahead of pattern for \".gz\""
+  :group 'pack
+  :type '(alist :key-type string :value-type (repeat string)))
 
 ;;;###autoload
 (defun pack-dired-dwim (&rest files)
