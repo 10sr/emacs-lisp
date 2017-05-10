@@ -1,11 +1,11 @@
 ;;; editorconfig-charset-extras.el --- Extra EditorConfig Charset Support
 
-;; Author: 10sr <>
+;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/editorconfig-charset-extras-el
-;; Package-Version: 20170502.2314
+;; Package-Version: 20170508.1712
 ;; Version: 0.1
-;; Package-Requires: ()
-;; Keywords: utility
+;; Package-Requires: ((editorconfig "0.6.0"))
+;; Keywords: tools
 
 ;; This file is not part of GNU Emacs.
 

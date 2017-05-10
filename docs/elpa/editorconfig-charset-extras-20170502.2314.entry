@@ -1,2 +1,0 @@
-
-(editorconfig-charset-extras . [(20170502 2314) nil "Extra EditorConfig Charset Support" single ((:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/editorconfig-charset-extras-el"))])
