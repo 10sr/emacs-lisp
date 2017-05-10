@@ -119,14 +119,6 @@ Prompt user to input output archive file name."
            files))
   (revert-buffer))
 
-;; DEPRECATED
-(defun pack--ensure-archive-extension (filename)
-  "If FILENAME has extension and it can be used for pack, return FILENAME.
-Otherwise, return FILENAME with `pack-default-extension'"
-  (if (pack--get-commands-for filename)
-      filename
-    (concat filename pack-dired-default-extension)))
-
 (defun pack--get-commands-for (filename)
   "Return commands to pack and unpack FILENAME archive file.
 
