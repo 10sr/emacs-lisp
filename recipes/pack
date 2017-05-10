@@ -1,1 +1,1 @@
-(pack :fetcher github :repo "10sr/pack")
+(pack :fetcher github :repo "10sr/pack-el")
