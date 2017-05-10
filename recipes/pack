@@ -1,4 +1,1 @@
-(pack :fetcher git
-      :url "."
-      ;; :branch "updatecask"
-      :files ("el/pack.el"))
+(pack :fetcher github :repo "10sr/pack")
