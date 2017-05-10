@@ -1,2 +1,0 @@
-
-(pack . [(20160520 1526) nil "Pack and unpack archive files" single ((:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pack.el"))])
