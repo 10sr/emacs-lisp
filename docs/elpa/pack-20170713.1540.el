@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/pack.el
-;; Package-Version: 20170510.1513
+;; Package-Version: 20170713.1540
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: files
@@ -108,7 +108,7 @@ Otherwise, pack marked files, prompting user to decide archive filename."
     (if (and (eq 1 (length files))
              (pack--get-commands-for firstfile))
         (pack-dired-do-unpack firstfile)
-      (pack-dired-do-pack files))))
+      (apply 'pack-dired-do-pack files))))
 
 ;;;###autoload
 (defun pack-dired-do-unpack (&rest files)
