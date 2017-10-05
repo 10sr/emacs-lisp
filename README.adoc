@@ -30,3 +30,16 @@ Issue
 ----
 make elpa
 ----
+
+
+Add packages
+~~~~~~~~~~~~
+
+
+Put a file into `recipes/` dir:
+
+----
+(package-name :fetcher github
+              :repo "10sr/package-name-el"
+              :branch "target-branch")
+----
