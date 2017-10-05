@@ -1,2 +1,2 @@
 
-(pack . [(20170713 1540) nil "Pack and unpack archive files" single ((:keywords "files") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pack.el"))])
+(pack . [(20170713 1540) nil "Pack and unpack archive files" single ((:commit . "e5921b16e75e82aa36c17c9a69b1b4985f17bd8c") (:keywords "files") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pack.el"))])
