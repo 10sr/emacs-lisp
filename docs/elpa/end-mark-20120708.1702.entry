@@ -1,0 +1,2 @@
+
+(end-mark . [(20120708 1702) nil "Show mark at the end of buffer" single ((:commit . "b9f6a7c1002248ce0f6a56bc720dafb5b77437be") (:authors ("INA Lintaro" . "ina@kuis.kyoto-u.ac.jp")) (:maintainer "INA Lintaro" . "ina@kuis.kyoto-u.ac.jp"))])

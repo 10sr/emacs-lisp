@@ -1,0 +1,2 @@
+
+(editorconfig-custom-majormode . [(20170425 1616) ((editorconfig (0 6 0))) "Decide major-mode and mmm-mode from EditorConfig" single ((:commit . "0caf451e3f2ced14e7023956c17f80f05057a454") (:keywords "editorconfig" "util") (:authors ("10sr <8slashes+el [at] gmail [dot] com>")) (:maintainer "10sr <8slashes+el [at] gmail [dot] com>") (:url . "https://github.com/10sr/editorconfig-custom-major-mode-el"))])

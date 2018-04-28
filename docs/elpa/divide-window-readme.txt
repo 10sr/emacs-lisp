@@ -1,0 +1,1 @@
+Split window evenly.
