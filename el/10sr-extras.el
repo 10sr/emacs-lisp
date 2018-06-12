@@ -880,5 +880,112 @@ this is test, does not rename files."
 ;;                 (concat my-system-info
 ;;                         (ad-get-arg 0)))))
 
+(when (autoload-eval-lazily 'google-translate '(google-translate-translate
+                                                google-translate-at-point))
+  (set-variable 'google-translate-default-source-language "auto")
+  (set-variable 'google-translate-default-target-language "ja"))
+(when (and (safe-require-or-eval 'google-translate)
+           (safe-require-or-eval 'google-translate-smooth-ui))
+  (add-to-list 'google-translate-translation-directions-alist
+               '("en" . "ja"))
+  (defun translate-echo-at-point ()
+    "Translate popup at point."
+    (interactive)
+    (let ((google-translate-output-destination 'echo-area))
+      (google-translate-translate "auto" "ja" (current-word t t))))
+  (define-minor-mode auto-translate-mode
+    "Translate word at point automatically."
+    :global nil
+    :lighter "ATranslate"))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; ilookup
+
+(with-eval-after-load 'ilookup
+  (set-variable 'ilookup-dict-alist
+                '(
+                  ("sdcv" . (lambda (word)
+                              (shell-command-to-string
+                               (format "sdcv -n '%s'"
+                                       word))))
+                  ("en" . (lambda (word)
+                            (shell-command-to-string
+                             (format "sdcv -n -u dictd_www.dict.org_gcide '%s'"
+                                     word))))
+                  ("ja" . (lambda (word)
+                            (shell-command-to-string
+                             (format "sdcv -n -u EJ-GENE95 -u jmdict-en-ja '%s'"
+                                     word))))
+                  ("jaj" . (lambda (word)
+                             (shell-command-to-string
+                              (format "sdcv -n -u jmdict-en-ja '%s'"
+                                      word))))
+                  ("jag" .
+                   (lambda (word)
+                     (with-temp-buffer
+                       (insert (shell-command-to-string
+                                (format "sdcv -n -u 'Genius English-Japanese' '%s'"
+                                        word)))
+                       (html2text)
+                       (buffer-substring (point-min)
+                                         (point-max)))))
+                  ("alc" . (lambda (word)
+                             (shell-command-to-string
+                              (format "alc '%s' | head -n 20"
+                                      word))))
+                  ("app" . (lambda (word)
+                             (shell-command-to-string
+                              (format "dict_app '%s'"
+                                      word))))
+                  ;; letters broken
+                  ("ms" .
+                   (lambda (word)
+                     (let ((url (concat
+                                 "http://api.microsofttranslator.com/V2/Ajax.svc/"
+                                 "Translate?appId=%s&text=%s&to=%s"))
+                           (apikey "3C9778666C5BA4B406FFCBEE64EF478963039C51")
+                           (target "ja")
+                           (eword (url-hexify-string word)))
+                       (with-current-buffer (url-retrieve-synchronously
+                                             (format url
+                                                     apikey
+                                                     eword
+                                                     target))
+                         (message "")
+                         (goto-char (point-min))
+                         (search-forward-regexp "^$"
+                                                nil
+                                                t)
+                         (url-unhex-string (buffer-substring-no-properties
+                                            (point)
+                                            (point-max)))))))
+                  ))
+  ;; (funcall (cdr (assoc "ms"
+  ;;                      ilookup-alist))
+  ;;          "dictionary")
+
+  ;; (switch-to-buffer (url-retrieve-synchronously "http://api.microsofttranslator.com/V2/Ajax.svc/Translate?appId=3C9778666C5BA4B406FFCBEE64EF478963039C51&text=dictionary&to=ja"))
+
+  ;; (switch-to-buffer (url-retrieve-synchronously "http://google.com"))
+
+  (set-variable 'ilookup-default "ja")
+  (when (locate-library "google-translate")
+    (defvar ilookup-dict-alist nil)
+    (add-to-list 'ilookup-dict-alist
+                 '("gt" .
+                   (lambda (word)
+                     (save-excursion
+                       (google-translate-translate "auto"
+                                                   "ja"
+                                                   word))
+                     (with-current-buffer "*Google Translate*"
+                       (buffer-substring-no-properties (point-min)
+                                                       (point-max)))))))
+  )
+
+
+
 (provide '10sr-extras)
 ;;; 10sr-extras.el ends here
