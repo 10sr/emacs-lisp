@@ -160,9 +160,7 @@ Any previous output will be removed."
                                  (or (nth 1 inputl)
                                      ilookup-default)))
                      "\n")
-             (let ((p (point)))
-               (goto-char (point-max))
-               (goto-char p))
+             (recenter -1)
              )))))
 
 (defun ilookup--get-result (word &optional dict)
