@@ -78,6 +78,9 @@ result for that word.")
 (defvar ilookup--last-input nil
   "Last input queried.")
 
+(defvar ilookup-open-word-history nil
+  "History for `ilookup-open-word'.")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Internal utilities
@@ -295,7 +298,9 @@ Freeze current input and show next prompt."
   "Open ilookup buffer with WORD input.
 Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   ;; TODO: implement me!
-  (interactive "sIlookup Word: ")
+  (interactive (list (read-string "Word: "
+                                  (thing-at-point 'word)
+                                  'ilookup-open-word-history)))
   (with-current-buffer (pop-to-buffer (ilookup--get-buffer-create))
     (when (ilookup--input-given-p)
       (ilookup--emit-next-prompt))
