@@ -81,6 +81,10 @@ result for that word.")
 (defvar ilookup-open-word-history nil
   "History for `ilookup-open-word'.")
 
+(defconst ilookup-buffer-initial-message
+  "Enter to lookup word at point.\n"
+  "Message printed at the top of ilookup buffer.")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Internal utilities
@@ -195,6 +199,7 @@ Return nil if current buffer is not ilookup buffer."
     ;; create newly
     (with-current-buffer (setq ilookup--buffer
                                (get-buffer-create "*ilookup*"))
+      (insert ilookup-buffer-initial-message)
       (ilookup-mode)
       (font-lock-mode t)
       (setq ilookup--current-prompt-point
