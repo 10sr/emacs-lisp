@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/ilookup.el
-;; Package-Version: 20180705.1416
+;; Package-Version: 20180705.1621
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
@@ -82,6 +82,10 @@ result for that word.")
 (defvar ilookup-open-word-history nil
   "History for `ilookup-open-word'.")
 
+(defconst ilookup-buffer-initial-message
+  "Enter to lookup word at point.\n"
+  "Message printed at the top of ilookup buffer.")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Internal utilities
@@ -157,9 +161,7 @@ Any previous output will be removed."
                                  (or (nth 1 inputl)
                                      ilookup-default)))
                      "\n")
-             (let ((p (point)))
-               (goto-char (point-max))
-               (goto-char p))
+             (recenter -1)
              )))))
 
 (defun ilookup--get-result (word &optional dict)
@@ -196,6 +198,7 @@ Return nil if current buffer is not ilookup buffer."
     ;; create newly
     (with-current-buffer (setq ilookup--buffer
                                (get-buffer-create "*ilookup*"))
+      (insert ilookup-buffer-initial-message)
       (ilookup-mode)
       (font-lock-mode t)
       (setq ilookup--current-prompt-point
