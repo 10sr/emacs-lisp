@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el
-;; Package-Version: 20160520.1526
+;; Package-Version: 20180814.1215
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility clipboard osx
@@ -97,18 +97,22 @@ https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard")
   "Pasting function using pasteboard.
 
 Intended to be set to `interprogram-paste-function'."
-  (shell-command-to-string pasteboard-paste-command))
+  ;; Invoke from local directory
+  (let ((default-directory temporary-file-directory))
+    (shell-command-to-string pasteboard-paste-command)))
 
 (defun pasteboard-cut (text &optional push)
   "Cutting function using pasteboard.
 
 Intended to be set to `interprogram-cut-function'."
-  (let ((process-connection-type nil))
-    (let ((proc (start-process-shell-command pasteboard-copy-program
-                                             "*Messages*"
-                                             pasteboard-copy-command)))
-      (process-send-string proc text)
-      (process-send-eof proc))))
+  (let* ((process-connection-type nil)
+         ;; Invoke from local directory
+         (default-directory temporary-file-directory)
+         (proc (start-process-shell-command pasteboard-copy-program
+                                            "*Messages*"
+                                            pasteboard-copy-command)))
+    (process-send-string proc text)
+    (process-send-eof proc)))
 
 (provide 'pasteboard)
 
