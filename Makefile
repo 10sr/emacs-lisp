@@ -56,6 +56,9 @@ info: $(el)
 elpa:
 	$(cask) exec github-elpa update
 
+build:
+	$(cask) exec github-elpa build
+
 
 ##############################
 
