@@ -1,2 +1,2 @@
 
-(10sr-eshell . [(20160916 1405) nil "10sr Eshell configurations" single])
+(10sr-eshell . [(20160916 1405) nil "10sr Eshell configurations" single ((:commit . "a0937da26e1f6d258578b94eb8cc045437f6285e") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/10sr-eshell.el"))])

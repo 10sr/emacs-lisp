@@ -1,2 +1,2 @@
 
-(read-only-only-mode . [(20160520 1526) nil "Always view-mode" single])
+(read-only-only-mode . [(20160520 1526) nil "Always view-mode" single ((:commit . "a0937da26e1f6d258578b94eb8cc045437f6285e") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el"))])
