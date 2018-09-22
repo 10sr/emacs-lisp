@@ -1,0 +1,3 @@
+(editorconfig :fetcher github
+              :repo "editorconfig/editorconfig-emacs"
+              :branch "extensionfiletype")

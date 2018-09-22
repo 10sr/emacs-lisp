@@ -1,8 +1,8 @@
 ;;; editorconfig-custom-majormode.el --- Decide major-mode and mmm-mode from EditorConfig
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
-;; URL: https://github.com/10sr/editorconfig-custom-major-mode-el
-;; Package-Version: 20180508.1142
+;; URL: https://github.com/10sr/editorconfig-custom-majormode-el
+;; Package-Version: 20180816.1144
 ;; Version: 0.0.3
 ;; Package-Requires: ((editorconfig "0.6.0"))
 ;; Keywords: editorconfig util

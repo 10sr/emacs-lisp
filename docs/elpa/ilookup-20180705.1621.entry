@@ -1,0 +1,6 @@
+
+<<<<<<< HEAD:docs/elpa/ilookup-20160520.1526.entry
+(ilookup . [(20160520 1526) nil "Incremental dictionary lookup" single ((:commit . "b686adbd18ecad09a5b436427ed5933a071dbc94") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/ilookup.el"))])
+=======
+(ilookup . [(20180705 1621) nil "Incremental dictionary lookup" single ((:commit . "373c8a53aa7328566277f9075756f469e6a9b108") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/ilookup.el"))])
+>>>>>>> origin/master:docs/elpa/ilookup-20180705.1621.entry

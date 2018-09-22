@@ -1,3 +1,0 @@
-(editorconfig-emacs :fetcher github
-                    :repo "editorconfig/editorconfig-emacs"
-                    :branch "master")

@@ -2,6 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el
+;; Package-Version: 20180814.1215
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility clipboard osx
