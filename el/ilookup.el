@@ -319,6 +319,9 @@ Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   (interactive)
   (ilookup-open-word (substring-no-properties (thing-at-point 'word))))
 
+;;;###autoload
+(defalias 'ilookup 'ilookup-open-at-point)
+
 (provide 'ilookup)
 
 ;;; ilookup.el ends here
