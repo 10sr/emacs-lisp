@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/ilookup.el
-;; Package-Version: 20180922.1845
+;; Package-Version: 20181018.1453
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
@@ -319,6 +319,9 @@ Optional argument DICT specified dict name defined in `ilookup-dict-alist'."
   "Open ilookup buffer with word at point input."
   (interactive)
   (ilookup-open-word (substring-no-properties (thing-at-point 'word))))
+
+;;;###autoload
+(defalias 'ilookup 'ilookup-open-at-point)
 
 (provide 'ilookup)
 

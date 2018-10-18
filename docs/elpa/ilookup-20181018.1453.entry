@@ -1,0 +1,2 @@
+
+(ilookup . [(20181018 1453) nil "Incremental dictionary lookup" single ((:commit . "c7b9617304abe6998cbc7b8a8b4dc6e7490b4612") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/ilookup.el"))])
