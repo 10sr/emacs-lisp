@@ -163,9 +163,12 @@ If MODE is nil this function allways returns nil."
 
 ;; (editorconfig-generate-take-first-valid '(a lisp-indent-offset))
 
-(defun editorconfig-generate-current-buffer ()
-  "Extract EditorConfig properties for current buffer."
+(defun editorconfig-generate (&optional buf)
+  "Generate EditorConfig content for buffer BUF.
+if BUF is omitted or nil, works for current buffer."
   (interactive)
+  (setq buf (or buf
+                (current-buffer)))
   (let* ((filename (file-name-nondirectory buffer-file-name))
          (output-buf (generate-new-buffer (concat "*editorconfig<"
                                                   filename
@@ -185,11 +188,6 @@ If MODE is nil this function allways returns nil."
                     "\n")))))
     (display-buffer output-buf)))
 
-;; (editorconfig-generate-current-buffer)
-
-(defun editorconfig-generate (buf)
-  "Extract EditorConfig properties for BUF."
-  (with-current-buffer buf
-    (editorconfig-generate-current-buffer)))
+;; (editorconfig-generate)
 
 ;;; editorconfig-generate.el ends here
