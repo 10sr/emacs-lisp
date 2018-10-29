@@ -1,7 +1,7 @@
-;;; editorconfig-extract.el --- Extract EditorConfig Properties
+;;; editorconfig-generate.el --- Generate EditorConfig file from current buffer
 
 ;; Author: 10sr <>
-;; URL: https://github.com/10sr/emacs-lisp/blob/master/editorconfig-extract.el
+;; URL: https://github.com/10sr/emacs-lisp/blob/master/editorconfig-generate.el
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility editorconfig
@@ -44,7 +44,7 @@
 ;; http://github.com/editorconfig/editorconfig-emacs#readme
 ;; Copyright (C) 2011-2015 EditorConfig Team
 ;; Released under GPL
-(defvar editorconfig-extract-mode-offset-alist
+(defvar editorconfig-generate-mode-offset-alist
   '((awk-mode c-basic-offset)
     (c++-mode c-basic-offset)
     (c-mode c-basic-offset)
@@ -90,13 +90,13 @@ The indentation offset will be gotten from the first valid value
   )
 
 
-(defvar editorconfig-extract-properties-alist
-  (setq editorconfig-extract-properties-alist
+(defvar editorconfig-generate-properties-alist
+  (setq editorconfig-generate-properties-alist
   '(
     ("indent_style" . (if indent-tabs-mode
                           "tab"
                         "space"))
-    ("indent_size" . (let ((s (editorconfig-extract-indent-size major-mode)))
+    ("indent_size" . (let ((s (editorconfig-generate-indent-size major-mode)))
                        (if s
                            (int-to-string s)
                          nil)))
@@ -140,7 +140,7 @@ The indentation offset will be gotten from the first valid value
   "Alist of EditorConfig properties to extract.
 Each element should be like (PROP . SEXP)")
 
-(defun editorconfig-extract-indent-size (mode)
+(defun editorconfig-generate-indent-size (mode)
   "Get indentation offset for major mode MODE.
 
 If MODE is a derived mode of other mode and no suitable offset value was found,
@@ -148,22 +148,22 @@ it will go up recursively and take the first valid value.
 If MODE is nil this function allways returns nil."
   (when mode
     (let ((var-list (cdr (assq mode
-                               editorconfig-extract-mode-offset-alist))))
-      (or (editorconfig-extract-take-first-valid var-list)
-          (editorconfig-extract-indent-size (get mode
+                               editorconfig-generate-mode-offset-alist))))
+      (or (editorconfig-generate-take-first-valid var-list)
+          (editorconfig-generate-indent-size (get mode
                                                  'derived-mode-parent))))))
 
-(defun editorconfig-extract-take-first-valid (l)
+(defun editorconfig-generate-take-first-valid (l)
   "Accept list of variables L and return the first valid value."
   (when l
     (let ((v (car l)))
       (or (and (boundp v)
                (eval v))
-          (editorconfig-extract-take-first-valid (cdr l))))))
+          (editorconfig-generate-take-first-valid (cdr l))))))
 
-(editorconfig-extract-take-first-valid '(a lisp-indent-offset))
+;; (editorconfig-generate-take-first-valid '(a lisp-indent-offset))
 
-(defun editorconfig-extract-current-buffer ()
+(defun editorconfig-generate-current-buffer ()
   "Extract EditorConfig properties for current buffer."
   (interactive)
   (let* ((filename (file-name-nondirectory buffer-file-name))
@@ -174,7 +174,7 @@ If MODE is nil this function allways returns nil."
       (insert "["
               filename
               "]\n\n"))
-    (dolist (prop editorconfig-extract-properties-alist)
+    (dolist (prop editorconfig-generate-properties-alist)
       (let ((value (eval (cdr prop))))
         (message "val:%S" output-buf)
         (when value
@@ -184,10 +184,12 @@ If MODE is nil this function allways returns nil."
                     value
                     "\n")))))
     (display-buffer output-buf)))
-(editorconfig-extract-current-buffer)
-(defun editorconfig-extract (buf)
+
+;; (editorconfig-generate-current-buffer)
+
+(defun editorconfig-generate (buf)
   "Extract EditorConfig properties for BUF."
   (with-current-buffer buf
-    (editorconfig-extract-current-buffer)))
+    (editorconfig-generate-current-buffer)))
 
-;;; editorconfig-extract.el ends here
+;;; editorconfig-generate.el ends here
