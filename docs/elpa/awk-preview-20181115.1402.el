@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/awk-preview-el
-;; Package-Version: 20181115.1335
+;; Package-Version: 20181115.1402
 ;; Version: 0.0.1
 ;; Package-Requires: ()
 
@@ -199,8 +199,9 @@ DISPLAY non-nil means redisplay buffer as output is inserted."
       (setf (awk-preview--env-preview-buffer e) buf)
       buf)))
 
+;;;###autoload
 (defun awk-preview (beg end &optional program-buffer)
-  "Run AWK and preview result.
+  "Start an awk-preview session.
 
 BEG and END should be points of region to filter with awk.
 If called interactively without region, whole contents will be
@@ -293,7 +294,7 @@ to filter input."
             (point)))))
 
 (defun awk-preview-commit ()
-  "Exit awk-preview and update buffer."
+  "Exit awk-preview session and update buffer."
   (interactive)
   (cl-assert awk-preview--env)
   (awk-preview--invoke-awk (awk-preview--env-source-buffer awk-preview--env)
@@ -306,12 +307,12 @@ to filter input."
   (awk-preview--cleanup))
 
 (defun awk-preview-abort ()
-  "Discard result and exit awk-preview."
+  "Exit awk-preview session without applying awk program."
   (interactive)
   (awk-preview--cleanup))
 
 (defun awk-preview--cleanup()
-  "Cleanup awk-preview buffers variables and files."
+  "Cleanup awk-preview objects and exit awk-preview sessiion."
   (cl-assert awk-preview--env)
   (with-current-buffer (awk-preview--env-source-buffer awk-preview--env)
     (kill-buffer (awk-preview--env-preview-buffer awk-preview--env))
