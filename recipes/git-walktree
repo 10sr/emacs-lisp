@@ -1,0 +1,3 @@
+(git-walktree :fetcher github
+              :repo "10sr/git-walktree-el"
+              :branch "master")
