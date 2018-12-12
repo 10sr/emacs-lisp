@@ -1,0 +1,3 @@
+(recently :fetcher github
+          :repo "10sr/recently-el"
+          :branch "master")
