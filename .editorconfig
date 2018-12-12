@@ -8,7 +8,7 @@ trim_trailing_whitespace = true
 
 
 [recipes/*]
-emacs_mode = emacs-lisp
+file_type_ext = el
 
 [Makefile]
 indent_style = tab
