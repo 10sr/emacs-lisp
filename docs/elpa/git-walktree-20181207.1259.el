@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/git-walktree-el
-;; Package-Version: 20181207.1248
+;; Package-Version: 20181207.1259
 ;; Version: 0.0.1
 ;; Keywords: utility git
 
@@ -329,6 +329,7 @@ PATH will be always treated as relative to repository root."
                                                                              path))))
       (plist-get info :object))))
 
+;;;###autoload
 (defun git-walktree-open (committish &optional path)
   "Open git tree buffer of COMMITTISH.
 When PATH was given and non-nil open that, otherwise try to open current path.
@@ -336,6 +337,7 @@ If target path is not found in COMMITISH tree, go up path and try again until fo
   ;; TODO: Add fallback method for cases where magit is not available
   (interactive (list (magit-read-branch-or-commit "Revision: ")))
   (switch-to-buffer (git-walktree--open-noselect-safe-path committish path)))
+;;;###autoload
 (defalias 'git-walktree 'git-walktree-open)
 
 (defun git-walktree--path-in-repository (path)
