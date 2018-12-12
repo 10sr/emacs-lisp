@@ -1,2 +1,0 @@
-
-(recently . [(20181212 1347) ((cl-lib (0 5))) "Recently opened files" single ((:commit . "b8eac2fa407415e10c8b777b0d93bfc847305ffe") (:keywords "utility" "files") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/recently-el"))])

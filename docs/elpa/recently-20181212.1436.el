@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20181212.1347
+;; Package-Version: 20181212.1436
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -213,7 +213,7 @@ BUFFER-NAME, if given, should be a string for buffer to create."
   (setq tabulated-list-entries
         (mapcar (lambda (f)
                   (list f
-                        (vector (file-name-nondirectory f)
+                        (vector (or (file-name-nondirectory f) "")
                                 (if recently-show-abbreviate
                                     (abbreviate-file-name f)
                                   f))))
