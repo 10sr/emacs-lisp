@@ -1,0 +1,2 @@
+
+(recently . [(20181217 1459) ((cl-lib (0 5)) (emacs (24))) "Recently opened files" single ((:commit . "654e3be0757171aa194af8e5c44691587dcc5ec7") (:keywords "utility" "files") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/recently-el"))])

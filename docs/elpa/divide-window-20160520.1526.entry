@@ -1,2 +1,2 @@
 
-(divide-window . [(20160520 1526) nil "Split window evenly" single ((:commit . "c924016ab93e3b8297f2d5744a8bda8a0737ba69") (:keywords "window") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
+(divide-window . [(20160520 1526) nil "Split window evenly" single ((:commit . "01678cd89645590201c114f4b503a2e1d93a9266") (:keywords "window") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])

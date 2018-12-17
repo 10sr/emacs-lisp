@@ -2,10 +2,10 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20181212.1436
+;; Package-Version: 20181217.1459
 ;; Version: 0.1
 ;; Keywords: utility files
-;; Package-Requires: ((cl-lib "0.5"))
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -36,6 +36,10 @@
 
 ;;; Commentary:
 
+;; Track recently opened files to visit them again.
+
+;; M-x recently-mode:  Start recording file paths on visiting them
+;; M-x recently-show:  Display buffer to visit files again
 
 
 ;;; Code:
@@ -67,7 +71,7 @@
 (add-to-list 'recently-excludes
              (eval-when-compile (rx "/COMMIT_EDITMSG" eot)))
 
-(defvar recently-list
+(defvar recently--list
   '()
   "Recently list.")
 
@@ -75,31 +79,31 @@
   nil
   "Modified time of `recently-file' when last read file.")
 
-(defun recently-write ()
+(defun recently--write ()
   "Write to file."
   ;; Failsafe to avoid purging all existing entries
-  (cl-assert recently-list)
+  (cl-assert recently--list)
   (with-temp-buffer
-    (prin1 recently-list
+    (prin1 recently--list
            (current-buffer))
     (write-region (point-min)
                   (point-max)
                   recently-file)))
 
-(defun recently-read ()
+(defun recently--read ()
   "Read file."
   (when (file-readable-p recently-file)
     (with-temp-buffer
       (insert-file-contents recently-file)
       (goto-char (point-min))
-      (setq recently-list
+      (setq recently--list
             (read (current-buffer))))
     (setq recently-file-mtime
           (nth 5
                (file-attributes recently-file)))))
 
-(defun recently-reload ()
-  "Reload file and update `recently-list' value.
+(defun recently--reload ()
+  "Reload file and update `recently--list' value.
 
 This function does nothing when there is no update to `recently-file' since last
 read."
@@ -107,7 +111,7 @@ read."
              (not (equal recently-file-mtime
                          (nth 5
                               (file-attributes recently-file)))))
-    (recently-read)
+    (recently--read)
     (cl-assert (equal recently-file-mtime
                       (nth 5
                            (file-attributes recently-file))))))
@@ -119,8 +123,8 @@ read."
   (when (cl-loop for re in recently-excludes
                  if (string-match re path) return nil
                  finally return t)
-    (recently-reload)
-    (let* ((l (cl-copy-list recently-list))
+    (recently--reload)
+    (let* ((l (cl-copy-list recently--list))
            (l (delete path
                       l))
            (l (cl-loop for e in l
@@ -128,17 +132,22 @@ read."
                        collect e))
            (l (cons path
                     l))
-           (l (recently--truncate l
-                                  recently-max)))
-      (unless (equal recently-list
+           (l (recently---truncate l
+                                   recently-max)))
+      (unless (equal recently--list
                      l)
-        (setq recently-list l)
-        (recently-write)
+        (setq recently--list l)
+        (recently--write)
         (setq recently-file-mtime
               (nth 5
                    (file-attributes recently-file)))))))
 
-(defun recently--truncate (list len)
+(defun recently-list ()
+  "Get latest recently opened file list."
+  (recently--reload)
+  recently--list)
+
+(defun recently---truncate (list len)
   "Truncate LIST to LEN."
   (if (> (length list)
          len)
@@ -150,7 +159,9 @@ read."
 (defun recently-hook-buffer-file-name ()
   "Add current file."
   (when buffer-file-name
-    (recently-add buffer-file-name)))
+    (recently-add buffer-file-name))
+  ;; Return nil to call from `write-file-functions'
+  nil)
 
 (defun recently-hook-default-directory ()
   "Add current directory."
@@ -159,15 +170,19 @@ read."
 ;;;###autoload
 (define-minor-mode recently-mode
   "Track recently opened files.
-When enabled save recently opened file path to `recently-list', and
+When enabled it records recently opened file paths, and
 view list and visit again via `recently-show' command."
   :global t
   :lighter Rcntly
+  :require 'recently
   (let ((f (if recently-mode
                'add-hook
              'remove-hook)))
     (funcall f
              'find-file-hook
+             'recently-hook-buffer-file-name)
+    (funcall f
+             'write-file-functions
              'recently-hook-buffer-file-name)
     (funcall f
              'dired-mode-hook
@@ -209,7 +224,6 @@ BUFFER-NAME, if given, should be a string for buffer to create."
 
 (defun recently-show--set-tabulated-list-mode-variables ()
   "Set variables for `tabulated-list-mode'."
-  (recently-reload)
   (setq tabulated-list-entries
         (mapcar (lambda (f)
                   (list f
@@ -217,7 +231,7 @@ BUFFER-NAME, if given, should be a string for buffer to create."
                                 (if recently-show-abbreviate
                                     (abbreviate-file-name f)
                                   f))))
-                recently-list
+                (recently-list)
                 ))
   (let ((max
          (apply 'max
@@ -279,7 +293,7 @@ BUFFER-NAME, if given, should be a string for buffer to create."
   (tabulated-list-print nil nil))
 
 (defun recently-show-tabulated-close ()
-  "Close recently-show window."
+  "Close `recently-show' window."
   (interactive)
   (kill-buffer (current-buffer))
   (set-window-configuration recently-show-window-configuration))
