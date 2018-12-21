@@ -9,7 +9,7 @@ Some small Emacs lisp libraries.
 
 
 
-Public Repository
+Access Repository
 -----------------
 
 Some packages in this repository can be installed with `package.el`.
@@ -22,8 +22,11 @@ To enable this repository, add lines to your init file:
 ----
 
 
-Update
-~~~~~~
+Manage Repository
+-----------------
+
+Update Packages
+~~~~~~~~~~~~~~~
 
 Issue
 
@@ -32,7 +35,7 @@ make elpa
 ----
 
 
-Add packages
+Add Packages
 ~~~~~~~~~~~~
 
 
@@ -43,3 +46,5 @@ Put a file into `recipes/` dir:
               :repo "10sr/package-name-el"
               :branch "target-branch")
 ----
+
+And issue `make elpa`.
