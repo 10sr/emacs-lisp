@@ -1,45 +1,34 @@
 ;;; pack.el --- Pack and unpack archive files
 
 ;; Author: 10sr <8.slashes@gmail.com>
-;; URL: https://github.com/10sr/emacs-lisp/blob/master/pack.el
-;; Package-Version: 20170713.1540
+;; URL: https://github.com/10sr/pack-el
+;; Package-Version: 20181221.1417
 ;; Version: 0.1
 ;; Package-Requires: ()
-;; Keywords: files
+;; Keywords: files dired
 
 ;; This file is not part of GNU Emacs.
 
-;; This is free and unencumbered software released into the public domain.
+;;   Licensed under the Apache License, Version 2.0 (the "License");
+;;   you may not use this file except in compliance with the License.
+;;   You may obtain a copy of the License at
 
-;; Anyone is free to copy, modify, publish, use, compile, sell, or
-;; distribute this software, either in source code form or as a compiled
-;; binary, for any purpose, commercial or non-commercial, and by any
-;; means.
-
-;; In jurisdictions that recognize copyright laws, the author or authors
-;; of this software dedicate any and all copyright interest in the
-;; software to the public domain. We make this dedication for the benefit
-;; of the public at large and to the detriment of our heirs and
-;; successors. We intend this dedication to be an overt act of
-;; relinquishment in perpetuity of all present and future rights to this
-;; software under copyright law.
-
-;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-;; IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-;; OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-;; OTHER DEALINGS IN THE SOFTWARE.
-
-;; For more information, please refer to <http://unlicense.org/>
+;;
+;;   http://www.apache.org/licenses/LICENSE-2.0
+;;
+;;   Unless required by applicable law or agreed to in writing, software
+;;   distributed under the License is distributed on an "AS IS" BASIS,
+;;   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;;   See the License for the specific language governing permissions and
+;;   limitations under the License.
 
 ;;; Commentary:
 
-;; This library provides some commands and functions to pack and unpack
-;; archives.
+;; Provides some commands and functions to pack and unpack
+;; archives in a simple way.
 
-;; Commands to pack/unpack archive files are defined in `pack-program-alist'.
+;; Commands to pack/unpack archive files can be defined by setting `pack-program-alist'
+;; variable.
 
 ;; Use from Dired
 ;; --------------
@@ -49,8 +38,8 @@
 ;; (with-eval-after-load 'dired
 ;;   (define-key dired-mode-map "P" 'pack-dired-dwim))
 
-;; Now you can create an archive file from marked files, or unpack the file when
-;; only one file is selected and that seems to be an archive.
+;; This command creates an archive file from marked files, or unpack the file when
+;; only one file is selected and that has an extension for archive.
 
 ;;; Code:
 
@@ -67,13 +56,13 @@
   :group 'tools)
 
 (defcustom pack-buffer-name "*Pack*"
-  "Buffer name for `pack'."
+  "Buffer name for `pack' process."
   :type 'string
   :group 'pack)
 
 (defcustom pack-dired-default-extension
   ".7z"
-  "Default suffix for pack-dired functions.
+  "Default suffix for `pack-dired-do-pack' functions.
 Filename with this suffix must matches one of the cars in
 `pack-program-alist'."
   :type 'string
@@ -81,28 +70,34 @@ Filename with this suffix must matches one of the cars in
 
 (defcustom pack-program-alist
   `(
-    ("\\.7z\\'" "7z a" "7z x")
-    ("\\.zip\\'" "zip -r" "unzip")
-    ("\\.tar\\'" "tar cf" "tar xf")
-    ("\\.tgz\\'" "tar czf" "tar xzf")
-    ("\\.tar\\.gz\\'" "tar czf" "tar xzf")
+    ;; Use plist for cdr
+    ("\\.7z\\'" :pack "7z a" :unpack "7z x")
+    ("\\.zip\\'" :pack "zip -r" :unpack "unzip")
+    ("\\.tar\\'" :pack "tar cf" :unpack "tar xf")
+    ("\\.tgz\\'" :pack "tar czf" :unpack "tar xzf")
+    ("\\.tar\\.gz\\'" :pack "tar czf" :unpack "tar xzf")
     )
   "Alist of filename patterns, and command for pack and unpack.
 
-Each element looks like (REGEXP PACKING-COMMAND UNPACKING-COMMAND).
-PACKING-COMMAND and UNPACKING-COMMAND can be nil if the command is not
-available.  Alist is searched from the beginning so pattern for \".tar.gz\"
+Each elemetn should look like (REGEXP . PLIST).
+PLIST should be a plist that may have `:pack' and `:unpack' keys, whose
+values will be commands used to pack and unpack files respectively.
+These can be omitted if commands are not available.
+
+Alist is searched from the beginning.  So, for example, pattern for \".tar.gz\"
 should be ahead of pattern for \".gz\""
   :group 'pack
-  :type '(alist :key-type string :value-type (repeat string)))
+  :type '(alist :key-type string
+                :value-type (plist :key-type symbol
+                                   :value-type string)))
 
 ;;;###autoload
 (defun pack-dired-dwim (&rest files)
   "Pack or unpack FILES in dired.
 
-If targetting one file and that has a archive suffix defined in
+If going to process one file and that has a archive suffix defined in
 `pack-program-alist', unpack that.
-Otherwise, pack marked files, prompting user to decide archive filename."
+Otherwise, creates archive from marked files, prompting user for archive filename."
   (interactive (dired-get-marked-files t))
   (let ((firstfile (car files)))
     (if (and (eq 1 (length files))
@@ -125,7 +120,7 @@ Prompt user to unpack files for sure."
 (defun pack-dired-do-pack (&rest files)
   "Pack FILES.
 
-Prompt user to input output archive file name."
+Prompt user for archive filename."
   (interactive (dired-get-marked-files t))
   (let* ((dir-default (if (require 'dired-aux nil t)
                           (dired-dwim-target-directory)
@@ -134,11 +129,8 @@ Prompt user to input output archive file name."
                                   pack-dired-default-extension))
          (archive ;; (if (interactive-p)
           (read-file-name "Archive file name: "
-                          dir-default
-                          nil
-                          nil
-                          archive-default)
-          ;; (concat dir-default archive-default)
+                          (expand-file-name archive-default dir-default)
+                          (expand-file-name archive-default dir-default))
           ))
     (apply 'pack-pack
            archive
@@ -163,38 +155,36 @@ If the pattern matching FILENAME is found at car of the list in
 Command for unpacking is defined in `pack-program-alist'."
   (interactive "fArchive to extract: ")
   (let* ((earchive (expand-file-name archive))
-         (cmd (nth 1
-                   (pack--get-commands-for earchive)))
+         (cmd (plist-get (pack--get-commands-for earchive)
+                         :unpack))
          )
     (if cmd
         (async-shell-command (concat cmd
-                               " "
-                               (shell-quote-argument earchive))
-                       (get-buffer-create pack-buffer-name))
+                                     " "
+                                     (shell-quote-argument earchive))
+                             (get-buffer-create pack-buffer-name))
       (error "Cannot find unpacking command for %s"
-               archive))))
+             archive))))
 
 (defun pack-pack (archive &rest files)
   "Make ARCHIVE from FILES.
 
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise, use `pack-default-extension' for pack."
-  (let* ((cmd (car (pack--get-commands-for archive))))
+  (let* ((cmd (plist-get (pack--get-commands-for archive)
+                         :pack)))
     (if cmd
         (async-shell-command (concat cmd
                                      " "
                                      (shell-quote-argument (expand-file-name
                                                             archive))
                                      " "
-                                     (mapconcat (lambda (f)
-                                                  (shell-quote-argument
-                                                   (expand-file-name
-                                                    f)))
+                                     (mapconcat 'shell-quote-argument
                                                 files
                                                 " "))
                              (get-buffer-create pack-buffer-name))
-      (error "Invalid extension for packing: %s"
-               archive))))
+      (error "Cannot find packing command for: %s"
+             archive))))
 
 (provide 'pack)
 

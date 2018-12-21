@@ -1,16 +1,18 @@
-;;; with-venv.el --- Execute with Python virtual environment enabled  -*- lexical-binding: t; -*-
+;;; with-venv.el --- Execute with Python virtual environment activated  -*- lexical-binding: t; -*-
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/with-venv-el
-;; Package-Version: 20181217.1942
+;; Package-Version: 20181220.1143
 ;; Version: 0.0.1
-;; Keywords: utility python venv
+;; Keywords: processes python venv
+;; Package-Requires: ((cl-lib "0.5") (emacs "24.4"))
 
 ;; This file is not part of GNU Emacs.
 
 ;;   Licensed under the Apache License, Version 2.0 (the "License");
 ;;   you may not use this file except in compliance with the License.
 ;;   You may obtain a copy of the License at
+
 ;;
 ;;   http://www.apache.org/licenses/LICENSE-2.0
 ;;
@@ -22,10 +24,39 @@
 
 ;;; Commentary:
 
-;; Execute functions inside of Python vurtual environment.
+;; Execute BODY with Python virtual environment activated with `with-venv-dir' macro:
 
+;; (with-venv-dir (expand-file-name ".venv" default-directory)
+;;   (executable-find "python"))
+
+
+;; Alternatively, make this package try to find venv directory automatically
+;; with `with-venv':
+
+;; (with-venv
+;;   (executable-find "python"))
+
+
+;; This macro uses `with-venv-find-venv-dir' to find suitable venv directory:
+;; this function currently support pipenv, poetry, and can find directories
+;; named ".venv".
+;; Or, you can set buffer-local vairable `with-venv-venv-dir' to explicitly
+;; specify which venv directory to use.
+
+
+;; If you want to always enable `with-venv' for certain functions, you can use
+;; `with-venv-advice-add':
+
+;; (with-venv-advice-add 'blacken-buffer)
+
+;; Adviced functions are always wrapped with `with-venv' macro when called.
+
+;; To remove these advices, you can use `with-venv-advice-remove'.
 
 ;;; Code:
+
+(require 'cl-lib)
+(require 'nadvice)
 
 (defvar-local with-venv-venv-dir
   nil
@@ -42,6 +73,7 @@ python environment.")
 
 This macro does not check if DIR is a valid python environemnt.
 If dir is nil, execute BODY as usual."
+  (declare (indent 1) (debug t))
   `(let ((--with-venv-process-environment-orig (cl-copy-list process-environment))
          (--with-venv-exec-path-orig (cl-copy-list exec-path)))
      (unwind-protect
@@ -72,13 +104,14 @@ If dir is nil, execute BODY as usual."
 
 This function tries to find suitable venv dir, or run BODY as usual when no
 suitable environment was found."
+  (declare (indent 0) (debug t))
   `(with-venv-dir
-    ;; If set explicitly use it
-    (or with-venv-venv-dir
-        ;; Check previously used directory
-        (with-venv-check-exists with-venv-previously-used)
-        (setq with-venv-previously-used (with-venv-find-venv-dir)))
-    ,@body))
+       ;; If set explicitly use it
+       (or with-venv-venv-dir
+           ;; Check previously used directory
+           (with-venv-check-exists with-venv-previously-used)
+           (setq with-venv-previously-used (with-venv-find-venv-dir)))
+     ,@body))
 
 (defun with-venv-find-venv-dir (&optional dir)
   "Try to find venv dir for DIR.
@@ -132,22 +165,24 @@ If none found return nil."
 
 ;;;###autoload
 (defun with-venv-advice-add (func)
-  "Setup advice so that FUNC uses `with-env' macro when executing."
+  "Setup advice so that FUNC use `with-env' macro when executing."
   (advice-add func
               :around
               'with-venv--advice-around))
 
 ;;;###autoload
 (defun with-venv-advice-remove (func)
-  "Remove advice added by `with-venv-advice-add'."
+  "Remove advice FUNC added by `with-venv-advice-add'."
   (advice-remove func
                  'with-venv--advice-around))
 
 (defun with-venv--advice-around (orig-func &rest args)
   "Function to be used to advice functions with `with-venv-advice-add'.
-When a function is adviced with this function, it is wrapped with `with-venv'."
+When a function is adviced with this function, it is wrapped with `with-venv'.
+
+ORIG-FUNC is the target function, and ARGS is the argument when it was called."
   (with-venv
-   (apply orig-func args)))
+    (apply orig-func args)))
 
 (provide 'with-venv)
 

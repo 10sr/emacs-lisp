@@ -1,2 +1,0 @@
-
-(with-venv . [(20181217 1942) nil "Execute with Python virtual environment enabled" single ((:commit . "6e2f5e3acb54d7308630d53217c8a0aacf32fd6b") (:keywords "utility" "python" "venv") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/with-venv-el"))])
