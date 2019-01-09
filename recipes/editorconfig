@@ -1,3 +1,3 @@
 (editorconfig :fetcher github
-              :repo "terlar/editorconfig-emacs"
-              :branch "master")
+              :repo "editorconfig/editorconfig-emacs"
+              :branch "usehash")
