@@ -1,10 +1,10 @@
-;;; pack.el --- Pack and unpack archive files
+;;; pack.el --- Pack and unpack archive files  -*- lexical-binding: t -*-
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20181221.1417
+;; Package-Version: 20181229.1437
 ;; Version: 0.1
-;; Package-Requires: ()
+;; Package-Requires: ((emacs "24"))
 ;; Keywords: files dired
 
 ;; This file is not part of GNU Emacs.
@@ -33,10 +33,9 @@
 ;; Use from Dired
 ;; --------------
 
-;; To pack/unpack files from dired buffers, add following to your init.el:
+;; To pack/unpack files from dired buffers, add following to your dired confiugration:
 
-;; (with-eval-after-load 'dired
-;;   (define-key dired-mode-map "P" 'pack-dired-dwim))
+;; (define-key dired-mode-map "P" 'pack-dired-dwim))
 
 ;; This command creates an archive file from marked files, or unpack the file when
 ;; only one file is selected and that has an extension for archive.
@@ -61,7 +60,7 @@
   :group 'pack)
 
 (defcustom pack-dired-default-extension
-  ".7z"
+  ".tgz"
   "Default suffix for `pack-dired-do-pack' functions.
 Filename with this suffix must matches one of the cars in
 `pack-program-alist'."
@@ -70,16 +69,15 @@ Filename with this suffix must matches one of the cars in
 
 (defcustom pack-program-alist
   `(
-    ;; Use plist for cdr
     ("\\.7z\\'" :pack "7z a" :unpack "7z x")
     ("\\.zip\\'" :pack "zip -r" :unpack "unzip")
-    ("\\.tar\\'" :pack "tar cf" :unpack "tar xf")
-    ("\\.tgz\\'" :pack "tar czf" :unpack "tar xzf")
-    ("\\.tar\\.gz\\'" :pack "tar czf" :unpack "tar xzf")
+    ("\\.tar\\'" :pack "tar -cf" :unpack "tar -xf")
+    ("\\.tgz\\'" :pack "tar -czf" :unpack "tar -xf")
+    ("\\.tar\\.gz\\'" :pack "tar -czf" :unpack "tar -xf")
     )
   "Alist of filename patterns, and command for pack and unpack.
 
-Each elemetn should look like (REGEXP . PLIST).
+Each element should look like (REGEXP . PLIST).
 PLIST should be a plist that may have `:pack' and `:unpack' keys, whose
 values will be commands used to pack and unpack files respectively.
 These can be omitted if commands are not available.
@@ -95,7 +93,7 @@ should be ahead of pattern for \".gz\""
 (defun pack-dired-dwim (&rest files)
   "Pack or unpack FILES in dired.
 
-If going to process one file and that has a archive suffix defined in
+If selecting one file and that has a archive suffix defined in
 `pack-program-alist', unpack that.
 Otherwise, creates archive from marked files, prompting user for archive filename."
   (interactive (dired-get-marked-files t))
@@ -148,7 +146,6 @@ If the pattern matching FILENAME is found at car of the list in
                    'string-match-p
                    nil)))
 
-;;;###autoload
 (defun pack-unpack (archive)
   "Unpack ARCHIVE.
 
@@ -170,7 +167,7 @@ Command for unpacking is defined in `pack-program-alist'."
   "Make ARCHIVE from FILES.
 
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
-Otherwise, use `pack-default-extension' for pack."
+Otherwise error will be thrown."
   (let* ((cmd (plist-get (pack--get-commands-for archive)
                          :pack)))
     (if cmd

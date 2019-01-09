@@ -1,8 +1,8 @@
-;;; recently.el --- Recently opened files  -*- lexical-binding: t; -*-
+;;; recently.el --- Track recently opened files to visit them again  -*- lexical-binding: t; -*-
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20181221.46
+;; Package-Version: 20190106.1342
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
