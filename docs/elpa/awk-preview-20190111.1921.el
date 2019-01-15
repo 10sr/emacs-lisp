@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/awk-preview-el
-;; Package-Version: 20181116.1544
+;; Package-Version: 20190111.1921
 ;; Version: 0.0.1
 ;; Package-Requires: ()
 
@@ -205,41 +205,58 @@ DISPLAY non-nil means redisplay buffer as output is inserted."
 (defun awk-preview (beg end &optional program-buffer)
   "Start an awk-preview session.
 
-BEG and END should be points of region to filter with awk.
-If called interactively without region, whole contents will be
-passwd to awk process.
+BEG and END should be points of region to pass to awk process.
+If called interactively, START and END are the start/end of the
+region if the mark is active, or of the buffer's accessible
+portion if the mark is inactive.
 
 PROGRAM-BUFFER, if given, should be a awk buffer and its content
-will be used as a awk program to filter input."
+will be used as a awk program to process input."
+  ;; TODO: What to do when source buffer is modified during session
   (interactive (if (use-region-p)
                    (list (region-beginning)
                          (region-end))
                  (list (point-min)
                        (point-max))))
-  (when (and awk-preview--env
-             (awk-preview--env-running-p awk-preview--env))
-    (error "AWK-Preview already running"))
-  (let ((e (make-awk-preview--env)))
+  ;; (when (and awk-preview--env
+  ;;            (awk-preview--env-running-p awk-preview--env))
+  ;;   ;; TODO: Do not raise error, instead set env and re-init session
+  ;;   (error "AWK-Preview already running"))
+  (let ((e awk-preview--env))
+    (unless (and e
+                 (awk-preview--env-running-p awk-preview--env))
+      ;; TODO: Check that current buffer is source buffer if already running
+      ;; If not running yet, create new env
+      (setq e (make-awk-preview--env)))
     (setq awk-preview--env e)
     (setf (awk-preview--env-point-beg e) beg)
     (setf (awk-preview--env-point-end e) end)
 
     (setf (awk-preview--env-source-buffer e) (current-buffer))
 
+    (when (awk-preview--env-preview-buffer e)
+      (kill-buffer (awk-preview--env-preview-buffer e)))
     (awk-preview--create-setup-preview-buffer e)
-    (awk-preview--setup-program-buffer e
-                                       (or program-buffer
-                                           (awk-preview--create-program-buffer e)))
 
-    (setf (awk-preview--env-previous-window-configuration e)
-          (current-window-configuration))
+    (if program-buffer
+        (awk-preview--setup-program-buffer e
+                                           program-buffer)
+      (unless (awk-preview--env-program-buffer e)
+        (awk-preview--setup-program-buffer e
+                                           (awk-preview--create-program-buffer e))))
 
-    (set-window-buffer (get-buffer-window (awk-preview--env-source-buffer e))
-                       (awk-preview--env-preview-buffer e))
-    (pop-to-buffer (awk-preview--env-program-buffer e))
-    (switch-to-buffer (awk-preview--env-program-buffer e))
-    (setf (awk-preview--env-window-configuration e)
-          (current-window-configuration))
+    (unless (awk-preview--env-previous-window-configuration e)
+      (setf (awk-preview--env-previous-window-configuration e)
+            (current-window-configuration)))
+
+    (if (awk-preview--env-window-configuration e)
+        (set-window-configuration (awk-preview--env-window-configuration e))
+      (set-window-buffer (get-buffer-window (awk-preview--env-source-buffer e))
+                         (awk-preview--env-preview-buffer e))
+      (pop-to-buffer (awk-preview--env-program-buffer e))
+      (switch-to-buffer (awk-preview--env-program-buffer e))
+      (setf (awk-preview--env-window-configuration e)
+            (current-window-configuration)))
 
     (cl-assert (awk-preview--env-point-beg e))
     (cl-assert (awk-preview--env-point-end e))
@@ -325,7 +342,8 @@ will be used as a awk program to filter input."
     (when (and (not (buffer-file-name (awk-preview--env-program-buffer awk-preview--env)))
                (if (eq 'ask
                        awk-preview-kill-orphan-program-buffer)
-                   (yes-or-no-p "Program buffer does not visit any file. Kill? ")
+                   (yes-or-no-p (format "Program buffer %S does not visit any file. Kill buffer and discard it contents? "
+                                        (awk-preview--env-program-buffer awk-preview--env)))
                  awk-preview-kill-orphan-program-buffer))
       (kill-buffer (awk-preview--env-program-buffer awk-preview--env)))
     (delete-file (awk-preview--env-program-filename awk-preview--env))
