@@ -1,0 +1,2 @@
+
+(with-venv . [(20190115 1311) ((cl-lib (0 5)) (emacs (24 4))) "Execute with Python virtual environment activated" single ((:commit . "f7543aac12319449e95b6ef476c700760259035a") (:keywords "processes" "python" "venv") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/with-venv-el"))])

@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/with-venv-el
-;; Package-Version: 20190111.1356
+;; Package-Version: 20190115.1311
 ;; Version: 0.0.1
 ;; Keywords: processes python venv
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.4"))
@@ -75,7 +75,7 @@ This macro does not check if DIR is a valid python environemnt.
 If dir is nil, execute BODY as usual."
   (declare (indent 1) (debug t))
   (let ((dirval (cl-gensym)))
-    `(let ((,dirval dir)
+    `(let ((,dirval ,dir)
            (--with-venv-process-environment-orig (cl-copy-list process-environment))
            (--with-venv-exec-path-orig (cl-copy-list exec-path)))
        (unwind-protect

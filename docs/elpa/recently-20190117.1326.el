@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20190106.1342
+;; Package-Version: 20190117.1326
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
@@ -160,7 +160,7 @@ read."
 When enabled it records recently opened file paths, and
 view list and visit again via `recently-show' command."
   :global t
-  :lighter Rcntly
+  :lighter " Rcntly"
   :require 'recently
   (let ((f (if recently-mode
                'add-hook
