@@ -2,9 +2,9 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20190107.1324
+;; Package-Version: 20190122.1259
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: files dired
 
 ;; This file is not part of GNU Emacs.
@@ -45,6 +45,8 @@
 (eval-when-compile
   (require 'simple))
 
+(require 'cl-lib)
+
 (declare-function dired-dwim-target-directory "dired-aux")
 (declare-function dired-get-marked-files "dired")
 
@@ -79,8 +81,8 @@ Filename with this suffix must matches one of the cars in
 
 Each element should look like (REGEXP . PLIST).
 PLIST should be a plist that may have `:pack' and `:unpack' keys, whose
-values will be commands used to pack and unpack files respectively.
-These can be omitted if commands are not available.
+values will be used as commands to pack and unpack files respectively.
+These can be omitted when pack/unpack cannot be done.
 
 Alist is searched from the beginning.  So, for example, pattern for \".tar.gz\"
 should be ahead of pattern for \".gz\""
@@ -90,7 +92,7 @@ should be ahead of pattern for \".gz\""
                                    :value-type string)))
 
 (defcustom pack-silence nil
-  "When set to non-nil, do not pop-up buffer where pack commands run."
+  "When set to non-nil, do not pop-up result buffer of pack and unpack processes."
   :type 'boolean
   :group 'pack)
 
@@ -151,20 +153,64 @@ If the pattern matching FILENAME is found at car of the list in
                    'string-match-p
                    nil)))
 
+(defun pack--generate-command (command archive &optional sources)
+  "Generate command string to execute.
+
+COMMAND should be a list that may contain `archive' and `sources' symbol.
+
+ARCHIVE should be the file path of archive to pack or unpack.
+SOURCES, if given, should be a list of file paths to create ARCHIVE
+from.
+These arguments are put in place of each symbol in COMMAND argument.
+
+For backward compatibility, string arguments are allowed for COMMAND.
+In that case, ARCIVES and SOURCES will be quoted and appended to that
+command, as follows:
+
+    COMMAND ARCHIVE [SOURCES ...]"
+  (cl-assert command)
+  (cl-assert archive)
+  (if (stringp command)
+      (let ((result command))
+        (setq result (concat result
+                             " "
+                             (shell-quote-argument archive)))
+        (when sources
+          (setq result (concat result
+                               " "
+                               (mapconcat 'shell-quote-argument
+                                          sources
+                                          " "))))
+        result)
+    (let* ((expanded (eval `(list ,@command)
+                           `((archive . ,archive)
+                             (sources . ,sources))))
+           ;; Flatten sources
+           (flattened (cl-loop for e in expanded
+                               nconc
+                               (if (listp e)
+                                   (cl-copy-list e)
+                                 (list e)))))
+      (mapconcat 'shell-quote-argument
+                 flattened
+                 " "))))
+
+;; (pack--generate-command '("unzip" archive) "a b.zip")
+;; (pack--generate-command '("tar" "-czf" archive sources) "a b.zip" '("a.txt" "b c.txt"))
+;; (pack--generate-command "tar -xf" "a b.zip")
+;; (pack--generate-command "tar -czf" "a b.zip" '("a b.txt" "b.txt"))
+
+
 (defun pack-unpack (archive)
   "Unpack ARCHIVE.
-
 Command for unpacking is defined in `pack-program-alist'."
   (interactive "fArchive to extract: ")
-  (let* ((earchive (expand-file-name archive))
-         (cmd (plist-get (pack--get-commands-for earchive)
-                         :unpack))
-         )
+  (setq archive (expand-file-name archive))
+  (let ((cmd (plist-get (pack--get-commands-for archive)
+                        :unpack)))
     (if cmd
         (let ((c (current-window-configuration)))
-          (async-shell-command (concat cmd
-                                       " "
-                                       (shell-quote-argument earchive))
+          (async-shell-command (pack--generate-command cmd archive)
                                (get-buffer-create pack-buffer-name))
           (when pack-silence
             (set-window-configuration c)))
@@ -176,18 +222,13 @@ Command for unpacking is defined in `pack-program-alist'."
 
 If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise error will be thrown."
+  (cl-assert files
+             "FILES to pack are empty")
   (let* ((cmd (plist-get (pack--get-commands-for archive)
                          :pack)))
     (if cmd
         (let ((c (current-window-configuration)))
-          (async-shell-command (concat cmd
-                                       " "
-                                       (shell-quote-argument (expand-file-name
-                                                              archive))
-                                       " "
-                                       (mapconcat 'shell-quote-argument
-                                                  files
-                                                  " "))
+          (async-shell-command (pack--generate-command cmd archive files)
                                (get-buffer-create pack-buffer-name))
           (when pack-silence
             (set-window-configuration c)))

@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20190117.1326
+;; Package-Version: 20190121.1440
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
@@ -70,12 +70,13 @@
   "Write to file."
   ;; Failsafe to avoid purging all existing entries
   (cl-assert recently--list)
-  (with-temp-buffer
-    (prin1 recently--list
-           (current-buffer))
-    (write-region (point-min)
-                  (point-max)
-                  recently-file)))
+  (let ((inhibit-message t))
+    (with-temp-buffer
+      (prin1 recently--list
+             (current-buffer))
+      (write-region (point-min)
+                    (point-max)
+                    recently-file))))
 
 (defun recently--read ()
   "Read file."

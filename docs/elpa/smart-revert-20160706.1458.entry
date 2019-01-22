@@ -1,2 +1,2 @@
 
-(smart-revert . [(20160706 1458) ((switch-buffer-functions (0 0 1))) "Revert buffers wisely" single ((:commit . "f13bd691173d6d2ec24f5061f28d3c9dd973754f") (:keywords "buffer" "revert") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
+(smart-revert . [(20160706 1458) ((switch-buffer-functions (0 0 1))) "Revert buffers wisely" single ((:commit . "0392d4e3ef8dc6758e6df6211c53f625687a8e73") (:keywords "buffer" "revert") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
