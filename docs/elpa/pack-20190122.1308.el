@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20190122.1259
+;; Package-Version: 20190122.1308
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: files dired
@@ -118,7 +118,7 @@ Prompt user to unpack files for sure."
   (interactive (dired-get-marked-files t))
   (dolist (file files)
     (when (yes-or-no-p (format "Unpack %s?: " file))
-      (pack-unpack file)))
+      (pack-unpack (expand-file-name file))))
   (revert-buffer))
 
 ;;;###autoload
@@ -138,7 +138,7 @@ Prompt user for archive filename."
                           (expand-file-name archive-default dir-default))
           ))
     (apply 'pack-pack
-           archive
+           (expand-file-name archive)
            files))
   (revert-buffer))
 
@@ -224,6 +224,7 @@ If ARCHIVE have extension defined in `pack-program-alist', use that command.
 Otherwise error will be thrown."
   (cl-assert files
              "FILES to pack are empty")
+  (setq archive (expand-file-name archive))
   (let* ((cmd (plist-get (pack--get-commands-for archive)
                          :pack)))
     (if cmd
