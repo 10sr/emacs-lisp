@@ -1,0 +1,2 @@
+
+(pack . [(20190122 1327) ((emacs (24)) (cl-lib (0 5))) "Pack and unpack archive files" single ((:commit . "9850b3b4a05b96fa7640be1aa8195c01ce59f706") (:keywords "files" "dired") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com") (:url . "https://github.com/10sr/pack-el"))])
