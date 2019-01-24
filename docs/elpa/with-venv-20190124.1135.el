@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/with-venv-el
-;; Package-Version: 20190115.1311
+;; Package-Version: 20190124.1135
 ;; Version: 0.0.1
 ;; Keywords: processes python venv
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.4"))
@@ -115,21 +115,27 @@ suitable environment was found."
            (setq with-venv-previously-used (with-venv-find-venv-dir)))
      ,@body))
 
+(defcustom with-venv-find-venv-dir-functions
+  nil
+  "Functions to find venv dir."
+  :type 'hook
+  :group 'with-venv)
+(add-hook 'with-venv-find-venv-dir-functions
+          'with-venv-find-venv-dir-pipenv)
+(add-hook 'with-venv-find-venv-dir-functions
+          'with-venv-find-venv-dir-poetry)
+(add-hook 'with-venv-find-venv-dir-functions
+          'with-venv-find-venv-dir-dot-venv)
+
 (defun with-venv-find-venv-dir (&optional dir)
   "Try to find venv dir for DIR.
 If none found return nil."
   (with-temp-buffer
     (when dir
       (cd dir))
-    (or
-     ;; Check pipenv
-     (with-venv-check-exists (with-venv--find-venv-dir-pipenv))
-     ;; Check poetry
-     (with-venv-check-exists (with-venv--find-venv-dir-poetry))
-     ;; Search for .venv dir
-     (with-venv-check-exists (with-venv--find-venv-dir-by-name)))))
+    (run-hook-with-args-until-success with-venv-find-venv-dir-functions)))
 
-(defun with-venv--find-venv-dir-pipenv ()
+(defun with-venv-find-venv-dir-pipenv ()
   "Try to find venv dir via pipenv."
   (with-temp-buffer
     (let ((status (call-process "pipenv" nil t nil "--venv")))
@@ -138,7 +144,7 @@ If none found return nil."
         (buffer-substring-no-properties (point-at-bol)
                                         (point-at-eol))))))
 
-(defun with-venv--find-venv-dir-poetry ()
+(defun with-venv-find-venv-dir-poetry ()
   "Try to find venv dir via poetry."
   (with-temp-buffer
     ;; TODO: Use poetry env info --path
@@ -149,7 +155,7 @@ If none found return nil."
           (when (re-search-forward "^ \\* Path: *\\(.*\\)$")
             (match-string 1)))))))
 
-(defun with-venv--find-venv-dir-by-name ()
+(defun with-venv-find-venv-dir-dot-venv ()
   "Try to find venv dir by its name."
   (let ((dir (locate-dominating-file default-directory
                                      ".venv")))
