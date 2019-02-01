@@ -1,0 +1,3 @@
+(navbar :fetcher github
+        :repo "papaeye/emacs-navbar"
+        :branch "master")
