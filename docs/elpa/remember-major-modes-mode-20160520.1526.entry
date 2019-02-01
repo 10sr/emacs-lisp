@@ -1,2 +1,2 @@
 
-(remember-major-modes-mode . [(20160520 1526) nil "Remember major-modes for files" single ((:commit . "2b03818dd3b1d99d32770100684ec1a7c157988a") (:keywords "major-mode") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el"))])
+(remember-major-modes-mode . [(20160520 1526) nil "Remember major-modes for files" single ((:commit . "8af30641b40ce5f68806c4f6297d6c10070aeb88") (:keywords "major-mode") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el"))])
