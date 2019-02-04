@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/with-venv-el
-;; Package-Version: 20190124.1135
+;; Package-Version: 20190204.1337
 ;; Version: 0.0.1
 ;; Keywords: processes python venv
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.4"))
@@ -133,7 +133,7 @@ If none found return nil."
   (with-temp-buffer
     (when dir
       (cd dir))
-    (run-hook-with-args-until-success with-venv-find-venv-dir-functions)))
+    (run-hook-with-args-until-success 'with-venv-find-venv-dir-functions)))
 
 (defun with-venv-find-venv-dir-pipenv ()
   "Try to find venv dir via pipenv."
