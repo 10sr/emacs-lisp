@@ -1,2 +1,0 @@
-
-(git-walktree . [(20190206 1323) nil "Walk through git revisions" tar ((:commit . "3b6bda26a04047dc833a64981fd4b9e60e3a32d3") (:keywords "utility" "git") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/git-walktree-el"))])
