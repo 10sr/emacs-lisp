@@ -1,0 +1,3 @@
+(git-worktree :fetcher github
+              :repo "10sr/git-worktree-el"
+              :branch "init")
