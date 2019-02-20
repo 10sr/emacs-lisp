@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/git-worktree-el
-;; Package-Version: 20190206.1250
+;; Package-Version: 20190220.1335
 ;; Version: 0.0.1
 ;; Package-Requires: ()
 ;; Keywords: util git vcs
