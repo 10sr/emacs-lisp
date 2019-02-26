@@ -1,2 +1,2 @@
 
-(github-elpa . [(20180831 1711) ((package-build (1 0)) (commander (0 7 0)) (git (0 1 1))) "Build and publish ELPA repositories with GitHub Pages" tar ((:commit . "32979fa1080f19d10c108d2776fbfe16547b4cf8") (:authors (nil . "10sr<8slashes+el@gmail.com>")) (:maintainer nil . "10sr<8slashes+el@gmail.com>") (:url . "https://github.com/10sr/github-elpa"))])
+(github-elpa . [(20180831 1711) ((package-build (1 0)) (commander (0 7 0)) (git (0 1 1))) "Build and publish ELPA repositories with GitHub Pages" tar ((:commit . "279b6c352859cfd519ea8726eafed84d6875c418") (:authors (nil . "10sr<8slashes+el@gmail.com>")) (:maintainer nil . "10sr<8slashes+el@gmail.com>") (:url . "https://github.com/10sr/github-elpa"))])
