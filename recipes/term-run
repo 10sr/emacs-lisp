@@ -1,0 +1,3 @@
+(term-run :fetcher github
+          :repo "10sr/term-run-el"
+          :branch "updateformat")
