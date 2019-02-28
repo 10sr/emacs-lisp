@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/term-run-el
-;; Package-Version: 20190221.1320
+;; Package-Version: 20190228.1337
 ;; Version: 0.1.5
 ;; Keywords: utility shell command term-mode
 
@@ -98,9 +98,9 @@ This function returns the buffer where the process starts running."
             (insert (format "[%s] >> %s"
                             dir
                             (nth 1 args)))
-          (insert (format "[%s] >> '%s' %s"
+          (insert (format "[%s] >> %s %s"
                           dir
-                          program
+                          (shell-quote-argument program)
                           (mapconcat 'shell-quote-argument args " "))))
         (add-text-properties (point-at-bol)
                              (point-at-eol)
