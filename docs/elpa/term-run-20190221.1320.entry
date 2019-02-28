@@ -1,0 +1,2 @@
+
+(term-run . [(20190221 1320) nil "Run arbitrary command in terminal buffer" single ((:commit . "6e8465104963cf35422202957d0d782172efdbf7") (:keywords "utility" "shell" "command" "term-mode") (:authors ("10sr <8slashes+el [at] gmail [dot] com>")) (:maintainer "10sr <8slashes+el [at] gmail [dot] com>") (:url . "https://github.com/10sr/term-run-el"))])
