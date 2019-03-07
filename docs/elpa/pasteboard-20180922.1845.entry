@@ -1,2 +1,2 @@
 
-(pasteboard . [(20180922 1845) nil "Use osx pasteboard for yank and paste" single ((:commit . "f1d8034ef900bc7cf8f6b2c165ded2e8fe2d84c9") (:keywords "utility" "clipboard" "osx") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el"))])
+(pasteboard . [(20180922 1845) nil "Use osx pasteboard for yank and paste" single ((:commit . "0bc6a473aff1fd88f6c1344fdbdd4919700a2a40") (:keywords "utility" "clipboard" "osx") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/pasteboard.el"))])
