@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/term-run-el
-;; Package-Version: 20190301.1301
+;; Package-Version: 20190311.1418
 ;; Version: 0.1.5
 ;; Keywords: utility shell command term-mode
 
@@ -96,10 +96,10 @@ This function returns the buffer where the process starts running."
                  (eq (length args)
                      2))
             (insert (format "[%s] >> %s"
-                            dir
+                            (abbreviate-file-name dir)
                             (nth 1 args)))
           (insert (format "[%s] >> %s %s"
-                          dir
+                          (abbreviate-file-name dir)
                           (shell-quote-argument program)
                           (mapconcat 'shell-quote-argument args " "))))
         (add-text-properties (point-at-bol)
