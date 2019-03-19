@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/term-run-el
-;; Package-Version: 20190311.1418
+;; Package-Version: 20190318.1255
 ;; Version: 0.1.5
 ;; Keywords: utility shell command term-mode
 
@@ -116,9 +116,12 @@ This function returns the buffer where the process starts running."
       (if (ignore-errors (get-buffer-process buf))
           (set-process-sentinel (get-buffer-process buf)
                                 (lambda (proc change)
-                                  (with-current-buffer (process-buffer proc)
-                                    (term-sentinel proc change)
-                                    (goto-char (point-max)))))
+                                  (let* ((buf (process-buffer proc))
+                                         (win (get-buffer-window buf)))
+                                    (when win
+                                      (with-selected-window win
+                                        (term-sentinel proc change)
+                                        (goto-char (point-max)))))))
         ;; (goto-char (point-max))
         ))
     buf))

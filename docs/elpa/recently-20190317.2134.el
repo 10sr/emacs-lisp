@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20190121.1440
+;; Package-Version: 20190317.2134
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
@@ -47,7 +47,7 @@
 (defcustom recently-max
   100
   "Recently list max length."
-  :type 'int
+  :type 'integer
   :group 'recently)
 
 (defcustom recently-excludes
@@ -70,7 +70,8 @@
   "Write to file."
   ;; Failsafe to avoid purging all existing entries
   (cl-assert recently--list)
-  (let ((inhibit-message t))
+  (let ((inhibit-message t)
+        (print-length nil))
     (with-temp-buffer
       (prin1 recently--list
              (current-buffer))
@@ -113,6 +114,8 @@ read."
                  finally return t)
     (recently--reload)
     (let* ((l (cl-copy-list recently--list))
+           (l (cl-remove-if-not 'stringp
+                                l))
            (l (delete path
                       l))
            (l (cl-loop for e in l
