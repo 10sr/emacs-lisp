@@ -53,6 +53,7 @@ PREV and CUR are ignored."
                  (dired-directory-changed-p default-directory))
             (and buffer-file-name
                  (file-readable-p buffer-file-name)
+                 ;; TODO: Ask when buffer is modified but file modified on the disk
                  (not (verify-visited-file-modtime (current-buffer)))))
     (revert-buffer t t)
     (message "%s reverted." (buffer-name))))
