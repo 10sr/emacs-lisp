@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
-;; Package-Version: 20160706.1458
+;; Package-Version: 20190404.1751
 ;; Version: 0.1
 ;; Package-Requires: ((switch-buffer-functions "0.0.1"))
 ;; Keywords: buffer revert
@@ -54,6 +54,7 @@ PREV and CUR are ignored."
                  (dired-directory-changed-p default-directory))
             (and buffer-file-name
                  (file-readable-p buffer-file-name)
+                 ;; TODO: Ask when buffer is modified but file modified on the disk
                  (not (verify-visited-file-modtime (current-buffer)))))
     (revert-buffer t t)
     (message "%s reverted." (buffer-name))))

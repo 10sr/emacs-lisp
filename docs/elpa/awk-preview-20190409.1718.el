@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/awk-preview-el
-;; Package-Version: 20190111.1921
+;; Package-Version: 20190409.1718
 ;; Version: 0.0.1
 ;; Package-Requires: ()
 
@@ -98,12 +98,6 @@ killed for any cases regardless of this variable."
   (point-beg nil)
   ;; Point of end in source buffer
   (point-end nil)
-  ;; Point of beginning
-  ;; Used by preview buffer and always same as point-beg
-  (preview-point-beg nil)
-  ;; Point of beginning
-  ;; Used by preview buffer and may defferent from point-end
-  (preview-point-end nil)
   ;; Awk preview program temporary file name
   (program-filename nil)
   ;; Source buffer
@@ -196,8 +190,6 @@ DISPLAY non-nil means redisplay buffer as output is inserted."
         (goto-char end)
         (setq buffer-read-only t)
         (setq awk-preview--env e))
-      (setf (awk-preview--env-preview-point-beg e) beg)
-      (setf (awk-preview--env-preview-point-end e) end)
       (setf (awk-preview--env-preview-buffer e) buf)
       buf)))
 
@@ -260,8 +252,6 @@ will be used as a awk program to process input."
 
     (cl-assert (awk-preview--env-point-beg e))
     (cl-assert (awk-preview--env-point-end e))
-    (cl-assert (awk-preview--env-preview-point-beg e))
-    (cl-assert (awk-preview--env-preview-point-end e))
     (cl-assert (awk-preview--env-program-filename e))
     (cl-assert (awk-preview--env-source-buffer e))
     (cl-assert (awk-preview--env-preview-buffer e))
@@ -281,10 +271,10 @@ will be used as a awk program to process input."
     (write-region (point-min)
                   (point-max)
                   (awk-preview--env-program-filename awk-preview--env)))
-  (let ((output (with-current-buffer (get-buffer-create " *awk-preview output*")
-                  (erase-buffer)
-                  (current-buffer)))
+  (let ((output (get-buffer-create " *awk-preview temporary output*"))
         (progfile (awk-preview--env-program-filename awk-preview--env)))
+    (with-current-buffer output
+      (erase-buffer))
     (awk-preview--invoke-awk (awk-preview--env-source-buffer awk-preview--env)
                              (awk-preview--env-point-beg awk-preview--env)
                              (awk-preview--env-point-end awk-preview--env)
@@ -292,12 +282,9 @@ will be used as a awk program to process input."
                              output)
     (with-current-buffer (awk-preview--env-preview-buffer awk-preview--env)
       (let ((inhibit-read-only t))
-        (goto-char (awk-preview--env-preview-point-end awk-preview--env))
-        (delete-region (awk-preview--env-preview-point-beg awk-preview--env)
-                       (point))
+        (erase-buffer)
         (insert-buffer-substring output)
-        (setf (awk-preview--env-preview-point-end awk-preview--env)
-              (point)))
+        )
       ))
   (set-window-configuration (awk-preview--env-window-configuration awk-preview--env)))
 
@@ -307,14 +294,10 @@ will be used as a awk program to process input."
   (cl-assert awk-preview--env)
   (with-current-buffer (awk-preview--env-preview-buffer awk-preview--env)
     (let ((inhibit-read-only t))
-      (goto-char (awk-preview--env-preview-point-end awk-preview--env))
-      (delete-region (awk-preview--env-preview-point-beg awk-preview--env)
-                     (point))
       (insert-buffer-substring (awk-preview--env-source-buffer awk-preview--env)
                                (awk-preview--env-point-beg awk-preview--env)
                                (awk-preview--env-point-end awk-preview--env))
-      (setf (awk-preview--env-preview-point-end awk-preview--env)
-            (point)))))
+      )))
 
 (defun awk-preview-commit ()
   "Exit awk-preview session and update buffer."
