@@ -1,0 +1,2 @@
+
+(editorconfig-auto-apply . [(20190418 1348) ((editorconfig (0 0 1)) (emacs (24))) "Auto apply editorconfig properties" single ((:commit . "6a1f7ec03bfed6f42770a62b3f1d3eadee6944ff") (:keywords "tools") (:authors ("10sr<>")) (:maintainer "10sr<>") (:url . "https://github.com/10sr/editorconfig-auto-apply-el"))])
