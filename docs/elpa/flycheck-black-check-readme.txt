@@ -1,0 +1,1 @@
+Flycheck black check.

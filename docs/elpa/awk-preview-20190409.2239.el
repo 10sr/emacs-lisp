@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/awk-preview-el
-;; Package-Version: 20190409.1718
+;; Package-Version: 20190409.2239
 ;; Version: 0.0.1
 ;; Package-Requires: ()
 
@@ -92,6 +92,7 @@ killed for any cases regardless of this variable."
   :group 'awk-preview)
 
 (cl-defstruct awk-preview--env
+  ;; TODO: Use comment
   ;; Whether awk-preview is currently running
   (running-p nil)
   ;; Point of beg in source buffer
@@ -193,33 +194,11 @@ DISPLAY non-nil means redisplay buffer as output is inserted."
       (setf (awk-preview--env-preview-buffer e) buf)
       buf)))
 
-;;;###autoload
-(defun awk-preview (beg end &optional program-buffer)
-  "Start an awk-preview session.
+(defun awk-preview--start-new-session (beg end &optional program-buffer)
+  "Start new awk-preview session.
 
-BEG and END should be points of region to pass to awk process.
-If called interactively, START and END are the start/end of the
-region if the mark is active, or of the buffer's accessible
-portion if the mark is inactive.
-
-PROGRAM-BUFFER, if given, should be a awk buffer and its content
-will be used as a awk program to process input."
-  ;; TODO: What to do when source buffer is modified during session
-  (interactive (if (use-region-p)
-                   (list (region-beginning)
-                         (region-end))
-                 (list (point-min)
-                       (point-max))))
-  ;; (when (and awk-preview--env
-  ;;            (awk-preview--env-running-p awk-preview--env))
-  ;;   ;; TODO: Do not raise error, instead set env and re-init session
-  ;;   (error "AWK-Preview already running"))
-  (let ((e awk-preview--env))
-    (unless (and e
-                 (awk-preview--env-running-p awk-preview--env))
-      ;; TODO: Check that current buffer is source buffer if already running
-      ;; If not running yet, create new env
-      (setq e (make-awk-preview--env)))
+See docstring of `awk-preview' for BEG, END and PROGRAM-BUFFER args."
+  (let ((e (make-awk-preview--env)))
     (setq awk-preview--env e)
     (setf (awk-preview--env-point-beg e) beg)
     (setf (awk-preview--env-point-end e) end)
@@ -262,6 +241,34 @@ will be used as a awk program to process input."
     (setf (awk-preview--env-running-p e) t)
     (awk-preview-update-preview)
     ))
+
+;;;###autoload
+(defun awk-preview (beg end &optional program-buffer)
+  "Start an awk-preview session.
+
+BEG and END should be points of region to pass to awk process.
+If called interactively, START and END are the start/end of the
+region if the mark is active, or of the buffer's accessible
+portion if the mark is inactive.
+
+PROGRAM-BUFFER, if given, should be a awk buffer and its content
+will be used as a awk program to process input."
+  ;; TODO: What to do when source buffer is modified during session
+  (interactive (if (use-region-p)
+                   (list (region-beginning)
+                         (region-end))
+                 (list (point-min)
+                       (point-max))))
+  ;; (when (and awk-preview--env
+  ;;            (awk-preview--env-running-p awk-preview--env))
+  ;;   ;; TODO: Do not raise error, instead set env and re-init session
+  ;;   (error "AWK-Preview already running"))
+  (if (and awk-preview--env
+           (awk-preview--env-running-p awk-preview--env))
+      ;; TODO: Check that current buffer is source buffer if already running
+      ;; TODO: Implement
+      (awk-preview--update-session beg end program-buffer)
+    (awk-preview--start-new-session beg end program-buffer)))
 
 (defun awk-preview-update-preview ()
   "Update awk-preview."
