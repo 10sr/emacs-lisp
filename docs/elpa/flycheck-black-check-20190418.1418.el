@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<>
 ;; Keywords: languages, tools
-;; Package-Version: 20190418.1412
+;; Package-Version: 20190418.1418
 ;; Version: 0.0.1
 ;; URL: https://github.com/10sr/flycheck-black-check
 ;; Package-Requires: ((flycheck "0.0.1") (emacs "24"))
@@ -85,7 +85,7 @@ For argument OUTPUT, CHECKER, and BUFFER refer to doc of `flycheck-define-comman
                  "Black: would reformat"
                  :buffer buffer
                  :checker checker)
-                'result))
+                result))
         (goto-char (point-min))
         (when (re-search-forward "^error: .*$" nil t)
           (push (flycheck-error-new-at
@@ -96,7 +96,7 @@ For argument OUTPUT, CHECKER, and BUFFER refer to doc of `flycheck-define-comman
                  (format "Black: %s" (match-string 0))
                  :buffer buffer
                  :checker checker)
-                'result))))
+                result))))
     result))
 
 ;; (defun my-flycheck-parse-unified-diff (output checker buffer)
