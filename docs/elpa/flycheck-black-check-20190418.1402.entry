@@ -1,2 +1,0 @@
-
-(flycheck-black-check . [(20190418 1402) ((flycheck (0 0 1)) (emacs (24))) "Black check" single ((:commit . "d69c03f233dcb76e166ea95ecc217eb3d004fc29") (:keywords "languages" "tools") (:authors ("10sr<>")) (:maintainer "10sr<>") (:url . "https://github.com/10sr/flycheck-black-check"))])
