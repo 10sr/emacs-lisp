@@ -1,0 +1,3 @@
+(flycheck-black-check :fetcher github
+                      :repo "10sr/flycheck-black-check-el"
+                      :branch "init")
