@@ -1,0 +1,3 @@
+(editorconfig-auto-apply :fetcher github
+                         :repo "10sr/editorconfig-auto-apply-el"
+                         :branch "init")
