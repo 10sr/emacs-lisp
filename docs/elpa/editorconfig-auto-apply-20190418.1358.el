@@ -4,7 +4,7 @@
 
 ;; Author: 10sr<>
 ;; Keywords: tools
-;; Package-Version: 20190418.1348
+;; Package-Version: 20190418.1358
 ;; Version: 0.0.1
 ;; URL: https://github.com/10sr/editorconfig-auto-apply-el
 ;; Package-Requires: ((editorconfig "0.0.1") (emacs "24"))
@@ -30,6 +30,7 @@
 
 (require 'editorconfig)
 
+;;;###autoload
 (define-minor-mode editorconfig-auto-apply-mode
   "When saving .editorconfig file update buffer configs."
   :lighter " ECAA"
@@ -39,6 +40,7 @@
     (remove-hook 'after-save-hook
                  'editorconfig-auto-apply-mode--run t)))
 
+;;;###autoload
 (defun editorconfig-auto-apply-enable ()
   "Turn on command `editorconfig-auto-apply-mode'."
   (unless editorconfig-auto-apply-mode
