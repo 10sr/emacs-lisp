@@ -1,7 +1,7 @@
 ;;; term-cursor.el --- Change cursor shape in terminal -*- lexical-binding: t; coding: utf-8; -*-
 
-;; Version: 0.3
-;; Package-Version: 20190418.415
+;; Version: 0.4
+;; Package-Version: 20190515.741
 ;; Author: h0d
 ;; URL: https://github.com/h0d
 ;; Keywords: terminals
@@ -20,6 +20,7 @@
   :group 'terminals
   :prefix 'term-cursor-)
 
+;; Define escape codes for different cursors
 (defcustom term-cursor-block-blinking "\e[1 q"
   "The escape code sent to terminal to set the cursor as a blinking box."
   :type 'string
@@ -50,12 +51,20 @@
   :type 'string
   :group 'term-cursor)
 
+;; Current cursor evaluation
+(defcustom term-cursor-triggers (list 'blink-cursor-mode-hook 'lsp-ui-doc-frame-hook)
+  "Hooks to add when the variable watcher might not be enough.
+That is, hooks to trigger `term-cursor--immediate'."
+  :type 'list
+  :group 'term-cursor)
+
 ;;;###autoload
 (define-minor-mode term-cursor-mode
   "Minor mode for term-cursor."
   :group 'term-cursor
   (if term-cursor-mode
       (term-cursor-watch)
+    ;; else
     (term-cursor-unwatch)))
 
 ;;;###autoload
@@ -64,45 +73,61 @@
     (term-cursor-mode t))
   :group 'term-cursor)
 
-;; (add-hook 'lsp-ui-doc-frame-hook #'term-cursor--eval)
+(defun term-cursor--normalize (cursor)
+  "Return the actual value of CURSOR.
+It can sometimes be a `cons' from which we only want the first element (cf `cursor-type')."
+  (if (consp cursor)
+      (car cursor)
+    ;; else
+    cursor))
 
-(defun term-cursor--eval (&optional cursor)
-  "Send escape code to terminal according to the value of `cursor-type'.
-If not supplied, CURSOR will be automatically set to `cursor-type'."
-  (unless (display-graphic-p)		; Must be in TTY
-    ;; Get the cursor when not supplied by the watcher
-    (unless cursor
-      (setq cursor cursor-type))
-    ;; CURSOR can be a `cons' (cf. `C-h v cursor-type')
-    ;; In that case, extract actual cursor type
-    (when (consp cursor)
-      (setq cursor (car cursor)))
+(defun term-cursor--determine-esc (cursor blink)
+  "Return an escape code depending on the CURSOR and whether it should BLINK."
+  (cond (;; Vertical bar
+	 (eq cursor 'bar)
+	 (if blink term-cursor-bar-blinking
+	   term-cursor-bar-steady))
+	(;; Underscore
+	 (eq cursor 'hbar)
+	 (if blink term-cursor-underline-blinking
+	   term-cursor-underline-steady))
+	(;; Box — default value
+	 t
+	 (if blink term-cursor-block-blinking
+	   term-cursor-block-steady))))
 
-    ;; Compare values and send corresponding escape code
-    (cond (;; Vertical bar
-	   (eq cursor 'bar)
-	   (send-string-to-terminal term-cursor-bar-steady))
-	  (;; Underscore
-	   (eq cursor 'hbar)
-	   (send-string-to-terminal term-cursor-underline-steady))
-	  (;; Box — default value
-	   t
-	   (send-string-to-terminal term-cursor-block-steady)))))
+(defun term-cursor--eval (cursor blink)
+  "Send escape code to terminal according to CURSOR and whether it should BLINK."
+  (unless (display-graphic-p) ; Must be in TTY
+    ;; CURSOR can be a `cons' (cf. `cursor-type')
+    (setq cursor
+	  (term-cursor--normalize cursor))
+
+    ;; Ask terminal to display new cursor
+    (send-string-to-terminal
+     (term-cursor--determine-esc cursor blink))))
+
+(defun term-cursor--immediate ()
+  "Send an escape code without waiting for `term-cursor-watcher'."
+  (term-cursor--eval cursor-type blink-cursor-mode))
 
 (defun term-cursor-watcher (_symbol cursor operation _watch)
   "Change cursor shape through escape sequences depending on CURSOR.
 Waits for OPERATION to be 'set."
-  ;; FIXME: investigate cursor being changed unexpectedly (e.g. with lsp-ui & js)
-  (unless (not (eq operation 'set))  ; A new value must be set to the variable
-    (term-cursor--eval cursor)))
+  (when (eq operation 'set)  ; A new value must be set to the variable
+    (term-cursor--eval cursor blink-cursor-mode)))
 
 (defun term-cursor-watch ()
-  "Start watching cursor change."
-  (add-variable-watcher 'cursor-type #'term-cursor-watcher))
+  "Start reacting to cursor change."
+  (add-variable-watcher 'cursor-type #'term-cursor-watcher)
+  (dolist (hook term-cursor-triggers)
+    (add-hook hook #'term-cursor--immediate)))
 
 (defun term-cursor-unwatch ()
-  "Stop watching cursor change."
-  (remove-variable-watcher 'cursor-type #'term-cursor-watcher))
+  "Stop reacting to cursor change."
+  (remove-variable-watcher 'cursor-type #'term-cursor-watcher)
+  (dolist (hook term-cursor-triggers)
+    (remove-hook hook #'term-cursor--immediate)))
 
 (provide 'term-cursor)
 

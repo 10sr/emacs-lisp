@@ -1,0 +1,2 @@
+
+(term-cursor . [(20190515 741) ((emacs (26 1))) "Change cursor shape in terminal" single ((:commit . "d6c9b46c6ad73875db4ce04cac335846f86fb7e7") (:keywords "terminals") (:authors ("h0d")) (:maintainer "h0d") (:url . "https://github.com/h0d"))])
