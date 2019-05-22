@@ -1,2 +1,2 @@
 
-(recentf-show . [(20160520 1526) ((recentf (0))) "Neat recentf view" single ((:commit . "4a33b2d1936b4b32dd1bdff42bf810ab779b13f0") (:keywords "recentf" "view" "show") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
+(recentf-show . [(20160520 1526) ((recentf (0))) "Neat recentf view" single ((:commit . "1ff359c30a92bf26c5986fee0639a8c5aac5cd59") (:keywords "recentf" "view" "show") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
