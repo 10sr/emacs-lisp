@@ -1,0 +1,2 @@
+
+(git-walktree . [(20190522 1759) ((git (0 1 1))) "Walk through git tree and blob objects" tar ((:commit . "9cc88412beb1429f576bfe54ba4dffe3e052c3a3") (:keywords "utility" "git") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/git-walktree-el"))])
