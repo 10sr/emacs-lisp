@@ -1,0 +1,2 @@
+
+(gited . [(20190625 1126) ((emacs (24 4)) (cl-lib (0 5))) "Operate on Git branches like dired" tar ((:commit . "636548c23ca62c2f0f1030904c375927f4c8c9d3") (:keywords "git" "vc" "convenience") (:authors ("Tino Calancha" . "tino.calancha@gmail.com")) (:maintainer "Tino Calancha" . "tino.calancha@gmail.com") (:url . "https://github.com/calancha/Gited"))])

@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20190312.1849
+;; Package-Version: 20190613.1325
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: files dired
@@ -85,6 +85,15 @@ Filename with this suffix must matches one of the cars in
      :unpack ("tar" "-xf" archive))
     ("\\.tar\\.gz\\'"
      :pack ("tar" "-czf" archive sources)
+     :unpack ("tar" "-xf" archive))
+    ("\\.tar\\.bz2\\'"
+     :pack ("tar" "-cjf" archive sources)
+     :unpack ("tar" "-xf" archive))
+    ("\\.tar\\.xz\\'"
+     :pack ("tar" "-cJf" archive sources)
+     :unpack ("tar" "-xf" archive))
+    ("\\.txz\\'"
+     :pack ("tar" "-cJf" archive sources)
      :unpack ("tar" "-xf" archive))
     )
   "Alist of filename patterns, and command for pack and unpack.

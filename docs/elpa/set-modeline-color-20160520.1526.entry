@@ -1,2 +1,2 @@
 
-(set-modeline-color . [(20160520 1526) nil "Set mode-line color according to writability state" single ((:commit . "0c1caa370a383a7494457590ce73237e2a19bd30") (:keywords "utility" "modeline") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/set-modeline-color.el"))])
+(set-modeline-color . [(20160520 1526) nil "Set mode-line color according to writability state" single ((:commit . "794ee3cb7beb387c687ceeca74039dcc69a6bacc") (:keywords "utility" "modeline") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/set-modeline-color.el"))])
