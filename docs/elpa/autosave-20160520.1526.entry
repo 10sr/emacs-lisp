@@ -1,2 +1,2 @@
 
-(autosave . [(20160520 1526) nil "Save buffers automatically" single ((:commit . "51d8882862a44d4482d14484e90536022b50fb0f") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/autosave.el"))])
+(autosave . [(20160520 1526) nil "Save buffers automatically" single ((:commit . "e0caa2938a4a4685b1ede196f7d9a870874ce72d") (:keywords "utility") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp/blob/master/autosave.el"))])
