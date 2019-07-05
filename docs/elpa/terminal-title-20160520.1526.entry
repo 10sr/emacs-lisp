@@ -1,2 +1,2 @@
 
-(terminal-title . [(20160520 1526) nil "Set terminal title" single ((:commit . "e0caa2938a4a4685b1ede196f7d9a870874ce72d") (:keywords "terminal" "title" "console") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
+(terminal-title . [(20160520 1526) nil "Set terminal title" single ((:commit . "97155be9acb4fc7569cc2c3e99a6dd77614bd929") (:keywords "terminal" "title" "console") (:authors ("10sr <>")) (:maintainer "10sr <>") (:url . "https://github.com/10sr/emacs-lisp"))])
