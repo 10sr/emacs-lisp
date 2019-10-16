@@ -1,2 +1,0 @@
-
-(git-walktree . [(20191003 1832) ((emacs (26)) (git (0 1 1)) (cl-lib (0 5))) "Browse Git tree and blob objects" tar ((:commit . "959a90a2baacda968990d0b52ab1e397bc551dc6") (:keywords "vc" "utility" "git") (:authors ("10sr <8.slashes [at] gmail [dot] com>")) (:maintainer "10sr <8.slashes [at] gmail [dot] com>") (:url . "https://github.com/10sr/git-walktree-el"))])
