@@ -2,8 +2,8 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20191011.1730
-;; Version: 0.1
+;; Package-Version: 20191017.456
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: files dired
 
@@ -282,8 +282,8 @@ For other cases, error will be thrown."
           (when pack-silence
             (set-window-configuration c)))
       (error (if append-p
-                 "Command not defined to append files to: %s"
-               "Command not defined to packing files into: %s")
+                 "Cannot append files to existing archives, append command is not defined: %s"
+               "Cannot pack files, command not defined: %s")
              archive))))
 
 (provide 'pack)
