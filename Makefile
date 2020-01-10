@@ -7,6 +7,15 @@ cask ?= CASK_EMACS=$(emacs) $(cask_install_path)/bin/cask
 casked_emacs := $(cask) emacs
 git ?= git
 markdown ?= markdown
+uname := $(shell uname)
+
+ifeq (Darwin,$(uname))
+tar := gtar
+else
+tar := tar
+endif
+
+
 
 all: compile clean
 
@@ -54,10 +63,10 @@ info: $(el)
 
 
 elpa:
-	$(cask) exec github-elpa update
+	$(cask) exec github-elpa update --tar $(tar)
 
 build:
-	$(cask) exec github-elpa build
+	$(cask) exec github-elpa build --tar $(tar)
 
 
 ##############################
