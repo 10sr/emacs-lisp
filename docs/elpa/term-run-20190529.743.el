@@ -2,7 +2,8 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/term-run-el
-;; Package-Version: 20190318.1255
+;; Package-Version: 20190529.743
+;; Package-Commit: fe8bf58814b167f887aaef98a148b8d5d8a11d3f
 ;; Version: 0.1.5
 ;; Keywords: utility shell command term-mode
 
@@ -78,6 +79,7 @@ This function returns the buffer where the process starts running."
          (proc (get-buffer-process buf))
          (dir default-directory))
     (and proc
+         ;; Use signal-process and SIGTERM instead?
          (delete-process proc))
     (display-buffer buf)
     (with-current-buffer buf

@@ -2,7 +2,8 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
-;; Package-Version: 20190317.2134
+;; Package-Version: 20200120.1432
+;; Package-Commit: 252cb0a63f27a75eb69e0dd902846457122f7f9c
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
@@ -39,7 +40,7 @@
   :prefix "recently-"
   :group 'tools)
 (defcustom recently-file
-  (locate-user-emacs-file "recently.el")
+  (expand-file-name (locate-user-emacs-file "recently.el"))
   "File to store recent file list."
   :type 'string
   :group 'recently)

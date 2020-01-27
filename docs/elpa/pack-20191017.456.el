@@ -2,8 +2,9 @@
 
 ;; Author: 10sr <8.slashes@gmail.com>
 ;; URL: https://github.com/10sr/pack-el
-;; Package-Version: 20190312.1849
-;; Version: 0.1
+;; Package-Version: 20191017.456
+;; Package-Commit: 85cd856fdc00a2365e88b50373b99f1b3d2227be
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: files dired
 
@@ -73,12 +74,15 @@ Filename with this suffix must matches one of the cars in
   `(
     ("\\.7z\\'"
      :pack ("7z" "a" archive sources)
+     :pack-append ("7z" "a" archive sources)
      :unpack ("7z" "x" archive))
     ("\\.zip\\'"
      :pack ("zip" "-r" archive sources)
+     :pack-append ("zip" "-r" archive sources)
      :unpack ("unzip" archive))
     ("\\.tar\\'"
      :pack ("tar" "-cf" archive sources)
+     :pack-append ("tar" "-rf" archive sources)
      :unpack ("tar" "-xf" archive))
     ("\\.tgz\\'"
      :pack ("tar" "-czf" archive sources)
@@ -86,12 +90,22 @@ Filename with this suffix must matches one of the cars in
     ("\\.tar\\.gz\\'"
      :pack ("tar" "-czf" archive sources)
      :unpack ("tar" "-xf" archive))
+    ("\\.tar\\.bz2\\'"
+     :pack ("tar" "-cjf" archive sources)
+     :unpack ("tar" "-xf" archive))
+    ("\\.tar\\.xz\\'"
+     :pack ("tar" "-cJf" archive sources)
+     :unpack ("tar" "-xf" archive))
+    ("\\.txz\\'"
+     :pack ("tar" "-cJf" archive sources)
+     :unpack ("tar" "-xf" archive))
     )
   "Alist of filename patterns, and command for pack and unpack.
 
 Each element should look like (REGEXP . PLIST).
-PLIST should be a plist that may have `:pack' and `:unpack' keys, whose
-values will be used as commands to pack and unpack files respectively.
+PLIST should be a plist that may have `:pack', `:pack-append' and `:unpack'
+keys, whose values will be used as commands to pack, append files to existing
+archive files, and unpack files respectively.
 These can be omitted when pack/unpack cannot be done.
 
 Each command should be in format like '(COMMAND ARGS...).
@@ -242,20 +256,35 @@ Command for unpacking is defined in `pack-program-alist'."
 (defun pack-pack (archive &rest files)
   "Make ARCHIVE from FILES.
 
-If ARCHIVE have extension defined in `pack-program-alist', use that command.
-Otherwise error will be thrown."
+If ARCHIVE file does not exists and `:pack' command is defined,
+create ARCHIVE using that command.
+
+If ARCHIVE file alreay exists and `:pack-append' command is defined,
+append files to ARCHIVE using `:pack-append' command.
+
+Command for archiving and appending is searched from `pack-program-alist'.
+For other cases, error will be thrown."
   (cl-assert files
              "FILES to pack are empty")
   (setq archive (expand-file-name archive))
-  (let* ((cmd (plist-get (pack--get-commands-for archive)
-                         :pack)))
-    (if cmd
+  (let* ((pack-command (plist-get (pack--get-commands-for archive)
+                                  :pack))
+         (pack-append-command (plist-get (pack--get-commands-for archive)
+                                         :pack-append))
+         (append-p (file-exists-p archive))
+         (command (if append-p
+                      pack-append-command
+                    pack-command)))
+
+    (if command
         (let ((c (current-window-configuration)))
-          (async-shell-command (pack--generate-command cmd archive files)
+          (async-shell-command (pack--generate-command command archive files)
                                (get-buffer-create pack-buffer-name))
           (when pack-silence
             (set-window-configuration c)))
-      (error "Cannot find packing command for: %s"
+      (error (if append-p
+                 "Cannot append files to existing archives, append command is not defined: %s"
+               "Cannot pack files, command not defined: %s")
              archive))))
 
 (provide 'pack)
