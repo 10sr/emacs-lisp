@@ -1,2 +1,0 @@
-
-(navbar . [(20151208 108) ((emacs (24 4))) "Navigation bar for Emacs" tar ((:commit . "25ad7a83fa54856d12205c9a85c0b22d3bfed8ea") (:keywords "convenience") (:authors ("papaeye" . "papaeye@gmail.com")) (:maintainer "papaeye" . "papaeye@gmail.com") (:url . "https://github.com/papaeye/emacs-navbar"))])
