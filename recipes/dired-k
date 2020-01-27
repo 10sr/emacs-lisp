@@ -1,0 +1,5 @@
+;; Current HEAD of original repo is broken
+;; See https://github.com/syohex/emacs-dired-k/issues/45
+(dired-k :fetcher github
+         :repo "amosbird/emacs-dired-k"
+         :branch "patch-1")
