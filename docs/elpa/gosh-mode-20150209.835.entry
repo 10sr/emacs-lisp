@@ -1,0 +1,2 @@
+
+(gosh-mode . [(20150209 835) nil "Programming utilities for Gauche code." tar ((:commit . "0bdc3393be7925c39665c0f35644f5ebe87a770b"))])

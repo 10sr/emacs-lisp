@@ -1,0 +1,2 @@
+
+(git-worktree . [(20190220 435) nil "Manage git worktrees" single ((:commit . "870333c0a9b76d568690ed89fd1aa1699dedd52f") (:keywords "util" "git" "vcs") (:authors ("10sr <8slashes+el [at] gmail [dot] com>")) (:maintainer "10sr <8slashes+el [at] gmail [dot] com>") (:url . "https://github.com/10sr/git-worktree-el"))])
