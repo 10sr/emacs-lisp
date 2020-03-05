@@ -1,0 +1,3 @@
+(sky-color-clock :fetcher github
+                 :repo "zk-phi/sky-color-clock"
+                 :branch "master")
