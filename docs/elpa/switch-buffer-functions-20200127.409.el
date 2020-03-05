@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8slashes+el [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/switch-buffer-functions-el
-;; Package-Version: 20171012.204
+;; Package-Version: 20200127.409
 ;; Version: 0.0.1
 ;; Keywords: hook utility
 
@@ -44,7 +44,9 @@
 ;; the current buffer.  For example, if you eval:
 
 ;; (add-hook 'switch-buffer-functions
-;;           (lambda (prev cur) (message "%S -> %S" prev cur)))
+;;           (lambda (prev curr)
+;;             (cl-assert (eq curr (current-buffer)))  ;; Always t
+;;             (message "%S -> %S" prev curr)))
 
 ;; then the message like "#<buffer *Messages*> -> #<buffer init.el<.emacs.d>>"
 ;; will be displayed to the echo area each time when you switch the current

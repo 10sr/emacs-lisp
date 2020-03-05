@@ -1,23 +1,16 @@
-`with-venv-dir' macro executes BODY with Python virtual environment activated:
-
-(with-venv-dir (expand-file-name ".venv" default-directory)
-  (executable-find "python"))
-
-
-Alternatively, `with-venv' tries to find venv directory automatically:
+`with-venv' macro executes BODY with Python virtual environment activated:
 
 (with-venv
   (executable-find "python"))
 
-
 This macro uses `with-venv-find-venv-dir-functions' to find suitable venv
 directory: by default it supports pipenv, poetry, and directories named
-".venv".
+".venv" and "venv".
 
 The automatic search result will be cached as a buffer-local variable, so
 `with-venv' try to find venv dir only at the first time it is used after
 visiting file.
-To explicitly update this cache (without restarting Emacs) after you created
+To explicitly update this cache (without re-visiting file) after you created
 a virtual environment newly, run M-x `with-venv-find-venv-dir' manually.
 
 You can also set buffer-local vairable `with-venv-venv-dir' explicitly

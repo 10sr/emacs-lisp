@@ -2,7 +2,7 @@
 
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/with-venv-el
-;; Package-Version: 20200110.625
+;; Package-Version: 20200125.1620
 ;; Version: 0.0.1
 ;; Keywords: processes python venv
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.4"))
@@ -24,26 +24,19 @@
 
 ;;; Commentary:
 
-;; `with-venv-dir' macro executes BODY with Python virtual environment activated:
-
-;; (with-venv-dir (expand-file-name ".venv" default-directory)
-;;   (executable-find "python"))
-
-
-;; Alternatively, `with-venv' tries to find venv directory automatically:
+;; `with-venv' macro executes BODY with Python virtual environment activated:
 
 ;; (with-venv
 ;;   (executable-find "python"))
 
-
 ;; This macro uses `with-venv-find-venv-dir-functions' to find suitable venv
 ;; directory: by default it supports pipenv, poetry, and directories named
-;; ".venv".
+;; ".venv" and "venv".
 
 ;; The automatic search result will be cached as a buffer-local variable, so
 ;; `with-venv' try to find venv dir only at the first time it is used after
 ;; visiting file.
-;; To explicitly update this cache (without restarting Emacs) after you created
+;; To explicitly update this cache (without re-visiting file) after you created
 ;; a virtual environment newly, run M-x `with-venv-find-venv-dir' manually.
 
 ;; You can also set buffer-local vairable `with-venv-venv-dir' explicitly
@@ -116,6 +109,14 @@ When empty string (\"\"), it means that venv is not available for this buffer.
 To force search venv again, run `with-venv-find-venv-dir' manually.
 ")
 
+(defvar-local with-venv-found-type nil
+  "`with-venv' directory type of current buffer.
+
+Used by `with-venv-info-mode'.")
+
+(defvar with-venv--last-found-type nil
+  "Last found type.")
+
 ;;;###autoload
 (defmacro with-venv (&rest body)
   "Execute BODY with venv enabled.
@@ -147,7 +148,13 @@ Return value of `with-venv--venv-dir-found'."
   (unless (and with-venv--venv-dir-found
                no-refresh)
     (setq with-venv--venv-dir-found (or (with-venv--find-venv-dir)
-                                        "")))
+                                        ""))
+    ;; FIXME: Not work when called in parallel
+    (setq with-venv-found-type
+          with-venv--last-found-type)
+    (setq with-venv--last-found-type
+          nil)
+    )
   with-venv--venv-dir-found)
 
 (defcustom with-venv-find-venv-dir-functions
@@ -158,11 +165,17 @@ See `with-venv-find-venv-dir' how this variable is used."
   :type 'hook
   :group 'with-venv)
 (add-hook 'with-venv-find-venv-dir-functions
-          'with-venv-find-venv-dir-pipenv)
+          'with-venv-find-venv-dir-pipenv
+          t)
 (add-hook 'with-venv-find-venv-dir-functions
-          'with-venv-find-venv-dir-poetry)
+          'with-venv-find-venv-dir-poetry
+          t)
 (add-hook 'with-venv-find-venv-dir-functions
-          'with-venv-find-venv-dir-dot-venv)
+          'with-venv-find-venv-dir-dot-venv
+          t)
+(add-hook 'with-venv-find-venv-dir-functions
+          'with-venv-find-venv-dir-venv
+          t)
 
 (defun with-venv--find-venv-dir (&optional dir)
   "Try to find venv dir for DIR.
@@ -177,51 +190,68 @@ This function processes `with-venv-find-venv-dir-functions' with
 
 (defun with-venv-find-venv-dir-pipenv ()
   "Try to find venv dir via pipenv."
-  (with-temp-buffer
-    (let ((status (call-process "pipenv" nil t nil "--venv")))
-      (when (eq status 0)
-        (goto-char (point-min))
-        (buffer-substring-no-properties (point-at-bol)
-                                        (point-at-eol))))))
+  (when (executable-find "pipenv")
+    (with-temp-buffer
+      (let ((status (call-process "pipenv" nil t nil "--venv")))
+        (when (eq status 0)
+          (setq with-venv--last-found-type "Pipenv")
+          (goto-char (point-min))
+          (buffer-substring-no-properties (point-at-bol)
+                                          (point-at-eol)))))))
 
 (defun with-venv-find-venv-dir-poetry ()
   "Try to find venv dir via poetry."
-  (with-temp-buffer
-    ;; TODO: Use poetry env info --path
-    (let ((status (call-process "poetry" nil t nil "debug:info")))
-      (when (eq status 0)
-        (goto-char (point-min))
-        (save-match-data
-          (when (re-search-forward "^ \\* Path: *\\(.*\\)$")
-            (match-string 1)))))))
+  (when (executable-find "poetry")
+    (with-temp-buffer
+      (let ((status (call-process "poetry" nil t nil "env" "info" "--path")))
+        (when (eq status 0)
+          (setq with-venv--last-found-type "Poetry")
+          (goto-char (point-min))
+          (buffer-substring-no-properties (point-at-bol)
+                                          (point-at-eol)))))))
+
+(defun with-venv-find-venv-dir-poetry-legacy ()
+  "Try to find venv dir via poetry debug:info command."
+  (when (executable-find "poetry")
+    (with-temp-buffer
+      (let ((status (call-process "poetry" nil t nil "debug:info")))
+        (when (eq status 0)
+          (goto-char (point-min))
+          (save-match-data
+            (when (re-search-forward "^ \\* Path: *\\(.*\\)$")
+              (setq with-venv--last-found-type "Poetry")
+              (match-string 1))))))))
 
 (defun with-venv-find-venv-dir-dot-venv ()
   "Try to find venv dir by its name."
   (let ((dir (locate-dominating-file default-directory
-                                     ".venv")))
+                                     ;; OK on windows?
+                                     ".venv/bin/python")))
     (when dir
-      ;; TODO: check with -check-exists
+      (setq with-venv--last-found-type ".venv/")
       (expand-file-name ".venv"
                         dir))))
 
-(defun with-venv-check-exists (dir)
-  "Return DIR as is if \"bin\" directory was found under DIR.
-Otherwise returns nil."
-  (and dir
-       (file-directory-p (expand-file-name "bin"
-                                           dir))
-       dir))
+(defun with-venv-find-venv-dir-venv ()
+  "Try to find venv dir by its name."
+  (let ((dir (locate-dominating-file default-directory
+                                     ;; OK on windows?
+                                     "venv/bin/python")))
+    (when dir
+      (setq with-venv--last-found-type "venv/")
+      (expand-file-name "venv"
+                        dir))))
 
 ;;;###autoload
 (defun with-venv-advice-add (func)
-  "Setup advice so that FUNC use `with-env' macro when executing."
+  "Setup advice so that `with-venv' macro is always applied to FUNC."
   (advice-add func
               :around
               'with-venv--advice-around))
 
 ;;;###autoload
 (defun with-venv-advice-remove (func)
-  "Remove advice FUNC added by `with-venv-advice-add'."
+  "Remove advice of FUNC added by `with-venv-advice-add'."
   (advice-remove func
                  'with-venv--advice-around))
 
@@ -229,9 +259,30 @@ Otherwise returns nil."
   "Function to be used to advice functions with `with-venv-advice-add'.
 When a function is adviced with this function, it is wrapped with `with-venv'.
 
-ORIG-FUNC is the target function, and ARGS is the argument when it was called."
+ORIG-FUNC is the target function, and ARGS is the argument when it is called."
   (with-venv
     (apply orig-func args)))
+
+
+;; with-venv-info-mode
+
+(defun with-venv-info-lighter ()
+  "Genarete status of `with-venv-info-mode'."
+  (let ((type (if with-venv-venv-dir
+                  "Given"
+                (if (string= ""
+                             with-venv--venv-dir-found)
+                    "-"
+                  (or with-venv-found-type
+                      "?")))))
+    (format " W/V[%s]"
+            type)))
+
+;;;###autoload
+(define-minor-mode with-venv-info-mode
+  "Minor-mode to show info about current `with-venv' activated directory."
+  :lighter (:eval (with-venv-info-lighter))
+  nil)
 
 (provide 'with-venv)
 
