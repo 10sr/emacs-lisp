@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 by Bailey Ling
 ;; Author: Bailey Ling
 ;; URL: https://github.com/bling/fzf.el
-;; Package-Version: 20200812.1128
+;; Package-Version: 20200813.757
 ;; Filename: fzf.el
 ;; Description: A front-end for fzf
 ;; Created: 2015-09-18
@@ -135,7 +135,7 @@
     (setq fzf--tmp-output-file
           output-file)
     (with-current-buffer buf
-      (setq default-directory directory))
+      (cd directory))
     (split-window-vertically window-height)
     (when fzf/position-bottom (other-window 1))
     (make-term "fzf" "sh" nil "-c" sh-cmd-with-redirect)

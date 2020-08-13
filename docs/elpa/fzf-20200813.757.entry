@@ -1,0 +1,2 @@
+
+(fzf . [(20200813 757) ((emacs (24 4))) "A front-end for fzf." single ((:commit . "879a521b682a71e778d281d9b9480e57d123d34a") (:keywords "fzf" "fuzzy" "search") (:authors ("Bailey Ling")) (:maintainer "Bailey Ling") (:url . "https://github.com/bling/fzf.el"))])
