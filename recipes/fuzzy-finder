@@ -1,0 +1,3 @@
+(fuzzy-finder :fetcher github
+              :repo "10sr/fuzzy-finder-el"
+              :branch "master")
