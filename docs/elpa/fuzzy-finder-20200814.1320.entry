@@ -1,0 +1,2 @@
+
+(fuzzy-finder . [(20200814 1320) nil "A Front-End for Fuzzy Finder Applications" single ((:commit . "a83bd1b44fe795ccb7cd68200b60454d9b94c67e") (:keywords "matching") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com"))])
