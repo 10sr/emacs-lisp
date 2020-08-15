@@ -8,7 +8,7 @@
 ;; Author: Bailey Ling
 ;; Maintainer: 10sr <8.slashes@gmail.com>
 ;; Keywords: matching
-;; Package-Version: 20200815.1516
+;; Package-Version: 20200815.1646
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@
   :group 'fuzzy-finder)
 
 (defcustom fuzzy-finder-exit-hook nil
-  "Hook run just before starting exit process of fuzzy-finder.."
+  "Hook run just before starting exit process of fuzzy-finder."
   :type 'hook
   :group 'fuzzy-finder)
 
@@ -85,9 +85,6 @@
 
 (defvar-local fuzzy-finder--action nil
   "Action function given to this fuzzy-finder session.")
-
-(defvar-local fuzzy-finder--action-extra-args nil
-  "List of extra args which will be passed to the action function.")
 
 
 
@@ -117,30 +114,34 @@ This function sets current buffer to BUF, and returns created window."
     (switch-to-buffer buf)
     new-window))
 
-(cl-defun fuzzy-finder--after-term-handle-exit (&rest _)
+(cl-defun fuzzy-finder--after-term-handle-exit (_ msg)
   "Call the action function when fuzzy-finder program terminated normally.
 
-Should be hooked to `term-handle-exit'."
+Should be hooked to `term-handle-exit'.
+Use MSG to check if fuzzy-finder process exited with code 0."
   (unless fuzzy-finder--output-file
     (cl-return-from fuzzy-finder--after-term-handle-exit))
 
   (run-hooks 'fuzzy-finder-exit-hook)
-  (let* ((output-file fuzzy-finder--output-file)
+  (let* ((directory default-directory)
+         (output-file fuzzy-finder--output-file)
          (output-delimiter fuzzy-finder--output-delimiter)
          (action fuzzy-finder--action)
-         (action-extra-args fuzzy-finder--action-extra-args)
          (text (with-temp-buffer
                  (insert-file-contents output-file)
                  (buffer-substring-no-properties (point-min) (point-max))))
          (lines (split-string text output-delimiter t)))
     (delete-file output-file)
     (set-window-configuration fuzzy-finder--window-configuration)
-    (apply action lines action-extra-args)))
+    (when (string= "finished\n" msg)
+      (with-temp-buffer
+        (cd directory)
+        (funcall action lines)))))
 (advice-add 'term-handle-exit :after
             'fuzzy-finder--after-term-handle-exit)
 
 ;;;###autoload
-(cl-defun fuzzy-finder (&key directory command input-command action output-delimiter window-height action-extra-args)
+(cl-defun fuzzy-finder (&key directory command input-command action output-delimiter window-height)
   "Invoke fzf executable and return resulting list."
   (interactive)
   (setq directory (or directory
@@ -182,7 +183,6 @@ Should be hooked to `term-handle-exit'."
     (setq-local fuzzy-finder--output-file output-file)
     (setq-local fuzzy-finder--output-delimiter output-delimiter)
     (setq-local fuzzy-finder--action action)
-    (setq-local fuzzy-finder--action-extra-args action-extra-args)
 
     (linum-mode 0)
     (visual-line-mode 0)
@@ -212,12 +212,7 @@ If path of root directory is available via projectile, start from that directory
                    (require 'projectile)
                    (projectile-project-root))
                  default-directory)))
-    (fuzzy-finder :directory dir
-                  :action-extra-args (list dir)
-                  :action (lambda (results dir)
-                            (dolist (file results)
-                              (find-file (expand-file-name file
-                                                           dir)))))))
+    (fuzzy-finder :directory dir)))
 
 (provide 'fuzzy-finder)
 
