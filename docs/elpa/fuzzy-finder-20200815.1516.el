@@ -8,7 +8,7 @@
 ;; Author: Bailey Ling
 ;; Maintainer: 10sr <8.slashes@gmail.com>
 ;; Keywords: matching
-;; Package-Version: 20200814.1320
+;; Package-Version: 20200815.1516
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -59,6 +59,16 @@
 (defcustom fuzzy-finder-default-window-height 12
   "Default value for `fuzzy-finder' WINDOW-HEIGHT."
   :type 'integer
+  :group 'fuzzy-finder)
+
+(defcustom fuzzy-finder-init-hook nil
+  "Hook run just after initialize fuzzy-finder buffer."
+  :type 'hook
+  :group 'fuzzy-finder)
+
+(defcustom fuzzy-finder-exit-hook nil
+  "Hook run just before starting exit process of fuzzy-finder.."
+  :type 'hook
   :group 'fuzzy-finder)
 
 (defvar fuzzy-finder--window-configuration nil
@@ -114,6 +124,7 @@ Should be hooked to `term-handle-exit'."
   (unless fuzzy-finder--output-file
     (cl-return-from fuzzy-finder--after-term-handle-exit))
 
+  (run-hooks 'fuzzy-finder-exit-hook)
   (let* ((output-file fuzzy-finder--output-file)
          (output-delimiter fuzzy-finder--output-delimiter)
          (action fuzzy-finder--action)
@@ -182,6 +193,8 @@ Should be hooked to `term-handle-exit'."
     (setq-local show-trailing-whitespace nil)
     (setq-local display-line-numbers nil)
     (face-remap-add-relative 'mode-line '(:box nil))
+
+    (run-hooks 'fuzzy-finder-init-hook)
     ))
 
 (defun fuzzy-finder-action-find-files (files)
