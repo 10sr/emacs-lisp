@@ -8,7 +8,7 @@
 ;; Author: Bailey Ling
 ;; Maintainer: 10sr <8.slashes@gmail.com>
 ;; Keywords: matching
-;; Package-Version: 20200815.1646
+;; Package-Version: 20200817.1302
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ Use MSG to check if fuzzy-finder process exited with code 0."
     (cl-return-from fuzzy-finder--after-term-handle-exit))
 
   (run-hooks 'fuzzy-finder-exit-hook)
-  (let* ((directory default-directory)
+  (let* ((buf (current-buffer))
          (output-file fuzzy-finder--output-file)
          (output-delimiter fuzzy-finder--output-delimiter)
          (action fuzzy-finder--action)
@@ -134,8 +134,7 @@ Use MSG to check if fuzzy-finder process exited with code 0."
     (delete-file output-file)
     (set-window-configuration fuzzy-finder--window-configuration)
     (when (string= "finished\n" msg)
-      (with-temp-buffer
-        (cd directory)
+      (with-current-buffer buf
         (funcall action lines)))))
 (advice-add 'term-handle-exit :after
             'fuzzy-finder--after-term-handle-exit)
@@ -162,12 +161,13 @@ Use MSG to check if fuzzy-finder process exited with code 0."
         (current-window-configuration))
 
   (let* ((buf (fuzzy-finder--get-buffer-create t))
-         (sh-cmd (if input-command
-                  (concat input-command " | " command)
-                command))
+         (sh-cmd (if (and input-command
+                          (not (string= "" input-command)))
+                     (concat input-command "|" command)
+                   command))
          (output-file (make-temp-file "fzf-el-result"))
          (sh-cmd-with-redirect (concat sh-cmd
-                                       " > "
+                                       ">"
                                        (shell-quote-argument output-file))))
 
     (fuzzy-finder--display-buffer buf window-height)
@@ -186,6 +186,8 @@ Use MSG to check if fuzzy-finder process exited with code 0."
 
     (linum-mode 0)
     (visual-line-mode 0)
+    (when (fboundp 'company-mode)
+      (company-mode 0))
     (setq-local mode-line-format nil)
     (setq-local scroll-margin 0)
     (setq-local scroll-conservatively 0)
@@ -199,8 +201,10 @@ Use MSG to check if fuzzy-finder process exited with code 0."
 
 (defun fuzzy-finder-action-find-files (files)
   "Visit FILES."
-  (dolist (file files)
+  (dolist (file (mapcar 'expand-file-name  files))
     (find-file file)))
+
+(declare-function projectile-project-root "projectile")
 
 ;;;###autoload
 (defun fuzzy-finder-find-files-projectile ()
