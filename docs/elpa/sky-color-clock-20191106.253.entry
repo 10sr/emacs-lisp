@@ -1,2 +1,0 @@
-
-(sky-color-clock . [(20191106 253) nil "A clock widget for modelines with real-time sky color and moonphase/weather icon" single ((:commit . "d39f3209faee629bbf140277ce897bae16818602") (:authors ("zk_phi")) (:maintainer "zk_phi") (:url . "https://github.com/zk-phi/sky-color-clock"))])

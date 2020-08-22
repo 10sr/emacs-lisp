@@ -16,8 +16,8 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-;; Version: 1.0.0
-;; Package-Version: 20191106.253
+;; Version: 1.0.1
+;; Package-Version: 20200820.1058
 ;; Author: zk_phi
 ;; URL: https://github.com/zk-phi/sky-color-clock
 
@@ -47,6 +47,7 @@
 ;;; Change Log:
 
 ;; 1.0.0 Initial release
+;; 1.0.1 Add option sky-color-clock-enable-daytime-emoji
 
 ;;; Code:
 
@@ -55,7 +56,7 @@
 (require 'json)
 (require 'url)
 
-(defconst sky-color-clock-version "1.0.0")
+(defconst sky-color-clock-version "1.0.1")
 
 (defgroup sky-color-clock nil
   "A clock widget for modelines with real-time sky color and
@@ -73,6 +74,12 @@ to indicate either rain, snow or moonphase otherwise. You also
 need to initialize openweathermap client with
 `sky-color-clock-initialize-openweathermap-client' to fetch
 weather informations."
+  :group 'sky-color-clock
+  :type 'boolean)
+
+(defcustom sky-color-clock-enable-daytime-emoji nil
+  "When non-nil and `sky-color-clock-enable-emoji-icon' is
+enabled, use sun (or cloud) emoji to indicate it's daytime."
   :group 'sky-color-clock
   :type 'boolean)
 
@@ -176,6 +183,12 @@ defaults 30."
   "A function which converts a float time (12:30 as 12.5, for
 example), to a color.")
 
+(defvar sky-color-clock--sunrise nil
+  "Sunrise time from noon")
+
+(defvar sky-color-clock--sunset nil
+  "Sunset tiem from noon")
+
 ;;;###autoload
 (defun sky-color-clock-initialize (latitude)
   "Initialize sky-color-clock with LATITUDE (in degrees). Special
@@ -193,7 +206,9 @@ daytime length must be longer than 2hrs, and sun must set before
           (* 24 (/ (radians-to-degrees sunset-hour-angle) 360)))
          (sunrise (- 12 sunset-time-from-noon))
          (sunset (+ 12 sunset-time-from-noon)))
-    (setq sky-color-clock--bg-color-gradient
+    (setq sky-color-clock--sunrise sunrise
+          sky-color-clock--sunset  sunset
+          sky-color-clock--bg-color-gradient
           (sky-color-clock--make-gradient
            (cons (- sunrise 2.0)          "#111111")
            (cons (- sunrise 1.5)          "#4d548a")
@@ -273,10 +288,22 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
           ((<= phase 27.68) "🌘")
           (t                "🌑"))))
 
-(defun sky-color-clock--emoji-icon (time &optional weather)
+(defun sky-color-clock--emoji-daytime (time &optional cloudiness)
+  (cl-destructuring-bind (sec min hour . _) (decode-time time)
+    (let ((time-in-hours (+ (/ (+ (/ sec 60.0) min) 60.0) hour)))
+      (cond ((< sky-color-clock--sunset time-in-hours) nil)
+            ((< time-in-hours sky-color-clock--sunrise) nil)
+            ((and cloudiness (>= cloudiness 50)) "☁️")
+            ((< time-in-hours (+ sky-color-clock--sunrise 0.5)) "🌅")
+            ((< time-in-hours (- sky-color-clock--sunset 0.5)) "☀️")
+            (t "🌇")))))
+
+(defun sky-color-clock--emoji-icon (time &optional cloudiness weather)
   (cond ((and weather (< weather 600)) "💧")
         ((and weather (< weather 700)) "❄️")
-        (t (sky-color-clock--emoji-moonphase time))))
+        (t (or (and sky-color-clock-enable-daytime-emoji
+                    (sky-color-clock--emoji-daytime time cloudiness))
+               (sky-color-clock--emoji-moonphase time)))))
 
 ;; ---- the clock
 
@@ -292,7 +319,7 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
          (fg (sky-color-clock--pick-fg-color bg))
          (str (concat " " (format-time-string sky-color-clock-format time) " ")))
     (when sky-color-clock-enable-emoji-icon
-      (setq str (concat " " (sky-color-clock--emoji-icon time weather) str)))
+      (setq str (concat " " (sky-color-clock--emoji-icon time cloudiness weather) str)))
     (setq str (propertize str 'face `(:background ,bg :foreground ,fg)))
     (when sky-color-clock-enable-temperature-indicator
       (setq str (concat str (sky-color-clock--temperature-indicator bg temperature))))

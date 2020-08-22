@@ -1,0 +1,2 @@
+
+(fuzzy-finder . [(20200821 749) nil "Fuzzy Finder App Integration into Emacs" single ((:commit . "a4768dedadf8f55fe0ba95f05a8d01846e3cf4f3") (:keywords "matching") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com"))])
