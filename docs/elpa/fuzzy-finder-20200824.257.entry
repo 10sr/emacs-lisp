@@ -1,2 +1,0 @@
-
-(fuzzy-finder . [(20200824 257) ((emacs (24 4))) "Fuzzy Finder App Integration" single ((:commit . "61a19ea5b8a4ccf0f33adc31851e1d24a0652abc") (:keywords "matching") (:authors ("10sr" . "8.slashes@gmail.com")) (:maintainer "10sr" . "8.slashes@gmail.com") (:url . "https://github.com/10sr/fuzzy-finder-el"))])

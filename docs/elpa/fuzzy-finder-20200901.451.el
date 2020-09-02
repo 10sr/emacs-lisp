@@ -8,7 +8,7 @@
 ;; Author: Bailey Ling
 ;; Maintainer: 10sr <8.slashes@gmail.com>
 ;; Keywords: matching
-;; Package-Version: 20200824.257
+;; Package-Version: 20200901.451
 ;; URL: https://github.com/10sr/fuzzy-finder-el
 ;; Version: 0.0.1
 ;; Package-Requires: ((emacs "24.4"))
@@ -30,9 +30,12 @@
 
 ;; Fuzzy finder app integration into Emacs.
 
-;; `fuzzy-finder' command opens a new window, starts a fuzzy finder
-;; process inside of it, and then calls a function with selected items.
+;; `fuzzy-finder' command starts a fuzzy finder process and calls a function
+;; on the selected items.
 ;; By default it visits selected files.
+
+;; There are a number of applications which can be used with `fuzzy-finder'
+;; such as fzf (default), peco, and selecta.
 
 ;; You can customize default values used for `fuzzy-finder' execution:
 ;; fuzzy finder command, input command, action function and so on.
@@ -46,32 +49,39 @@
 (require 'nadvice)
 (require 'term)
 
+(declare-function company-mode "company")
+
 (defgroup fuzzy-finder nil
-  "A Front-End for Fuzzy Finder Applications."
+  "Fuzzy finder app integration for Emacs."
   :group 'convenience)
 
-(defcustom fuzzy-finder-default-command "fzf --multi --reverse"
-  "Default value for `fuzzy-finder' COMMAND argument."
+(defcustom fuzzy-finder-executable (executable-find "fzf")
+  "Path to the fuzzy finder executable."
+  :type 'string
+  :group 'fuzzy-finder)
+
+(defcustom fuzzy-finder-default-arguments "--multi --reverse"
+  "Default arguments for `fuzzy-finder' ARGUMENTS keyword."
   :type 'string
   :group 'fuzzy-finder)
 
 (defcustom fuzzy-finder-default-input-command nil
-  "Default value for `fuzzy-finder' INPUT-COMMAND argument."
+  "Default value for `fuzzy-finder' INPUT-COMMAND keyword."
   :type 'string
   :group 'fuzzy-finder)
 
 (defcustom fuzzy-finder-default-action #'fuzzy-finder-action-find-files
-  "Default value for `fuzzy-finder' ACTION argument."
+  "Default value for `fuzzy-finder' ACTION keyword."
   :type 'function
   :group 'fuzzy-finder)
 
 (defcustom fuzzy-finder-default-output-delimiter "\n"
-  "Default value for `fuzzy-finder' OUTPUT-DELIMITER argument."
+  "Default value for `fuzzy-finder' OUTPUT-DELIMITER keyword."
   :type 'string
   :group 'fuzzy-finder)
 
 (defcustom fuzzy-finder-default-window-height 12
-  "Default value for `fuzzy-finder' WINDOW-HEIGHT argument."
+  "Default value for `fuzzy-finder' WINDOW-HEIGHT keyword."
   :type 'integer
   :group 'fuzzy-finder)
 
@@ -155,22 +165,27 @@ Use MSG to check if fuzzy-finder process exited with code 0."
             #'fuzzy-finder--after-term-handle-exit)
 
 ;;;###autoload
-(cl-defun fuzzy-finder (&key directory command input-command action output-delimiter window-height)
+(cl-defun fuzzy-finder (&key (directory default-directory)
+                             (arguments fuzzy-finder-default-arguments)
+                             (input-command fuzzy-finder-default-input-command)
+                             (action fuzzy-finder-default-action)
+                             (output-delimiter fuzzy-finder-default-output-delimiter)
+                             (window-height fuzzy-finder-default-window-height))
   "Execute fuzzy-finder application.
 
-Open a term buffer and start fuzzy-finder process using COMMAND argument.
+Open a term buffer and start fuzzy-finder process using ARGUMENTS.
 After the process exits successfully call ACTION function with selected items.
 
 All arguments are optional keyword arguments.
 There is a variable that defines default value for each argument except for
-DIRECTORY: for example `fuzzy-finder-default-command' is for COMMAND argument.
+DIRECTORY. For example, `fuzzy-finder-default-arguments' for the ARGUMENTS key.
 
 `:directory DIRECTORY'
     Set the directory to start fuzzy-finder application from.
     If not given current `default-directory' will be used.
 
-`:command COMMAND'
-    Command-line string of fuzzy-finder application to execute.
+`:arguments ARGUMENTS'
+    Command line arguments to be passed to `fuzzy-finder-executable'.
 
 `:input-command INPUT-COMMAND'
     When non-empty string is given for INPUT-COMMAND, the stdout of this
@@ -186,31 +201,24 @@ DIRECTORY: for example `fuzzy-finder-default-command' is for COMMAND argument.
     splitting stdout of command by OUTPUT-DELIMITER.
 
 `:output-delimiter OUTPUT-DELIMITER'
-    Regular expression to split result of COMMAND.
+    Regular expression to split the command output.
     When the stdout is delimited by ASCII NUL characters, this value should be
     \"\\0\".
 
 `:window-height WINDOW-HEIGHT'
-    Interger of height of window that displays fuzzy-finder buffer."
+    Interger height of window that displays fuzzy-finder buffer."
   (interactive)
-  (setq directory (or directory
-                      default-directory))
-  (setq command (or command
-                    fuzzy-finder-default-command))
-  (setq input-command (or input-command
-                          fuzzy-finder-default-input-command))
-  (setq action (or action
-                   fuzzy-finder-default-action))
-  (setq output-delimiter (or output-delimiter
-                             fuzzy-finder-default-output-delimiter))
-  (setq window-height (or window-height
-                          fuzzy-finder-default-window-height))
-
+  (unless fuzzy-finder-executable
+    (user-error "Fuzzy-finder-executable \"%s\" not found"
+                fuzzy-finder-executable))
   ;; Modified from fzf.el: https://github.com/bling/fzf.el
   (setq fuzzy-finder--window-configuration
         (current-window-configuration))
 
   (let* ((buf (fuzzy-finder--get-buffer-create t))
+         (command (concat fuzzy-finder-executable
+                          " "
+                          arguments))
          (sh-cmd (if (and input-command
                           (not (string= "" input-command)))
                      (concat input-command "|" command)
