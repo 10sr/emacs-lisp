@@ -8,7 +8,7 @@
 ;; Author: Bailey Ling
 ;; Maintainer: 10sr <8.slashes@gmail.com>
 ;; Keywords: matching
-;; Package-Version: 20200901.451
+;; Package-Version: 20200902.1912
 ;; URL: https://github.com/10sr/fuzzy-finder-el
 ;; Version: 0.0.1
 ;; Package-Requires: ((emacs "24.4"))
@@ -138,11 +138,10 @@ This function sets current buffer to BUF, and returns created window."
     (switch-to-buffer buf)
     new-window))
 
-(cl-defun fuzzy-finder--after-term-handle-exit (_ msg)
+(cl-defun fuzzy-finder--after-term-handle-exit (&rest _)
   "Call the action function when fuzzy-finder program terminated normally.
 
-Should be hooked to `term-handle-exit'.
-Use MSG to check if fuzzy-finder process exited with code 0."
+Should be hooked to `term-handle-exit'."
   (unless fuzzy-finder--output-file
     (cl-return-from fuzzy-finder--after-term-handle-exit))
 
@@ -157,7 +156,7 @@ Use MSG to check if fuzzy-finder process exited with code 0."
          (lines (split-string text output-delimiter t)))
     (delete-file output-file)
     (set-window-configuration fuzzy-finder--window-configuration)
-    (when (string= "finished\n" msg)
+    (when lines
       (with-current-buffer buf
         (funcall action lines)))))
 (advice-add #'term-handle-exit
