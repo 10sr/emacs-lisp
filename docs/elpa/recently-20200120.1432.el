@@ -3,6 +3,7 @@
 ;; Author: 10sr <8.slashes [at] gmail [dot] com>
 ;; URL: https://github.com/10sr/recently-el
 ;; Package-Version: 20200120.1432
+;; Package-Commit: fa8b52fe891a0adaabe0456f6f5a56a2600a831f
 ;; Version: 0.1
 ;; Keywords: utility files
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
