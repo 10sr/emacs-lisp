@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el
 ;; Package-Version: 20160520.626
-;; Package-Commit: cd48564ce0b18d532029d699dadb606d903faa32
+;; Package-Commit: 22498b4bc079e8a31a970c920e53d20e8b34900e
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: major-mode
