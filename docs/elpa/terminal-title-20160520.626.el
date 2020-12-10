@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
 ;; Package-Version: 20160520.626
-;; Package-Commit: e89d5aae5da52d3c03bf1b0bdfc2ebb4b416ec18
+;; Package-Commit: 079ba815ff6e05c3e77216ec2e430595fd9ae969
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: terminal title console
