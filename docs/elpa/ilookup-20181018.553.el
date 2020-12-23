@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/ilookup.el
 ;; Package-Version: 20181018.553
-;; Package-Commit: 079ba815ff6e05c3e77216ec2e430595fd9ae969
+;; Package-Commit: 944fc4db738ae1dc1933911dfa4c744b93fc9c67
 ;; Version: 0.1
 ;; Package-Requires: ()
 ;; Keywords: utility
