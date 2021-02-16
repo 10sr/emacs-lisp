@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; URL: https://github.com/10sr/emacs-lisp
 ;; Package-Version: 20160520.626
-;; Package-Commit: 944fc4db738ae1dc1933911dfa4c744b93fc9c67
+;; Package-Commit: 989eaff016e0bbc2cbcfaf0ff5adc6d8590b027f
 ;; Version: 0.1
 ;; Package-Requires: ((recentf "0"))
 ;; Keywords: recentf view show
