@@ -3,7 +3,7 @@
 ;; Author: 10sr <8slashes+el@gmail.com>
 ;; URL: https://github.com/10sr/emacs-lisp
 ;; Package-Version: 20161114.1618
-;; Package-Commit: 33a1d920e032007b39d5e7240867f0b8f9557946
+;; Package-Commit: bdaf5bfdc26b0eae4d2fbe6ec51b22a9b6296fc3
 ;; Version: 0.1
 ;; Keywords: dired
 
