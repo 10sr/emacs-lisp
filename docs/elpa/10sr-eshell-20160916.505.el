@@ -3,7 +3,7 @@
 ;; Author: 10sr <>
 ;; Version: 0.0.1
 ;; Package-Version: 20160916.505
-;; Package-Commit: bdaf5bfdc26b0eae4d2fbe6ec51b22a9b6296fc3
+;; Package-Commit: a533698f2e533cfed90834f7037754ede8d5d346
 ;; URL: https://github.com/10sr/emacs-lisp/blob/master/10sr-eshell.el
 
 ;;; Commentary:
