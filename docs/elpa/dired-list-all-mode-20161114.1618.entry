@@ -1,2 +1,2 @@
 
-(dired-list-all-mode . [(20161114 1618) nil "Toggle listing dot files in dired" single ((:commit . "c4baef802f8a8431a2e0a463d025fcfa26915d61") (:authors ("10sr" . "8slashes+el@gmail.com")) (:maintainer "10sr" . "8slashes+el@gmail.com") (:keywords "dired") (:url . "https://github.com/10sr/emacs-lisp"))])
+(dired-list-all-mode . [(20161114 1618) nil "Toggle listing dot files in dired" single ((:commit . "0be495218167ca20dd2c957890dc5c3aa8f3bdc5") (:authors ("10sr" . "8slashes+el@gmail.com")) (:maintainer "10sr" . "8slashes+el@gmail.com") (:keywords "dired") (:url . "https://github.com/10sr/emacs-lisp"))])

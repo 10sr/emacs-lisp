@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; sky-color-clock.el --- A clock widget for modelines with real-time sky color and moonphase/weather icon
 
 ;; Copyright (C) 2018- zk_phi
@@ -17,8 +18,8 @@
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 ;; Version: 1.0.2
-;; Package-Version: 20200822.1441
-;; Package-Commit: 3522726a5af0421f70ff9db68bd889cb4c7b6e62
+;; Package-Version: 20210306.428
+;; Package-Commit: 525122ffb94ae4ac160de72c2ee0ade331d2e80a
 ;; Author: zk_phi
 ;; URL: https://github.com/zk-phi/sky-color-clock
 
@@ -237,7 +238,7 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
 0 to 100."
   (unless sky-color-clock--bg-color-gradient
     (error "sky-color-clock-initialize is not called."))
-  (cl-destructuring-bind (sec min hour . _) (decode-time time)
+  (cl-destructuring-bind (sec min hour . xs) (decode-time time)
     (let ((cloudiness (if cloudiness (/ cloudiness 100.0) 0.00))
           (color (funcall sky-color-clock--bg-color-gradient (+ (/ (+ (/ sec 60.0) min) 60.0) hour))))
       (cl-destructuring-bind (h s l) (apply 'color-rgb-to-hsl (color-name-to-rgb color))
@@ -270,7 +271,7 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
    ;; -10             15                 40
    '(263 . "#00a1ff") '(288 . "#ffffff") '(313 . "#ffa100")))
 
-(defun sky-color-clock--temperature-indicator (basecolor &optional temperature)
+(defun sky-color-clock--temperature-indicator (temperature)
   (if (null temperature) ""
     (let ((color (funcall sky-color-clock--temperature-color-gradient temperature)))
       (propertize " " 'face `(:background ,color)))))
@@ -297,7 +298,7 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
           (t                "🌑"))))
 
 (defun sky-color-clock--emoji-daytime (time &optional cloudiness)
-  (cl-destructuring-bind (sec min hour . _) (decode-time time)
+  (cl-destructuring-bind (sec min hour . xs) (decode-time time)
     (let ((time-in-hours (+ (/ (+ (/ sec 60.0) min) 60.0) hour)))
       (cond ((< sky-color-clock--sunset time-in-hours) nil)
             ((< time-in-hours sky-color-clock--sunrise) nil)
@@ -330,7 +331,7 @@ saturate according to CLOUDINESS. CLOUDINESS can be a number from
       (setq str (concat " " (sky-color-clock--emoji-icon time cloudiness weather) str)))
     (setq str (propertize str 'face `(:background ,bg :foreground ,fg)))
     (when sky-color-clock-enable-temperature-indicator
-      (setq str (concat str (sky-color-clock--temperature-indicator bg temperature))))
+      (setq str (concat str (sky-color-clock--temperature-indicator temperature))))
     str))
 
 (provide 'sky-color-clock)
