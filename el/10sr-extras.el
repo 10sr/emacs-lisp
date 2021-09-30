@@ -1032,5 +1032,176 @@ This assumes that file name should be in a format like BASE.EXT.j2 ."
 
 
 
+;;;;;;;;;;;;;;;;;;;;;
+;; git-bug
+
+(defconst git-bug-ls-regexp
+  (eval-when-compile
+    (rx bol
+        (submatch (one-or-more alphanumeric))  ; id
+        ;; (one-or-more any)
+        (one-or-more space)
+        (submatch (or "open" "close"))  ; status
+        (one-or-more space)
+        (submatch (maximal-match (zero-or-more print)))  ; title
+        "\t"
+        (submatch (one-or-more alphanumeric))  ; user
+        (one-or-more space)
+        "C:"
+        (submatch (one-or-more digit))  ; Comment num
+        (one-or-more space)
+        "L:"
+        (submatch (one-or-more digit))  ; Label num
+        eol
+        ))
+  "Regexp to parse line of output of git-bug ls.
+Used by `git-bug-ls'.")
+
+(declare-function string-trim "subr-x")
+(defun git-bug-bugs ()
+  "Get list of git-bug bugs."
+  (with-temp-buffer
+    (git-bug--call-process "bug" "ls")
+    (goto-char (point-min))
+    (let ((bugs nil))
+      (while (not (eq (point) (point-max)))
+        (save-match-data
+          (when (re-search-forward git-bug-ls-regexp (point-at-eol) t)
+            (setq bugs `(,@bugs
+                         ,(list
+                           :id (match-string 1)
+                           :status (match-string 2)
+                           :title (string-trim (match-string 3))
+                           :user (match-string 4)
+                           :comment-num (match-string 5)
+                           :label-num (match-string 6)
+                           )))))
+        (forward-line 1)
+        (goto-char (point-at-bol)))
+      bugs)))
+
+(defun git-bug-ls ()
+  "Open and select git bug list buffer."
+  (interactive)
+  (pop-to-buffer (git-bug-ls-noselect)))
+
+(defun git-bug-ls--set-tabulated-list-mode-variables ()
+  "Not implemented.")
+
+(defun git-bug-ls-mode ()
+  "Not implemented.")
+
+(defun git-bug-ls-noselect (&optional directory)
+  "Open git bug list buffer.
+
+If optional arg DIRECTORY is given change current directory to there before
+initializing."
+  (setq directory (expand-file-name (or directory
+                                        default-directory)))
+  (cl-assert (file-directory-p directory))
+  (let* ((root (git-bug--get-repository-root directory))
+         (name (file-name-nondirectory root))
+         (bname (format "*GitBug<%s>*" name)))
+    (with-current-buffer (get-buffer-create bname)
+      (cd root)
+      (git-bug-ls--set-tabulated-list-mode-variables)
+      (git-bug-ls-mode)
+      (current-buffer))))
+
+(defun git-bug--get-repository-root (dir)
+  "Resolve repository root of DIR.
+
+If DIR is not inside of any git repository, signal an error."
+  (cl-assert (file-directory-p dir))
+  (with-temp-buffer
+    (cd dir)
+    (git-bug--call-process "rev-parse" "--show-toplevel")
+    (goto-char (point-min))
+    (buffer-substring-no-properties (point-at-bol) (point-at-eol))))
+
+(defun git-bug--call-process (&rest args)
+  "Start git process synchronously with ARGS.
+
+Raise error when git process ends with non-zero status.
+Any output will be written to current buffer."
+  (let ((status (apply 'call-process
+                       "git"
+                       nil
+                       t
+                       nil
+                       args)))
+    (cl-assert (eq status 0)
+               nil
+               (buffer-substring-no-properties (point-min) (point-max)))))
+
+
+;;;;;;;;;;;;;;
+;; mmv
+;; https://www.emacswiki.org/emacs/MakingMarkVisible
+
+;;;; Make the mark visible, and the visibility toggleable. ('mmv' means 'make
+;;;; mark visible'.) By Patrick Gundlach, Teemu Leisti, and Stefan.
+
+(defgroup mmv nil
+  "Make mark visible."
+  :group 'tools)
+
+(defvar mmv-face-foreground
+  (face-foreground 'hi-yellow)
+  "Foreground color for `mmv-face'.")
+
+(defvar mmv-face-background
+  (face-background 'hi-yellow)
+  "Background color for `mmv-face'.")
+
+(defface mmv-face
+  `((t :background ,mmv-face-background :foreground ,mmv-face-foreground))
+  "Face used for showing the mark's position."
+  :group 'mmv)
+
+(defvar-local mmv-mark-overlay nil
+  "The overlay for showing the mark's position.")
+
+(defvar-local mmv-is-mark-visible t
+  "The overlay is visible only when this variable's value is t.")
+
+(defun mmv-draw-mark (&rest _)
+  "Make the mark's position stand out by means of a one-character-long overlay.
+   If the value of variable `mmv-is-mark-visible' is nil, the mark will be
+   invisible."
+  (unless mmv-mark-overlay
+    (setq mmv-mark-overlay (make-overlay 0 0 nil t))
+    (overlay-put mmv-mark-overlay 'face 'mmv-face)
+    (overlay-put mmv-mark-overlay 'priority 10))  ;; bigger than highlight-indentation-current-column-overlay-priority
+  (let ((mark-position (mark t)))
+    (cond
+     ((null mark-position) (delete-overlay mmv-mark-overlay))
+     ((and (< mark-position (point-max))
+           (not (eq ?\n (char-after mark-position))))
+      (overlay-put mmv-mark-overlay 'after-string nil)
+      (move-overlay mmv-mark-overlay mark-position (1+ mark-position)))
+     (t
+      ;; This branch is called when the mark is at the end of a line or at the
+      ;; end of the buffer. We use a bit of trickery to avoid the higlight
+      ;; extending from the mark all the way to the right end of the frame.
+      (overlay-put mmv-mark-overlay 'after-string
+                   (propertize " " 'face (overlay-get mmv-mark-overlay 'face)))
+      (move-overlay mmv-mark-overlay mark-position mark-position)))))
+
+;; ;; Makes display very slow?
+;; (add-hook 'pre-redisplay-functions #'mmv-draw-mark)
+
+(defun mmv-toggle-mark-visibility ()
+  "Toggles the mark's visiblity and redraws it (whether invisible or visible)."
+  (interactive)
+  (setq mmv-is-mark-visible (not mmv-is-mark-visible))
+  (if mmv-is-mark-visible
+      (set-face-attribute 'mmv-face nil :background mmv-face-background :foreground mmv-face-foreground)
+    (set-face-attribute 'mmv-face nil :background 'unspecified :foreground 'unspecified))
+  (mmv-draw-mark))
+
+
+
+
 (provide '10sr-extras)
 ;;; 10sr-extras.el ends here
