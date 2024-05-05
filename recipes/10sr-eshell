@@ -1,1 +1,1 @@
-(10sr-eshell :fetcher git :url "." :files ("el/10sr-eshell.el"))
+(10sr-eshell :fetcher github :repo "10sr/emacs-lisp" :files ("el/10sr-eshell.el"))

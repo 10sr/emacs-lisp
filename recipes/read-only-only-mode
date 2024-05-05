@@ -1,1 +1,1 @@
-(read-only-only-mode :fetcher git :url "." :files ("el/read-only-only-mode.el"))
+(read-only-only-mode :fetcher github :repo "10sr/emacs-lisp" :files ("el/read-only-only-mode.el"))

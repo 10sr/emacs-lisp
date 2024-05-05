@@ -1,3 +1,3 @@
-(remember-major-modes-mode :fetcher git
-                           :url "."
+(remember-major-modes-mode :fetcher github
+                           :repo "10sr/emacs-lisp"
                            :files ("el/remember-major-modes-mode.el"))

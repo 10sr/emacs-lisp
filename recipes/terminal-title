@@ -1,1 +1,1 @@
-(terminal-title :fetcher git :url "." :files ("el/terminal-title.el"))
+(terminal-title :fetcher github :repo "10sr/emacs-lisp" :files ("el/terminal-title.el"))

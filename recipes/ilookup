@@ -1,1 +1,1 @@
-(ilookup :fetcher git :url "." :files ("el/ilookup.el"))
+(ilookup :fetcher github :repo "10sr/emacs-lisp" :files ("el/ilookup.el"))

@@ -1,1 +1,1 @@
-(smart-revert :fetcher git :url "." :files ("el/smart-revert.el"))
+(smart-revert :fetcher github :repo "10sr/emacs-lisp" :files ("el/smart-revert.el"))

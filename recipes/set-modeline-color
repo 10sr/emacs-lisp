@@ -1,1 +1,1 @@
-(set-modeline-color :fetcher git :url "." :files ("el/set-modeline-color.el"))
+(set-modeline-color :fetcher github :repo "10sr/emacs-lisp" :files ("el/set-modeline-color.el"))
