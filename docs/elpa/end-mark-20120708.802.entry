@@ -1,2 +1,9 @@
-
-(end-mark . [(20120708 802) nil "Show mark at the end of buffer" single ((:commit . "b9f6a7c1002248ce0f6a56bc720dafb5b77437be") (:authors ("INA Lintaro" . "ina@kuis.kyoto-u.ac.jp")) (:maintainer "INA Lintaro" . "ina@kuis.kyoto-u.ac.jp"))])
+(end-mark .
+	  [(20120708 802)
+	   nil "Show mark at the end of buffer" tar
+	   ((:commit . "cd08de7a240e549311d223a6ad189994a56470a7")
+	    (:authors
+	     ("INA Lintaro" . "ina@kuis.kyoto-u.ac.jp"))
+	    (:maintainers
+	     ("INA Lintaro" . "ina@kuis.kyoto-u.ac.jp"))
+	    (:maintainer "INA Lintaro" . "ina@kuis.kyoto-u.ac.jp"))])

@@ -1,3 +1,4 @@
+
 This library lists the branches in a Git repository.  Then you can
 operate on them with a dired-like interface.
 
@@ -201,7 +202,7 @@ Bugs/TODO
   `gited-status-branch-local', `gited-status-tag'.
 
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 This file is NOT part of GNU Emacs.
 

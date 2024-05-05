@@ -1,2 +1,0 @@
-
-(awk-preview . [(20190409 1339) nil "Preview and Apply AWK Filter" single ((:commit . "ed4c2d06db0b4a22a448f8313ae5b36936e82415") (:authors (nil . "10sr<8.slashes@gmail.com>")) (:maintainer nil . "10sr<8.slashes@gmail.com>") (:url . "https://github.com/10sr/awk-preview-el"))])

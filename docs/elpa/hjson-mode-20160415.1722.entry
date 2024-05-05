@@ -1,2 +1,12 @@
-
-(hjson-mode . [(20160415 1722) ((emacs (24 3))) "Major mode for editing Hjson files" single ((:commit . "022233169b2e30136080ec2f3a729109dfcec59e") (:authors ("Chunyang Xu" . "xuchunyang.me@gmail.com")) (:maintainer "Chunyang Xu" . "xuchunyang.me@gmail.com") (:keywords "json"))])
+(hjson-mode .
+	    [(20160415 1722)
+	     ((emacs
+	       (24 3)))
+	     "Major mode for editing Hjson files" tar
+	     ((:commit . "4a8e23d28673778c75eeaf2cd08e52dae17d36cf")
+	      (:authors
+	       ("Chunyang Xu" . "xuchunyang.me@gmail.com"))
+	      (:maintainers
+	       ("Chunyang Xu" . "xuchunyang.me@gmail.com"))
+	      (:maintainer "Chunyang Xu" . "xuchunyang.me@gmail.com")
+	      (:keywords "json"))])
