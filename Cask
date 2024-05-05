@@ -5,3 +5,7 @@
 
 (depends-on "github-elpa")
 (depends-on "switch-buffer-functions")
+;; Without this, cask install tries to install compat 27.1,
+;; which is not available
+;; https://elpa.gnu.org/packages/compat.html
+(depends-on "compat")
