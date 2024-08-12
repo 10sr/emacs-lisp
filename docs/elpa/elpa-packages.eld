@@ -18,6 +18,7 @@
   (gosh-mode :url "https://github.com/mhayashi1120/Emacs-gosh-mode.git")
   (hjson-mode :url "https://github.com/xuchunyang/hjson-mode.git")
   (ilookup :url "https://github.com/10sr/emacs-lisp.git")
+  (indent-bars :url "https://github.com/jdtsmith/indent-bars.git" :branch "main")
   (navbar :url "https://github.com/papaeye/emacs-navbar.git" :branch "master")
   (pack :url "https://github.com/10sr/pack-el.git" :branch "master")
   (pasteboard :url "https://github.com/10sr/emacs-lisp.git")

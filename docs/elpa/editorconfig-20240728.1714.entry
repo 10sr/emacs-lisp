@@ -1,11 +1,9 @@
 (editorconfig .
-	      [(20240505 1446)
+	      [(20240728 1714)
 	       ((emacs
-		 (26 1))
-		(nadvice
-		 (0 3)))
+		 (26 1)))
 	       "EditorConfig Emacs Plugin" tar
-	       ((:commit . "2d6690e8d81ba65b27ab697e527a3ae2e03d95da")
+	       ((:commit . "fbd078ad647888c971abe3508dd0ba27fac97cb9")
 		(:authors
 		 ("EditorConfig Team" . "editorconfig@googlegroups.com"))
 		(:maintainers
