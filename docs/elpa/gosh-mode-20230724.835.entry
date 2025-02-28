@@ -1,9 +1,14 @@
 (gosh-mode .
 	   [(20230724 835)
-	    nil "Programming utilities for Gauche code." tar
-	    ((:commit . "44b81bc34d47030ca95107696b080e2dd64f8720")
+	    ((emacs
+	      (28 1)))
+	    "Programming language gauche editing tools" tar
+	    ((:url . "https://github.com/mhayashi1120/Emacs-gosh-mode")
+	     (:commit . "44b81bc34d47030ca95107696b080e2dd64f8720")
+	     (:revdesc . "44b81bc34d47")
+	     (:keywords "lisp" "gauche" "scheme" "edit")
 	     (:authors
 	      ("Masahiro Hayashi" . "mhayashi1120@gmail.com"))
-	     (:maintainer "Masahiro Hayashi" . "mhayashi1120@gmail.com")
-	     (:keywords "lisp" "gauche" "scheme" "edit")
-	     (:url . "https://github.com/mhayashi1120/Emacs-gosh-mode"))])
+	     (:maintainers
+	      ("Masahiro Hayashi" . "mhayashi1120@gmail.com"))
+	     (:maintainer "Masahiro Hayashi" . "mhayashi1120@gmail.com"))])

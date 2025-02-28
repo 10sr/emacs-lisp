@@ -1,11 +1,12 @@
 (autosave .
 	  [(20160520 626)
 	   nil "Save buffers automatically" tar
-	   ((:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+	   ((:url . "https://github.com/10sr/emacs-lisp/blob/master/autosave.el")
+	    (:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+	    (:revdesc . "e4928282f97b")
+	    (:keywords "utility")
 	    (:authors
 	     ("10sr" . ""))
 	    (:maintainers
 	     ("10sr" . ""))
-	    (:maintainer "10sr" . "")
-	    (:keywords "utility")
-	    (:url . "https://github.com/10sr/emacs-lisp/blob/master/autosave.el"))])
+	    (:maintainer "10sr" . ""))])

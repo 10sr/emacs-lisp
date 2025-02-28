@@ -1,11 +1,12 @@
 (dired-list-all-mode .
 		     [(20161114 1618)
 		      nil "Toggle listing dot files in dired" tar
-		      ((:commit . "a708230356592aa01f37b8242c72a3279c6fc3fa")
+		      ((:url . "https://github.com/10sr/emacs-lisp")
+		       (:commit . "a708230356592aa01f37b8242c72a3279c6fc3fa")
+		       (:revdesc . "a70823035659")
+		       (:keywords "dired")
 		       (:authors
 			("10sr" . "8slashes+el@gmail.com"))
 		       (:maintainers
 			("10sr" . "8slashes+el@gmail.com"))
-		       (:maintainer "10sr" . "8slashes+el@gmail.com")
-		       (:keywords "dired")
-		       (:url . "https://github.com/10sr/emacs-lisp"))])
+		       (:maintainer "10sr" . "8slashes+el@gmail.com"))])

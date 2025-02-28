@@ -5,11 +5,12 @@
 			(emacs
 			 (24)))
 		       "Black check" tar
-		       ((:commit . "8f3b235f53fa4918b3c3a2aba68e9ae21385754c")
+		       ((:url . "https://github.com/10sr/flycheck-black-check")
+			(:commit . "8f3b235f53fa4918b3c3a2aba68e9ae21385754c")
+			(:revdesc . "8f3b235f53fa")
+			(:keywords "languages" "tools")
 			(:authors
 			 ("10sr" . ""))
 			(:maintainers
 			 ("10sr" . ""))
-			(:maintainer "10sr" . "")
-			(:keywords "languages" "tools")
-			(:url . "https://github.com/10sr/flycheck-black-check"))])
+			(:maintainer "10sr" . ""))])

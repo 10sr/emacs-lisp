@@ -1,11 +1,12 @@
 (remember-major-modes-mode .
 			   [(20160520 626)
 			    nil "Remember major-modes for files" tar
-			    ((:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+			    ((:url . "https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el")
+			     (:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+			     (:revdesc . "e4928282f97b")
+			     (:keywords "major-mode")
 			     (:authors
 			      ("10sr" . ""))
 			     (:maintainers
 			      ("10sr" . ""))
-			     (:maintainer "10sr" . "")
-			     (:keywords "major-mode")
-			     (:url . "https://github.com/10sr/emacs-lisp/blob/master/remember-major-modes-mode.el"))])
+			     (:maintainer "10sr" . ""))])

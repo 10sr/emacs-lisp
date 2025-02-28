@@ -3,11 +3,12 @@
 	       ((recentf
 		 (0)))
 	       "Neat recentf view" tar
-	       ((:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+	       ((:url . "https://github.com/10sr/emacs-lisp")
+		(:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+		(:revdesc . "e4928282f97b")
+		(:keywords "recentf" "view" "show")
 		(:authors
 		 ("10sr" . ""))
 		(:maintainers
 		 ("10sr" . ""))
-		(:maintainer "10sr" . "")
-		(:keywords "recentf" "view" "show")
-		(:url . "https://github.com/10sr/emacs-lisp"))])
+		(:maintainer "10sr" . ""))])
