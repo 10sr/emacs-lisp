@@ -3,11 +3,12 @@
 	       ((switch-buffer-functions
 		 (0 0 1)))
 	       "Revert buffers wisely" tar
-	       ((:commit . "826565cb3c866dbd83e776ad669dbeecda9aa6cb")
+	       ((:url . "https://github.com/10sr/emacs-lisp")
+		(:commit . "826565cb3c866dbd83e776ad669dbeecda9aa6cb")
+		(:revdesc . "826565cb3c86")
+		(:keywords "buffer" "revert")
 		(:authors
 		 ("10sr" . ""))
 		(:maintainers
 		 ("10sr" . ""))
-		(:maintainer "10sr" . "")
-		(:keywords "buffer" "revert")
-		(:url . "https://github.com/10sr/emacs-lisp"))])
+		(:maintainer "10sr" . ""))])

@@ -1,10 +1,11 @@
 (awk-preview .
 	     [(20211018 319)
 	      nil "Preview and Apply AWK Filter" tar
-	      ((:commit . "8dee7851dd675f179cf9d163d7cb7c643468283b")
+	      ((:url . "https://github.com/10sr/awk-preview-el")
+	       (:commit . "8dee7851dd675f179cf9d163d7cb7c643468283b")
+	       (:revdesc . "8dee7851dd67")
 	       (:authors
 		("10sr" . "8.slashes@gmail.com"))
 	       (:maintainers
 		("10sr" . "8.slashes@gmail.com"))
-	       (:maintainer "10sr" . "8.slashes@gmail.com")
-	       (:url . "https://github.com/10sr/awk-preview-el"))])
+	       (:maintainer "10sr" . "8.slashes@gmail.com"))])

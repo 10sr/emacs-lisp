@@ -2,7 +2,8 @@
      [(20200813 757)
       ((emacs
 	(24 4)))
-      "A front-end for fzf." tar
-      ((:commit . "879a521b682a71e778d281d9b9480e57d123d34a")
-       (:keywords "fzf" "fuzzy" "search")
-       (:url . "https://github.com/bling/fzf.el"))])
+      "A front-end for fzf" tar
+      ((:url . "https://github.com/bling/fzf.el")
+       (:commit . "879a521b682a71e778d281d9b9480e57d123d34a")
+       (:revdesc . "879a521b682a")
+       (:keywords "fzf" "fuzzy" "search"))])
