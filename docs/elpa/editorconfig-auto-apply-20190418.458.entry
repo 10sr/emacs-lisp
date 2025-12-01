@@ -1,15 +1,8 @@
-(editorconfig-auto-apply .
-			 [(20190418 458)
-			  ((editorconfig
-			    (0 0 1))
-			   (emacs
-			    (24)))
-			  "Auto apply editorconfig properties" tar
-			  ((:commit . "0dc12735ccf6e733b1e2685b27b191c5a4e364d9")
-			   (:authors
-			    ("10sr" . ""))
-			   (:maintainers
-			    ("10sr" . ""))
-			   (:maintainer "10sr" . "")
-			   (:keywords "tools")
-			   (:url . "https://github.com/10sr/editorconfig-auto-apply-el"))])
+(editorconfig-auto-apply
+ . [(20190418 458) ((editorconfig (0 0 1)) (emacs (24)))
+    "Auto apply editorconfig properties" tar
+    ((:url . "https://github.com/10sr/editorconfig-auto-apply-el")
+     (:commit . "0dc12735ccf6e733b1e2685b27b191c5a4e364d9")
+     (:revdesc . "0dc12735ccf6") (:keywords "tools")
+     (:authors ("10sr" . "")) (:maintainers ("10sr" . ""))
+     (:maintainer "10sr" . ""))])

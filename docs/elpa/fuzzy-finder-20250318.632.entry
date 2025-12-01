@@ -1,0 +1,8 @@
+(fuzzy-finder
+ . [(20250318 632) ((emacs (24 4))) "Fuzzy Finder App Integration" tar
+    ((:url . "https://github.com/10sr/fuzzy-finder-el")
+     (:commit . "097072165c0ee4a2200229f39851bd85ca0ea92c")
+     (:revdesc . "097072165c0e") (:keywords "matching")
+     (:authors ("10sr" . "8.slashes@gmail.com"))
+     (:maintainers ("10sr" . "8.slashes@gmail.com"))
+     (:maintainer "10sr" . "8.slashes@gmail.com"))])
