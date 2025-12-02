@@ -1,11 +1,8 @@
-(read-only-only-mode .
-		     [(20160520 626)
-		      nil "Always view-mode" tar
-		      ((:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
-		       (:authors
-			("10sr" . ""))
-		       (:maintainers
-			("10sr" . ""))
-		       (:maintainer "10sr" . "")
-		       (:keywords "utility")
-		       (:url . "https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el"))])
+(read-only-only-mode
+ . [(20160520 626) nil "Always view-mode" tar
+    ((:url
+      . "https://github.com/10sr/emacs-lisp/blob/master/read-only-only-mode.el")
+     (:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+     (:revdesc . "e4928282f97b") (:keywords "utility")
+     (:authors ("10sr" . "")) (:maintainers ("10sr" . ""))
+     (:maintainer "10sr" . ""))])

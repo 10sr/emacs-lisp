@@ -1,0 +1,9 @@
+(devcontainer
+ . [(20251005 1636) ((emacs (29 1))) "Support for devcontainer" tar
+    ((:url . "https://github.com/johannes-mueller/devcontainer.el")
+     (:commit . "87894ae74a79b61bee93e0925b49c287846c0deb")
+     (:revdesc . "87894ae74a79")
+     (:authors ("Johannes Mueller" . "github@johannes-mueller.org"))
+     (:maintainers
+      ("Johannes Mueller" . "github@johannes-mueller.org"))
+     (:maintainer "Johannes Mueller" . "github@johannes-mueller.org"))])

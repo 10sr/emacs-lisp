@@ -1,11 +1,7 @@
-(terminal-title .
-		[(20160520 626)
-		 nil "Set terminal title" tar
-		 ((:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
-		  (:authors
-		   ("10sr" . ""))
-		  (:maintainers
-		   ("10sr" . ""))
-		  (:maintainer "10sr" . "")
-		  (:keywords "terminal" "title" "console")
-		  (:url . "https://github.com/10sr/emacs-lisp"))])
+(terminal-title
+ . [(20160520 626) nil "Set terminal title" tar
+    ((:url . "https://github.com/10sr/emacs-lisp")
+     (:commit . "e4928282f97bce43165c4de46118bc923cc1977c")
+     (:revdesc . "e4928282f97b")
+     (:keywords "terminal" "title" "console") (:authors ("10sr" . ""))
+     (:maintainers ("10sr" . "")) (:maintainer "10sr" . ""))])
